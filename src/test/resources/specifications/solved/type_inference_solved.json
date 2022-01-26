@@ -1,0 +1,231 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "postRoot",
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "simpleS": {
+                    "maxLength": 10.0,
+                    "x-schemaName": "SimpleString",
+                    "type": "string",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleN": {
+                    "maximum": 20.0,
+                    "x-schemaName": "SimpleNumber",
+                    "type": "number",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleSP": {
+                    "pattern": ".*",
+                    "x-schemaName": "SimpleStringPattern",
+                    "type": "string",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleO": {
+                    "properties": {
+                      "First": {
+                        "maxLength": 10.0,
+                        "x-schemaName": "SimpleString",
+                        "type": "string",
+                        "in": "REQUEST_BODY"
+                      }
+                    },
+                    "x-schemaName": "SimpleObject",
+                    "type": "object",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleA": {
+                    "items": {
+                      "maxLength": 10.0,
+                      "x-schemaName": "SimpleString",
+                      "type": "string",
+                      "in": "REQUEST_BODY"
+                    },
+                    "x-schemaName": "SimpleArray",
+                    "type": "array",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleOne": {
+                    "oneOf": [
+                      {
+                        "maxLength": 10.0,
+                        "x-schemaName": "SimpleString",
+                        "type": "string",
+                        "in": "REQUEST_BODY"
+                      },
+                      {
+                        "minLength": 10.0,
+                        "type": "string",
+                        "in": "REQUEST_BODY"
+                      }
+                    ],
+                    "x-schemaName": "OneOfMaxString",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleAny": {
+                    "anyOf": [
+                      {
+                        "maximum": 20.0,
+                        "x-schemaName": "SimpleNumber",
+                        "type": "number",
+                        "in": "REQUEST_BODY"
+                      },
+                      {
+                        "minimum": 5.0,
+                        "type": "number",
+                        "in": "REQUEST_BODY"
+                      },
+                      {
+                        "multipleOf": 1.0,
+                        "type": "number",
+                        "in": "REQUEST_BODY"
+                      }
+                    ],
+                    "x-schemaName": "AnyOfNumber",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleAll": {
+                    "type": "number",
+                    "allOf": [
+                      {
+                        "maximum": 20.0,
+                        "x-schemaName": "SimpleNumber",
+                        "type": "number",
+                        "in": "REQUEST_BODY"
+                      },
+                      {
+                        "minimum": 5.0,
+                        "type": "number",
+                        "in": "REQUEST_BODY"
+                      },
+                      {
+                        "multipleOf": 1.0,
+                        "type": "number",
+                        "in": "REQUEST_BODY"
+                      }
+                    ],
+                    "x-schemaName": "AllOfNumber",
+                    "in": "REQUEST_BODY"
+                  },
+                  "simpleNot": {
+                    "not": {
+                      "maxLength": 30.0,
+                      "type": "string"
+                    },
+                    "x-schemaName": "NotMaxString",
+                    "in": "REQUEST_BODY"
+                  }
+                },
+                "type": "object",
+                "in": "request_body"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimpleString": {
+        "maxLength": 10.0,
+        "x-schemaName": "SimpleString"
+      },
+      "SimpleNumber": {
+        "maximum": 20.0,
+        "x-schemaName": "SimpleNumber"
+      },
+      "SimpleStringPattern": {
+        "pattern": ".*",
+        "x-schemaName": "SimpleStringPattern"
+      },
+      "SimpleObject": {
+        "properties": {
+          "First": {
+            "maxLength": 10.0,
+            "x-schemaName": "SimpleString"
+          }
+        },
+        "x-schemaName": "SimpleObject"
+      },
+      "SimpleArray": {
+        "items": {
+          "maxLength": 10.0,
+          "x-schemaName": "SimpleString"
+        },
+        "x-schemaName": "SimpleArray"
+      },
+      "OneOfMaxString": {
+        "oneOf": [
+          {
+            "maxLength": 10.0,
+            "x-schemaName": "SimpleString"
+          },
+          {
+            "minLength": 10.0
+          }
+        ],
+        "x-schemaName": "OneOfMaxString"
+      },
+      "AnyOfNumber": {
+        "anyOf": [
+          {
+            "maximum": 20.0,
+            "x-schemaName": "SimpleNumber"
+          },
+          {
+            "minimum": 5.0
+          },
+          {
+            "multipleOf": 1.0
+          }
+        ],
+        "x-schemaName": "AnyOfNumber"
+      },
+      "AllOfNumber": {
+        "type": "number",
+        "allOf": [
+          {
+            "maximum": 20.0,
+            "x-schemaName": "SimpleNumber"
+          },
+          {
+            "minimum": 5.0
+          },
+          {
+            "multipleOf": 1.0
+          }
+        ],
+        "x-schemaName": "AllOfNumber"
+      },
+      "NotMaxString": {
+        "not": {
+          "maxLength": 30.0
+        },
+        "x-schemaName": "NotMaxString"
+      }
+    }
+  }
+}

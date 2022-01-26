@@ -1,0 +1,105 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Swagger Petstore",
+    "description": "This is a fork of Petstore server specification.  You can find out more about Swagger at [http://swagger.io](http://swagger.io). For this sample, you can use the api key `special-key` to test the authorization filters.",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "davide.corradini@univr.it"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8080/v2"
+    }
+  ],
+  "tags": [
+    {
+      "name": "pet",
+      "description": "Everything about your Pets",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    }
+  ],
+  "paths": {
+    "/pet/{petId}/{anotherId}": {
+      "get": {
+        "tags": [
+          "pet"
+        ],
+        "summary": "Find pet by ID",
+        "description": "Returns a single pet",
+        "operationId": "getPetById",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "description": "ID of pet to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "anotherId",
+            "in": "path",
+            "style": "label",
+            "description": "anotherId ID of pet to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "anObject",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "description": "an object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "first": {
+                  "type": "string"
+                },
+                "second": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          {
+            "name": "anArray",
+            "in": "query",
+            "style": "pipeDelimited",
+            "description": "an array",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  }
+}

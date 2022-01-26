@@ -1,0 +1,711 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8080/"
+    }
+  ],
+  "info": {
+    "contact": {
+      "x-twitter": "amentumspace"
+    },
+    "description": "Instantly access empirical models of atmospheric density and  composition that are recommended by the Committee on Space Research (COSPAR) for  satellite drag calculations. \u003cbr\u003e\u003cbr\u003e\nAPI requests must contain a key \"API-Key\" in the header (see code samples). Obtain a key from  \u003ca href\u003d\u0027https://developer.amentum.io\u0027\u003ehere\u003c/a\u003e. \u003cbr\u003e\u003cbr\u003e \nHelp us improve the quality of our web APIs by completing our 2 minute survey \u003ca href\u003d\"https://www.surveymonkey.com/r/CTDTRBN\"\u003ehere\u003c/a\u003e.\u003cbr\u003e\u003cbr\u003e\nAmentum Pty Ltd is not responsible nor liable for any loss or damage of any sort incurred as a result of using the API. \u003cbr\u003e\u003cbr\u003e\nCopyright \u003ca href\u003d\u0027https://amentum.space\u0027\u003eAmentum Pty Ltd\u003c/a\u003e 2021.\n",
+    "title": "Atmosphere API",
+    "version": "1.1.1",
+    "x-apisguru-categories": [
+      "location"
+    ],
+    "x-logo": {
+      "altText": "Amentum Aerospace",
+      "backgroundColor": "#FFFFFF",
+      "url": "https://api.apis.guru/v2/cache/logo/https_twitter.com_amentumspace_profile_image.jpeg"
+    },
+    "x-origin": [
+      {
+        "format": "openapi",
+        "url": "https://atmosphere.amentum.space/openapi.json",
+        "version": "3.0"
+      }
+    ],
+    "x-providerName": "amentum.space",
+    "x-serviceName": "atmosphere"
+  },
+  "tags": [
+    {
+      "description": "The \u003ca href\u003d\u0027https://ccmc.gsfc.nasa.gov/modelweb/atmos/nrlmsise00.html\u0027\u003eNRLMSISE-00\u003c/a\u003e  model was developed by the US Naval Research Laboratory.  It is based on mass spectrometry and incoherent radar scatter data,  includes drag and accelerometer data, and accounts for anomalous  oxygen at high altitudes. It is recommended by the International  Committee on Space Resarch (COSPAR) as the standard for atmospheric  composition. \u003cbr\u003e\u003cbr\u003e The API now automatically updates the Ap and F10.7 cm radio flux  indices unless provided by the user.\n",
+      "name": "nrlmsise00",
+      "x-displayName": "NRLMSISE-00"
+    },
+    {
+      "description": "The \u003ca href\u003d\u0027https://sol.spacenvironment.net/jb2008/\u0027\u003eJB2008\u003c/a\u003e (Jacchia-Bowman) model is a newer model developed by  Space Environment Technologies and the US Air Force Space Command.\n The model accounts for various phenomena related to EUV heating of \n the thermosphere and uses the DST index as the driver of global \n density changes. The model is complementary to the NRLMSISE00 model \n and is more accurate during times of high solar activity and \n geomagnetic storms. It is recommended by COSPAR as the standard \n for thermospheric density in satellite drag calculations.\u003cbr\u003e\u003cbr\u003e\n The API now automatically updates the indices needed to account \n for global density variations due to geomagnetic storms and EUV heating. \n",
+      "name": "jb2008",
+      "x-displayName": "JB2008"
+    }
+  ],
+  "paths": {
+    "/jb2008": {
+      "get": {
+        "description": "under given conditions.\n",
+        "operationId": "app.api.endpoints.JB2008.sample_atmosphere",
+        "parameters": [
+          {
+            "description": "Year in YYYY format",
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "example": 2020.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Month in MM format",
+            "in": "query",
+            "name": "month",
+            "required": true,
+            "schema": {
+              "example": 5.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Day in DD format",
+            "in": "query",
+            "name": "day",
+            "required": true,
+            "schema": {
+              "example": 21.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Altitude in (km)",
+            "in": "query",
+            "name": "altitude",
+            "required": true,
+            "schema": {
+              "example": 300.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "GeodeticLatitude (deg) -90 to 90 deg",
+            "in": "query",
+            "name": "geodetic_latitude",
+            "required": true,
+            "schema": {
+              "example": 42.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "GeodeticLongitude (deg) 0 to 360 deg",
+            "in": "query",
+            "name": "geodetic_longitude",
+            "required": true,
+            "schema": {
+              "example": 42.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "Coordinated Universal Time (hrs)",
+            "in": "query",
+            "name": "utc",
+            "required": true,
+            "schema": {
+              "example": 2.0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "at_alt_temp": {
+                    "units": "K",
+                    "value": 667.005615234375
+                  },
+                  "exospheric_temp": {
+                    "units": "K",
+                    "value": 666.522705078125
+                  },
+                  "total_mass_density": {
+                    "units": "kg/m3",
+                    "value": 5.201439105817496E-12
+                  }
+                },
+                "schema": {
+                  "properties": {
+                    "at_alt_temp": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "exospheric_temp": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "total_mass_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Successful atmospheric density calculation"
+          }
+        },
+        "summary": "Compute atmospheric density and temperatures\n",
+        "tags": [
+          "jb2008"
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \"https://atmosphere.amentum.io/jb2008?year\u003d2020\u0026month\u003d5\u0026day\u003d21\u0026altitude\u003d300\u0026geodetic_latitude\u003d42\u0026geodetic_longitude\u003d42\u0026utc\u003d2\" -H \"API-Key: \u003cyour_key\u003e\" -H  \"accept: application/json\"\n"
+          },
+          {
+            "lang": "Python",
+            "source": "import json\nimport requests\n\nurl \u003d \"https://atmosphere.amentum.io/jb2008\"\n\nparams \u003d {\n    \u0027year\u0027 : 2020,\n    \u0027month\u0027 : 5,\n    \u0027day\u0027 : 21,\n    \u0027geodetic_latitude\u0027 : 42,\n    \u0027geodetic_longitude\u0027 : 42,\n    \u0027altitude\u0027 : 300, # km\n    \u0027utc\u0027 : 2, # hours\n}\nheaders \u003d {\"API-Key\" : \"\u003cadd_your_key\u003e\"}\n# handle exceptions\nresponse \u003d requests.get(url, params\u003dparams, headers\u003dheaders)\njson_payload \u003d response.json()\n\nprint(json.dumps(json_payload, indent\u003d4, sort_keys\u003dTrue))\n"
+          }
+        ]
+      }
+    },
+    "/nrlmsise00": {
+      "get": {
+        "description": "at specified conditions.\n",
+        "operationId": "app.api.endpoints.NRLMSISE00.sample_atmosphere",
+        "parameters": [
+          {
+            "description": "Year in YYYY format",
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "example": 2020.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Month in MM format",
+            "in": "query",
+            "name": "month",
+            "required": true,
+            "schema": {
+              "example": 5.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Day in DD format",
+            "in": "query",
+            "name": "day",
+            "required": true,
+            "schema": {
+              "example": 21.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Altitude in (km)",
+            "in": "query",
+            "name": "altitude",
+            "required": true,
+            "schema": {
+              "example": 300.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "GeodeticLatitude (deg) -90 to 90 deg",
+            "in": "query",
+            "name": "geodetic_latitude",
+            "required": true,
+            "schema": {
+              "example": 42.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "GeodeticLongitude (deg) 0 to 360 deg",
+            "in": "query",
+            "name": "geodetic_longitude",
+            "required": true,
+            "schema": {
+              "example": 42.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "Coordinated Universal Time (hrs)",
+            "in": "query",
+            "name": "utc",
+            "required": true,
+            "schema": {
+              "example": 2.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "(Optional) 81 day average of F10.7 flux (SFU) centered on the specified day. F107 and F107A values correspond to the 10.7 cm radio flux at the actual distance of Earth from Sun rather than radio flux at 1 AU. F107, F107A, AP effects can be neglected below 80 km. If unspecified, values provided by the US National Oceanic and  Atmospheric Administration are retrieved automatically.\n",
+            "in": "query",
+            "name": "f107a",
+            "required": false,
+            "schema": {
+              "example": 120.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "(Optional) Daily F10.7 cm radio flux for previous day (SFU). F107 and F107A values correspond to the 10.7 cm radio flux at the actual distance of Earth from Sun rather than radio flux at 1 AU. F107, F107A, AP effects can be neglected below 80 km. If unspecified, values provided by the US National Oceanic and  Atmospheric Administration are retrieved automatically.\n",
+            "in": "query",
+            "name": "f107",
+            "required": false,
+            "schema": {
+              "example": 120.0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "(Optional) The Ap-index provides a daily average level for geomagnetic activity F107, F107A, AP effects can be neglected below 80 km. If unspecified, the average of values in the 24 hours preceding the date-time  are automatically calculated from data provided by GFZ German Research Centre  for Geosciences.\n",
+            "in": "query",
+            "name": "ap",
+            "required": false,
+            "schema": {
+              "example": 30.0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "Ar_density": {
+                    "units": "/m3",
+                    "value": 3.45221344E8
+                  },
+                  "H_density": {
+                    "units": "/m3",
+                    "value": 8.46266302464E11
+                  },
+                  "He_density": {
+                    "units": "/m3",
+                    "value": 1.413735776256E13
+                  },
+                  "N2_density": {
+                    "units": "/m3",
+                    "value": 7.37019691008E12
+                  },
+                  "N_density": {
+                    "units": "/m3",
+                    "value": 4.24038367232E11
+                  },
+                  "O2_density": {
+                    "units": "/m3",
+                    "value": 2.8538667008E11
+                  },
+                  "O_density": {
+                    "units": "/m3",
+                    "value": 1.60525593870336E14
+                  },
+                  "anomalous_O_density": {
+                    "units": "/m3",
+                    "value": 2940371.25
+                  },
+                  "ap": {
+                    "value": 3.0
+                  },
+                  "at_alt_temp": {
+                    "units": "K",
+                    "value": 590.3972778320312
+                  },
+                  "exospheric_temp": {
+                    "units": "K",
+                    "value": 590.4319458007812
+                  },
+                  "f107": {
+                    "units": "sfu",
+                    "value": 70.0
+                  },
+                  "f107a": {
+                    "units": "sfu",
+                    "value": 69.35802469135803
+                  },
+                  "total_mass_density": {
+                    "units": "kg/m3",
+                    "value": 4.7264410267533474E-12
+                  }
+                },
+                "schema": {
+                  "properties": {
+                    "Ar_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "H_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "He_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "N2_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "N_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "O2_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "O_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "anomalous_O_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "ap": {
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "at_alt_temp": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "exospheric_temp": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "f107": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "f107a": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "total_mass_density": {
+                      "properties": {
+                        "units": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "value": {
+                          "type": "number",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Successful atmospheric density calculation"
+          }
+        },
+        "summary": "Compute atmospheric composition, density, and temperatures\n",
+        "tags": [
+          "nrlmsise00"
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "Shell",
+            "source": "curl -X GET \"https://atmosphere.amentum.io/nrlmsise00?year\u003d2020\u0026month\u003d5\u0026day\u003d21\u0026altitude\u003d300\u0026geodetic_latitude\u003d42\u0026geodetic_longitude\u003d42\u0026utc\u003d2\" -H \"API-Key: \u003cyour_key\u003e\" -H \"accept: application/json\"\n"
+          },
+          {
+            "lang": "Python",
+            "source": "import json\nimport requests\n\nurl \u003d \"https://atmosphere.amentum.io/nrlmsise00\"\n\nheaders \u003d {\"API-Key\" : \"\u003cadd_your_key\u003e\"}\n\nparams \u003d {\n    \u0027year\u0027 : 2020,\n    \u0027month\u0027 : 5,\n    \u0027day\u0027 : 21,\n    \u0027geodetic_latitude\u0027 : 42,\n    \u0027geodetic_longitude\u0027 : 42,\n    \u0027altitude\u0027 : 300, # km\n    \u0027utc\u0027 : 2, # hours\n}\n# handle exceptions\nresponse \u003d requests.get(url, params\u003dparams, headers\u003dheaders)\njson_payload \u003d response.json()\n\nprint(json.dumps(json_payload, indent\u003d4, sort_keys\u003dTrue))\n"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "AP": {
+        "description": "(Optional) The Ap-index provides a daily average level for geomagnetic activity F107, F107A, AP effects can be neglected below 80 km. If unspecified, the average of values in the 24 hours preceding the date-time  are automatically calculated from data provided by GFZ German Research Centre  for Geosciences.\n",
+        "in": "query",
+        "name": "ap",
+        "required": false,
+        "schema": {
+          "example": 30.0,
+          "type": "number"
+        }
+      },
+      "Altitude": {
+        "description": "Altitude in (km)",
+        "in": "query",
+        "name": "altitude",
+        "required": true,
+        "schema": {
+          "example": 300.0,
+          "type": "number"
+        }
+      },
+      "Day": {
+        "description": "Day in DD format",
+        "in": "query",
+        "name": "day",
+        "required": true,
+        "schema": {
+          "example": 21.0,
+          "type": "integer"
+        }
+      },
+      "F107": {
+        "description": "(Optional) Daily F10.7 cm radio flux for previous day (SFU). F107 and F107A values correspond to the 10.7 cm radio flux at the actual distance of Earth from Sun rather than radio flux at 1 AU. F107, F107A, AP effects can be neglected below 80 km. If unspecified, values provided by the US National Oceanic and  Atmospheric Administration are retrieved automatically.\n",
+        "in": "query",
+        "name": "f107",
+        "required": false,
+        "schema": {
+          "example": 120.0,
+          "type": "number"
+        }
+      },
+      "F107A": {
+        "description": "(Optional) 81 day average of F10.7 flux (SFU) centered on the specified day. F107 and F107A values correspond to the 10.7 cm radio flux at the actual distance of Earth from Sun rather than radio flux at 1 AU. F107, F107A, AP effects can be neglected below 80 km. If unspecified, values provided by the US National Oceanic and  Atmospheric Administration are retrieved automatically.\n",
+        "in": "query",
+        "name": "f107a",
+        "required": false,
+        "schema": {
+          "example": 120.0,
+          "type": "number"
+        }
+      },
+      "GeodeticLatitude": {
+        "description": "GeodeticLatitude (deg) -90 to 90 deg",
+        "in": "query",
+        "name": "geodetic_latitude",
+        "required": true,
+        "schema": {
+          "example": 42.0,
+          "type": "number"
+        }
+      },
+      "GeodeticLongitude": {
+        "description": "GeodeticLongitude (deg) 0 to 360 deg",
+        "in": "query",
+        "name": "geodetic_longitude",
+        "required": true,
+        "schema": {
+          "example": 42.0,
+          "type": "number"
+        }
+      },
+      "Month": {
+        "description": "Month in MM format",
+        "in": "query",
+        "name": "month",
+        "required": true,
+        "schema": {
+          "example": 5.0,
+          "type": "integer"
+        }
+      },
+      "UTC": {
+        "description": "Coordinated Universal Time (hrs)",
+        "in": "query",
+        "name": "utc",
+        "required": true,
+        "schema": {
+          "example": 2.0,
+          "type": "number"
+        }
+      },
+      "Year": {
+        "description": "Year in YYYY format",
+        "in": "query",
+        "name": "year",
+        "required": true,
+        "schema": {
+          "example": 2020.0,
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Density and composition",
+      "tags": [
+        "nrlmsise00",
+        "jb2008"
+      ]
+    }
+  ]
+}

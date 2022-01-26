@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "default": "1",
+  "example": {
+    "a": "aVal",
+    "b": true
+  },
+  "enum": [
+    4,
+    true
+  ],
+  "properties": {
+    "a": {
+      "type": "string"
+    },
+    "b": {
+      "type": "number"
+    }
+  }
+}

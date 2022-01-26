@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.0",
+  "info" : {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "postRoot",
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topLevelArray"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topLevelArray"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/objectWithNestedArray"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putRoot",
+        "parameters": [
+          {
+            "name":"statusObj",
+            "in":"query",
+            "required": true,
+            "schema":{
+              "type":"object",
+              "required": [
+                "available",
+                "sold"
+              ],
+              "properties": {
+                "available": {
+                  "type": "boolean"
+                },
+                "pending": {
+                  "type": "boolean"
+                },
+                "sold": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          {
+            "name":"idsList",
+            "in":"query",
+            "required": false,
+            "schema":{
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "serial"
+                ],
+                "properties": {
+                  "serial": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/objectWithNestedArray"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/composedObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+
+      "baseObject": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          }
+        }
+      },
+
+      "baseArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/baseObject"
+        }
+      },
+
+      "objectWithNestedArray": {
+        "type": "object",
+        "required": [
+          "second"
+        ],
+        "properties": {
+          "first": {
+            "$ref": "#/components/schemas/baseArray"
+          },
+          "second": {
+            "$ref": "#/components/schemas/baseArray"
+          }
+        }
+      },
+
+      "topLevelArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/objectWithNestedArray"
+        }
+      },
+      "composedObject": {
+        "type": "object",
+        "required": [
+          "b"
+        ],
+        "properties": {
+          "a": {
+            "$ref": "#/components/schemas/baseObject"
+          },
+          "b": {
+            "$ref": "#/components/schemas/baseObject"
+          }
+        }
+      }
+    }
+  }
+}

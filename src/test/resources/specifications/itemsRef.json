@@ -1,0 +1,73 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "test specification",
+    "title": "test",
+    "version": "0.4"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/{id}": {
+      "get": {
+        "operationId": "getRoot",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CustomString"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CustomString"
+            }
+          },
+          {
+            "name": "hParam",
+            "in": "header",
+            "schema": {
+              "$ref": "#/components/schemas/CustomString"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomString": {
+        "type": "string"
+      },
+      "MyBaseSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "MyRefSchema": {
+        "properties": {
+          "baseSchemas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyBaseSchema"
+            }
+          }
+        }
+      }
+    }
+  }
+}

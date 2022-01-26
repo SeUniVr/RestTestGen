@@ -1,0 +1,123 @@
+{
+  "operationId": "deletePet",
+  "parameters":[
+    {
+      "name":"api_key",
+      "in":"header",
+      "schema":{
+        "type":"string"
+      },
+      "example": "this_is_a_key_example"
+    },
+    {
+      "name":"paramNumber",
+      "in":"query",
+      "description":"Pet id to delete",
+      "required":true,
+      "schema":{
+        "type":"integer",
+        "format":"int64"
+      },
+      "examples": {
+        "1": {
+          "value": 1
+        },
+        "2": {
+          "value": 2
+        },
+        "3": {
+          "value": 3
+        }
+      }
+    }
+  ],
+  "requestBody": {
+    "description": "Pet object that needs to be added to the store",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "example": {
+            "id": 123123,
+            "category": {
+              "id": 234234,
+              "name": "categoryName!"
+            },
+            "name": "firstLevelName",
+            "photoUrls": ["root_url"],
+            "tags": [
+              {
+                "id": 1,
+                "name": "firstTag"
+              },
+              {
+                "id": 2,
+                "name": "secondTag"
+              }
+            ]
+          },
+          "properties": {
+            "id": {
+              "type": "integer",
+              "example": 5
+            },
+            "category": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "category_name"
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "example": "doggie"
+            },
+            "photoUrls": {
+              "type": "array",
+              "example": ["url_1", "url_2"],
+              "items": {
+                "type": "string"
+              }
+            },
+            "tags": {
+              "type": "array",
+              "example": [
+                {
+                  "id": 999,
+                  "name": "bigTag"
+                }
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 333
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "string",
+              "description": "pet status in the store"
+            }
+          }
+        }
+      }
+    }
+  },
+  "responses":{
+    "200":{
+      "description":"Successful operation",
+      "content":{}
+    }
+  }
+}

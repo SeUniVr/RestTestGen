@@ -1,0 +1,163 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getRoot",
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimpleStringMax10": {
+        "type": "string",
+        "maxLength": 10.0,
+        "x-schemaName": "SimpleStringMax10"
+      },
+      "SimpleStringMax20": {
+        "type": "string",
+        "maxLength": 20.0,
+        "x-schemaName": "SimpleStringMax20"
+      },
+      "SimpleStringMax30": {
+        "type": "string",
+        "maxLength": 30.0,
+        "x-schemaName": "SimpleStringMax30"
+      },
+      "SimpleStringMin20": {
+        "type": "string",
+        "minLength": 20.0,
+        "x-schemaName": "SimpleStringMin20"
+      },
+      "OneOfMaxString": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "maxLength": 10.0,
+            "x-schemaName": "SimpleStringMax10"
+          },
+          {
+            "type": "string",
+            "maxLength": 20.0,
+            "x-schemaName": "SimpleStringMax20"
+          },
+          {
+            "type": "string",
+            "maxLength": 30.0,
+            "x-schemaName": "SimpleStringMax30"
+          }
+        ],
+        "x-schemaName": "OneOfMaxString"
+      },
+      "AnyOfMaxString": {
+        "type": "string",
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 10.0,
+            "x-schemaName": "SimpleStringMax10"
+          },
+          {
+            "type": "string",
+            "maxLength": 20.0,
+            "x-schemaName": "SimpleStringMax20"
+          },
+          {
+            "type": "string",
+            "maxLength": 30.0,
+            "x-schemaName": "SimpleStringMax30"
+          }
+        ],
+        "x-schemaName": "AnyOfMaxString"
+      },
+      "AllOfMaxString": {
+        "type": "string",
+        "allOf": [
+          {
+            "type": "string",
+            "maxLength": 10.0,
+            "x-schemaName": "SimpleStringMax10"
+          },
+          {
+            "type": "string",
+            "maxLength": 20.0,
+            "x-schemaName": "SimpleStringMax20"
+          },
+          {
+            "type": "string",
+            "maxLength": 30.0,
+            "x-schemaName": "SimpleStringMax30"
+          }
+        ],
+        "x-schemaName": "AllOfMaxString"
+      },
+      "NotMaxString": {
+        "type": "string",
+        "not": {
+          "type": "string",
+          "maxLength": 10.0,
+          "x-schemaName": "SimpleStringMax10"
+        },
+        "x-schemaName": "NotMaxString"
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "allOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "allOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 10.0,
+                    "x-schemaName": "SimpleStringMax10"
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 20.0,
+                    "x-schemaName": "SimpleStringMax20"
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 30.0,
+                    "x-schemaName": "SimpleStringMax30"
+                  }
+                ],
+                "x-schemaName": "AllOfMaxString"
+              }
+            ]
+          },
+          "surname": {
+            "type": "string",
+            "not": {
+              "type": "string",
+              "maxLength": 10.0,
+              "x-schemaName": "SimpleStringMax10"
+            },
+            "x-schemaName": "NotMaxString"
+          }
+        },
+        "x-schemaName": "Person"
+      }
+    }
+  }
+}

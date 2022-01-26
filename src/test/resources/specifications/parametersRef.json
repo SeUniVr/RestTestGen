@@ -1,0 +1,31 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getRoot",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MyID"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "MyID": {
+        "in": "path",
+        "name": "my_id",
+        "schema": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "integer",
+  "default": "1",
+  "example": "5",
+  "enum": [
+    1,
+    2,
+    "3",
+    true
+  ]
+}

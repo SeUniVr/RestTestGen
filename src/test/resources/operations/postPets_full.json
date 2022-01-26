@@ -1,0 +1,190 @@
+{
+  "operationId": "deletePet",
+  "parameters":[
+    {
+      "name":"api_key",
+      "in":"header",
+      "schema":{
+        "type":"string",
+        "default": "default_api_key"
+      },
+      "example": "this_is_a_key_example"
+    },
+    {
+      "name":"paramNumber",
+      "in":"query",
+      "description":"Pet id to delete",
+      "required":true,
+      "schema":{
+        "type":"integer",
+        "format":"int64",
+        "default": 12,
+        "enum": [
+          12,
+          21
+        ]
+      },
+      "examples": {
+        "1": {
+          "value": 1
+        },
+        "2": {
+          "value": 2
+        },
+        "3": {
+          "value": 3
+        }
+      }
+    }
+  ],
+  "requestBody": {
+    "description": "Pet object that needs to be added to the store",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "default": {
+            "id": 664466,
+            "category": {
+              "id": 880088,
+              "name": "categoryDefaultName"
+            },
+            "name": "firstLevelDefault",
+            "photoUrls": ["url_1", "url_2"],
+            "tags": [
+              {
+                "id": 1,
+                "name": "Tag1"
+              },
+              {
+                "id": 2,
+                "name": "Tag2"
+              }
+            ]
+          },
+          "example": {
+            "id": 123123,
+            "category": {
+              "id": 234234,
+              "name": "categoryName!"
+            },
+            "name": "firstLevelName",
+            "photoUrls": ["root_url"],
+            "tags": [
+              {
+                "id": 1,
+                "name": "firstTag"
+              },
+              {
+                "id": 2,
+                "name": "secondTag"
+              }
+            ]
+          },
+          "properties": {
+            "id": {
+              "type": "integer",
+              "default": 1,
+              "example": 5,
+              "enum": [
+                1,
+                2,
+                3
+              ]
+            },
+            "category": {
+              "type": "object",
+              "default": {
+                "id": 3434,
+                "name": "cat_def"
+              },
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "default": 33,
+                  "enum": [
+                    4,
+                    5,
+                    6
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "default": "category_name",
+                  "example": "category_name",
+                  "enum": [
+                    "cat_1",
+                    "cat_2",
+                    "cat_3"
+                  ]
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "default": "doggie",
+              "example": "doggie"
+            },
+            "photoUrls": {
+              "type": "array",
+              "default": ["url_a", "url_b"],
+              "example": ["url_1", "url_2"],
+              "items": {
+                "type": "string"
+              }
+            },
+            "tags": {
+              "type": "array",
+              "default": [
+                {
+                  "id": 999,
+                  "name": "highTag"
+                }
+              ],
+              "example": [
+                {
+                  "id": 999,
+                  "name": "bigTag"
+                }
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "default": 333,
+                    "example": 333,
+                    "enum": [
+                      7,
+                      8,
+                      9
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "default": "aTag",
+                    "enum": [
+                      "aTag",
+                      "bTag",
+                      "cTag"
+                    ]
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "string",
+              "description": "pet status in the store"
+            }
+          }
+        }
+      }
+    }
+  },
+  "responses":{
+    "200":{
+      "description":"Successful operation",
+      "content":{}
+    }
+  }
+}

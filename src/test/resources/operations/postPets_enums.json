@@ -1,0 +1,113 @@
+{
+  "operationId": "deletePet",
+  "parameters":[
+    {
+      "name":"api_key",
+      "in":"header",
+      "schema":{
+        "type":"string",
+        "enum": [
+          "devKey",
+          "prodKey"
+        ]
+      }
+    },
+    {
+      "name":"paramNumber",
+      "in":"query",
+      "description":"Pet id to delete",
+      "required":true,
+      "schema":{
+        "type":"integer",
+        "format":"int64",
+        "enum": [
+          1,
+          2,
+          3
+        ]
+      }
+    }
+  ],
+  "requestBody": {
+    "description": "Pet object that needs to be added to the store",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "enum": [
+            {
+              "id": 1,
+              "category": {
+                "id": 2,
+                "name": "cat"
+              },
+              "tags": [
+                {
+                  "id": 1,
+                  "name": "aTag"
+                },
+                {
+                  "id": 2,
+                  "name": "bTag"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "category": {
+                "id": 2,
+                "name": "cat"
+              },
+              "tags": [
+                {
+                  "id": 1,
+                  "name": "aTag"
+                },
+                {
+                  "id": 3,
+                  "name": "cTag"
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "category": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "responses":{
+    "200":{
+      "description":"Successful operation",
+      "content":{}
+    }
+  }
+}

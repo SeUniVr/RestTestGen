@@ -1,0 +1,53 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getRoot",
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimpleString": {
+        "type": "string",
+        "maxLength": 10
+      },
+      "SimpleStringS": {
+        "items": {
+          "$ref": "#/components/schemas/SimpleString"
+        }
+      },
+      "SimpleStringSAlias": {
+        "$ref": "#/components/schemas/SimpleStringS"
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "firstNames": {
+            "items": {
+              "$ref": "#/components/schemas/SimpleString"
+            }
+          },
+          "lastNames": {
+            "$ref": "#/components/schemas/SimpleStringS"
+          }
+        }
+      }
+    }
+  }
+}

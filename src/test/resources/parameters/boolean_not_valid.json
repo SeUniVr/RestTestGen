@@ -1,0 +1,14 @@
+{
+  "type": "boolean",
+  "default": "3",
+  "examples": {
+    "0": {"value": "0"},
+    "1": {"value": "1"},
+    "a": {"value": "a"}
+  },
+  "enum": [
+    true,
+    "false",
+    [true, false]
+  ]
+}

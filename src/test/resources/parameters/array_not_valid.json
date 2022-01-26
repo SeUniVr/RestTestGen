@@ -1,0 +1,11 @@
+{
+  "type": "array",
+  "default": "1",
+  "example": [1, 2],
+  "enum": [
+    true
+  ],
+  "items": {
+    "type": "string"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "default": "a",
+  "example": true,
+  "enum": [
+    1,
+    2.5,
+    "a",
+    ["b", "c"]
+  ]
+}

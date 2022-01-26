@@ -1,0 +1,40 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getRoot"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MyRecursiveSchema": {
+        "properties": {
+          "recursive": {
+            "$ref": "#/components/schemas/MyRecursiveSchema"
+          }
+        }
+      },
+      "MyRecursiveSchema2": {
+        "properties": {
+          "recursive": {
+            "$ref": "#/components/schemas/MyRecursiveSchema3"
+          }
+        }
+      },
+      "MyRecursiveSchema3": {
+        "properties": {
+          "recursive": {
+            "$ref": "#/components/schemas/MyRecursiveSchema2"
+          }
+        }
+      }
+    }
+  }
+}

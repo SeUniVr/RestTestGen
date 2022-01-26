@@ -1,0 +1,4383 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://circleci.com/api/v1"
+    }
+  ],
+  "info": {
+    "description": "The CircleCI API is a RESTful, fully-featured API that allows you to do almost anything in CircleCI.\nYou can access all information and trigger all actions.\nThe only thing we don’t provide access to is billing functions, which must be done from the CircleCI web UI.\n",
+    "license": {
+      "name": "Attribution-NonCommercial-ShareAlike 4.0 International",
+      "url": "http://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    "title": "CircleCI REST API",
+    "version": "v1",
+    "x-apisguru-categories": [
+      "developer_tools"
+    ],
+    "x-logo": {
+      "url": "https://api.apis.guru/v2/cache/logo/https_avatars0.githubusercontent.com_u_1231870.png"
+    },
+    "x-origin": [
+      {
+        "format": "openapi",
+        "url": "https://raw.githubusercontent.com/kamikazechaser/spec-circleci/master/swagger.yml",
+        "version": "3.0"
+      }
+    ],
+    "x-providerName": "circleci.com",
+    "x-unofficialSpec": true
+  },
+  "security": [
+    {
+      "apikey": []
+    }
+  ],
+  "paths": {
+    "/me": {
+      "get": {
+        "description": "Provides information about the signed in user.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "admin": {
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "all_emails": {
+                      "items": {
+                        "format": "email",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "type": "array",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "analytics_id": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "avatar_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "basic_email_prefs": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "bitbucket": {
+                      "nullable": true,
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "bitbucket_authorized": {
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "containers": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "days_left_in_trial": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "dev_admin": {
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "enrolled_betas": {
+                      "items": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "type": "array",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "github_id": {
+                      "nullable": true,
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "github_oauth_scopes": {
+                      "items": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "type": "array",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "gravatar_id": {
+                      "nullable": true,
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "heroku_api_key": {
+                      "nullable": true,
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "in_beta_program": {
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "login": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "organization_prefs": {
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "parallelism": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "plan": {
+                      "nullable": true,
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "projects": {
+                      "type": "object",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "pusher_id": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "selected_email": {
+                      "format": "email",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "sign_in_count": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "trial_end": {
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "User",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "signed in user"
+          }
+        }
+      }
+    },
+    "/project/{username}/{project}": {
+      "get": {
+        "description": "Build summary for each of the last 30 builds for a single git repo.\n",
+        "parameters": [
+          {
+            "description": "The number of builds to return. Maximum 100, defaults to 30.\n",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 30.0,
+              "maximum": 100.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The API returns builds starting from this offset, defaults to 0.\n",
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Restricts which builds are returned.\nSet to \"completed\", \"successful\", \"failed\", \"running\", or defaults to no filter.\n",
+            "in": "query",
+            "name": "filter",
+            "schema": {
+              "enum": [
+                "completed",
+                "successful",
+                "failed",
+                "running"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "body": {
+                        "description": "commit message body",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "branch": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "build_time_millis": {
+                        "type": "integer",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "build_url": {
+                        "format": "uri",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "committer_email": {
+                        "format": "email",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "committer_name": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "dont_build": {
+                        "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+                        "nullable": true,
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "lifecycle": {
+                        "enum": [
+                          "queued",
+                          "scheduled",
+                          "not_run",
+                          "not_running",
+                          "running",
+                          "finished"
+                        ],
+                        "type": "string",
+                        "x-schemaName": "Lifecycle",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "previous": {
+                        "description": "previous build",
+                        "properties": {
+                          "build_num": {
+                            "type": "integer",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "build_time_millis": {
+                            "type": "integer",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "status": {
+                            "enum": [
+                              "retried",
+                              "canceled",
+                              "infrastructure_fail",
+                              "timedout",
+                              "not_run",
+                              "running",
+                              "failed",
+                              "queued",
+                              "scheduled",
+                              "not_running",
+                              "no_tests",
+                              "fixed",
+                              "success"
+                            ],
+                            "type": "string",
+                            "x-schemaName": "Status",
+                            "in": "RESPONSE_BODY"
+                          }
+                        },
+                        "type": "object",
+                        "x-schemaName": "PreviousBuild",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "queued_at": {
+                        "description": "time build was queued",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "reponame": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "retry_of": {
+                        "description": "build_num of the build this is a retry of",
+                        "nullable": true,
+                        "type": "integer",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "start_time": {
+                        "description": "time build started",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "stop_time": {
+                        "description": "time build finished",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "subject": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "username": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "vcs_url": {
+                        "format": "uri",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "why": {
+                        "description": "short string explaining the reason we built",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      }
+                    },
+                    "type": "object",
+                    "x-schemaName": "Build",
+                    "in": "RESPONSE_BODY"
+                  },
+                  "type": "array",
+                  "x-schemaName": "Builds",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Build summary for each of the last 30 builds"
+          }
+        }
+      },
+      "post": {
+        "description": "Triggers a new build, returns a summary of the build.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "build_parameters": {
+                    "description": "Additional environment variables to inject into the build environment. A map of names to values.\n",
+                    "type": "object",
+                    "x-schemaName": "BuildParameters",
+                    "in": "REQUEST_BODY"
+                  },
+                  "parallel": {
+                    "description": "The number of containers to use to run the build. Default is null and the project default is used.\n",
+                    "type": "string",
+                    "x-schemaName": "Parallel",
+                    "in": "REQUEST_BODY"
+                  },
+                  "revision": {
+                    "description": "The specific revision to build.\nDefault is null and the head of the branch is used. Cannot be used with tag parameter.\n",
+                    "type": "string",
+                    "x-schemaName": "Revision",
+                    "in": "REQUEST_BODY"
+                  },
+                  "tag": {
+                    "description": "The tag to build. Default is null. Cannot be used with revision parameter.\n",
+                    "type": "string",
+                    "x-schemaName": "Tag",
+                    "in": "REQUEST_BODY"
+                  }
+                },
+                "type": "object",
+                "in": "request_body"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "added_at": {
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_num": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "outcome": {
+                      "enum": [
+                        "canceled",
+                        "infrastructure_fail",
+                        "timedout",
+                        "failed",
+                        "no_tests",
+                        "success"
+                      ],
+                      "type": "string",
+                      "x-schemaName": "Outcome",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "pushed_at": {
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "status": {
+                      "enum": [
+                        "retried",
+                        "canceled",
+                        "infrastructure_fail",
+                        "timedout",
+                        "not_run",
+                        "running",
+                        "failed",
+                        "queued",
+                        "scheduled",
+                        "not_running",
+                        "no_tests",
+                        "fixed",
+                        "success"
+                      ],
+                      "type": "string",
+                      "x-schemaName": "Status",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "vcs_revision": {
+                      "type": "string",
+                      "x-schemaName": "Sha1",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "BuildSummary",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "returns a summary of the build"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/build-cache": {
+      "delete": {
+        "description": "Clears the cache for a project.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "status message"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/checkout-key": {
+      "get": {
+        "description": "Lists checkout keys.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "fingerprint": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "preferred": {
+                        "type": "boolean",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "public_key": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "time": {
+                        "description": "when the key was issued",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "type": {
+                        "description": "can be \"deploy-key\" or \"github-user-key\"\n",
+                        "enum": [
+                          "deploy-key",
+                          "github-user-key"
+                        ],
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      }
+                    },
+                    "type": "object",
+                    "x-schemaName": "Key",
+                    "in": "RESPONSE_BODY"
+                  },
+                  "type": "array",
+                  "x-schemaName": "Keys",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "checkout keys"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "description": "Creates a new checkout key.\nOnly usable with a user API token.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "enum": [
+                  "deploy-key",
+                  "github-user-key"
+                ],
+                "type": "string",
+                "in": "request_body"
+              }
+            }
+          },
+          "description": "The type of key to create. Can be \u0027deploy-key\u0027 or \u0027github-user-key\u0027.\n",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "fingerprint": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "preferred": {
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "public_key": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "time": {
+                      "description": "when the key was issued",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "type": {
+                      "description": "can be \"deploy-key\" or \"github-user-key\"\n",
+                      "enum": [
+                        "deploy-key",
+                        "github-user-key"
+                      ],
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Key",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "checkout key"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/checkout-key/{fingerprint}": {
+      "delete": {
+        "description": "Delete a checkout key.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "enum": [
+                        "OK"
+                      ],
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "status message"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "fingerprint",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "Get a checkout key.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "fingerprint": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "preferred": {
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "public_key": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "time": {
+                      "description": "when the key was issued",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "type": {
+                      "description": "can be \"deploy-key\" or \"github-user-key\"\n",
+                      "enum": [
+                        "deploy-key",
+                        "github-user-key"
+                      ],
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Key",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "checkout key"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "fingerprint",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/envvar": {
+      "get": {
+        "description": "Lists the environment variables for :project\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "value": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      }
+                    },
+                    "type": "object",
+                    "x-schemaName": "Envvar",
+                    "in": "RESPONSE_BODY"
+                  },
+                  "type": "array",
+                  "x-schemaName": "Envvars",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "XXX"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "post": {
+        "description": "Creates a new environment variable\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "value": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Envvar",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "XXX"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/envvar/{name}": {
+      "delete": {
+        "description": "Deletes the environment variable named \u0027:name\u0027\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "enum": [
+                        "OK"
+                      ],
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Deletes the environment variable named \u0027:name\u0027\n"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "Gets the hidden value of environment variable :name\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "value": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Envvar",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "XXX"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/ssh-key": {
+      "post": {
+        "description": "Create an ssh key used to access external systems that require SSH key-based authentication\n",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Content-Type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "hostname": {
+                    "type": "string",
+                    "in": "REQUEST_BODY"
+                  },
+                  "private_key": {
+                    "type": "string",
+                    "in": "REQUEST_BODY"
+                  }
+                },
+                "type": "object",
+                "in": "request_body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "response": {
+                    "value": {
+                      "message": "a private key is required"
+                    }
+                  }
+                },
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "no response expected"
+          }
+        }
+      }
+    },
+    "/project/{username}/{project}/tree/{branch}": {
+      "post": {
+        "description": "Triggers a new build, returns a summary of the build.\nOptional build parameters can be set using an experimental API.\n\nNote: For more about build parameters, read about [using parameterized builds](https://circleci.com/docs/parameterized-builds/)\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "build_parameters": {
+                    "description": "Additional environment variables to inject into the build environment. A map of names to values.\n",
+                    "type": "object",
+                    "x-schemaName": "BuildParameters",
+                    "in": "REQUEST_BODY"
+                  },
+                  "parallel": {
+                    "description": "The number of containers to use to run the build. Default is null and the project default is used.\n",
+                    "type": "string",
+                    "x-schemaName": "Parallel",
+                    "in": "REQUEST_BODY"
+                  },
+                  "revision": {
+                    "description": "The specific revision to build.\nDefault is null and the head of the branch is used. Cannot be used with tag parameter.\n",
+                    "type": "string",
+                    "x-schemaName": "Revision",
+                    "in": "REQUEST_BODY"
+                  }
+                },
+                "type": "object",
+                "in": "request_body"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "body": {
+                      "description": "commit message body",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "branch": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_time_millis": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "committer_email": {
+                      "format": "email",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "committer_name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "dont_build": {
+                      "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+                      "nullable": true,
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "lifecycle": {
+                      "enum": [
+                        "queued",
+                        "scheduled",
+                        "not_run",
+                        "not_running",
+                        "running",
+                        "finished"
+                      ],
+                      "type": "string",
+                      "x-schemaName": "Lifecycle",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "previous": {
+                      "description": "previous build",
+                      "properties": {
+                        "build_num": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "build_time_millis": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "status": {
+                          "enum": [
+                            "retried",
+                            "canceled",
+                            "infrastructure_fail",
+                            "timedout",
+                            "not_run",
+                            "running",
+                            "failed",
+                            "queued",
+                            "scheduled",
+                            "not_running",
+                            "no_tests",
+                            "fixed",
+                            "success"
+                          ],
+                          "type": "string",
+                          "x-schemaName": "Status",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "x-schemaName": "PreviousBuild",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "queued_at": {
+                      "description": "time build was queued",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "reponame": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "retry_of": {
+                      "description": "build_num of the build this is a retry of",
+                      "nullable": true,
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "start_time": {
+                      "description": "time build started",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "stop_time": {
+                      "description": "time build finished",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "subject": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "username": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "vcs_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "why": {
+                      "description": "short string explaining the reason we built",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Build",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "returns a summary of the build",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "format": "uri",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "The branch name should be url-encoded.\n",
+            "in": "path",
+            "name": "branch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/{build_num}": {
+      "get": {
+        "description": "Full details for a single build. The response includes all of the fields from the build summary.\nThis is also the payload for the [notification webhooks](/docs/configuration/#notify), in which case this object is the value to a key named \u0027payload\u0027.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "previous build",
+                  "properties": {
+                    "all_commit_details": {
+                      "items": {
+                        "properties": {
+                          "author_date": {
+                            "format": "date-time",
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "author_email": {
+                            "format": "email",
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "author_login": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "author_name": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "body": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "commit": {
+                            "type": "string",
+                            "x-schemaName": "Sha1",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "commit_url": {
+                            "format": "uri",
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "committer_date": {
+                            "format": "date-time",
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "committer_email": {
+                            "format": "email",
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "committer_login": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "committer_name": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "subject": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          }
+                        },
+                        "type": "object",
+                        "x-schemaName": "CommitDetail",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "type": "array",
+                      "x-schemaName": "CommitDetails",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "compare": {
+                      "format": "uri",
+                      "nullable": true,
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "job_name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "node": {
+                      "nullable": true,
+                      "in": "RESPONSE_BODY"
+                    },
+                    "previous_successful_build": {
+                      "description": "previous build",
+                      "properties": {
+                        "build_num": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "build_time_millis": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "status": {
+                          "enum": [
+                            "retried",
+                            "canceled",
+                            "infrastructure_fail",
+                            "timedout",
+                            "not_run",
+                            "running",
+                            "failed",
+                            "queued",
+                            "scheduled",
+                            "not_running",
+                            "no_tests",
+                            "fixed",
+                            "success"
+                          ],
+                          "type": "string",
+                          "x-schemaName": "Status",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "x-schemaName": "PreviousBuild",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "retries": {
+                      "nullable": true,
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "ssh_enabled": {
+                      "nullable": true,
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "timedout": {
+                      "nullable": true,
+                      "type": "boolean",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "usage_queued_at": {
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "user": {
+                      "properties": {
+                        "admin": {
+                          "type": "boolean",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "all_emails": {
+                          "items": {
+                            "format": "email",
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "type": "array",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "analytics_id": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "avatar_url": {
+                          "format": "uri",
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "basic_email_prefs": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "bitbucket": {
+                          "nullable": true,
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "bitbucket_authorized": {
+                          "type": "boolean",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "containers": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "days_left_in_trial": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "dev_admin": {
+                          "type": "boolean",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "enrolled_betas": {
+                          "items": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "type": "array",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "github_id": {
+                          "nullable": true,
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "github_oauth_scopes": {
+                          "items": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "type": "array",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "gravatar_id": {
+                          "nullable": true,
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "heroku_api_key": {
+                          "nullable": true,
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "in_beta_program": {
+                          "type": "boolean",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "login": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "name": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "organization_prefs": {
+                          "type": "object",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "parallelism": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "plan": {
+                          "nullable": true,
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "projects": {
+                          "type": "object",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "pusher_id": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "selected_email": {
+                          "format": "email",
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "sign_in_count": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "trial_end": {
+                          "format": "date-time",
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "x-schemaName": "User",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "BuildDetail",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Full details for a single build"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "build_num",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/{build_num}/artifacts": {
+      "get": {
+        "description": "List the artifacts produced by a given build.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "node_index": {
+                        "type": "integer",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "path": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "pretty_path": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "url": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      }
+                    },
+                    "type": "object",
+                    "x-schemaName": "Artifact",
+                    "in": "RESPONSE_BODY"
+                  },
+                  "type": "array",
+                  "x-schemaName": "Artifacts",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "List the artifacts produced by a given build"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "build_num",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/{build_num}/cancel": {
+      "post": {
+        "description": "Cancels the build, returns a summary of the build.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "body": {
+                      "description": "commit message body",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "branch": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_time_millis": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "committer_email": {
+                      "format": "email",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "committer_name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "dont_build": {
+                      "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+                      "nullable": true,
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "lifecycle": {
+                      "enum": [
+                        "queued",
+                        "scheduled",
+                        "not_run",
+                        "not_running",
+                        "running",
+                        "finished"
+                      ],
+                      "type": "string",
+                      "x-schemaName": "Lifecycle",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "previous": {
+                      "description": "previous build",
+                      "properties": {
+                        "build_num": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "build_time_millis": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "status": {
+                          "enum": [
+                            "retried",
+                            "canceled",
+                            "infrastructure_fail",
+                            "timedout",
+                            "not_run",
+                            "running",
+                            "failed",
+                            "queued",
+                            "scheduled",
+                            "not_running",
+                            "no_tests",
+                            "fixed",
+                            "success"
+                          ],
+                          "type": "string",
+                          "x-schemaName": "Status",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "x-schemaName": "PreviousBuild",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "queued_at": {
+                      "description": "time build was queued",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "reponame": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "retry_of": {
+                      "description": "build_num of the build this is a retry of",
+                      "nullable": true,
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "start_time": {
+                      "description": "time build started",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "stop_time": {
+                      "description": "time build finished",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "subject": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "username": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "vcs_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "why": {
+                      "description": "short string explaining the reason we built",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Build",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "returns a summary of the build"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "build_num",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/{build_num}/retry": {
+      "post": {
+        "description": "Retries the build, returns a summary of the new build.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "body": {
+                      "description": "commit message body",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "branch": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_time_millis": {
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "build_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "committer_email": {
+                      "format": "email",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "committer_name": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "dont_build": {
+                      "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+                      "nullable": true,
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "lifecycle": {
+                      "enum": [
+                        "queued",
+                        "scheduled",
+                        "not_run",
+                        "not_running",
+                        "running",
+                        "finished"
+                      ],
+                      "type": "string",
+                      "x-schemaName": "Lifecycle",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "previous": {
+                      "description": "previous build",
+                      "properties": {
+                        "build_num": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "build_time_millis": {
+                          "type": "integer",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "status": {
+                          "enum": [
+                            "retried",
+                            "canceled",
+                            "infrastructure_fail",
+                            "timedout",
+                            "not_run",
+                            "running",
+                            "failed",
+                            "queued",
+                            "scheduled",
+                            "not_running",
+                            "no_tests",
+                            "fixed",
+                            "success"
+                          ],
+                          "type": "string",
+                          "x-schemaName": "Status",
+                          "in": "RESPONSE_BODY"
+                        }
+                      },
+                      "type": "object",
+                      "x-schemaName": "PreviousBuild",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "queued_at": {
+                      "description": "time build was queued",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "reponame": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "retry_of": {
+                      "description": "build_num of the build this is a retry of",
+                      "nullable": true,
+                      "type": "integer",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "start_time": {
+                      "description": "time build started",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "stop_time": {
+                      "description": "time build finished",
+                      "format": "date-time",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "subject": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "username": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "vcs_url": {
+                      "format": "uri",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    },
+                    "why": {
+                      "description": "short string explaining the reason we built",
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Build",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "returns a summary of the new build"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "build_num",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/project/{username}/{project}/{build_num}/tests": {
+      "get": {
+        "description": "Provides test metadata for a build\nNote: [Learn how to set up your builds to collect test metadata](https://circleci.com/docs/test-metadata/)\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "tests": {
+                      "items": {
+                        "properties": {
+                          "classname": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "file": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "message": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "name": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "result": {
+                            "enum": [
+                              "retried",
+                              "canceled",
+                              "infrastructure_fail",
+                              "timedout",
+                              "not_run",
+                              "running",
+                              "failed",
+                              "queued",
+                              "scheduled",
+                              "not_running",
+                              "no_tests",
+                              "fixed",
+                              "success"
+                            ],
+                            "type": "string",
+                            "x-schemaName": "Status",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "run_time": {
+                            "type": "number",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "source": {
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          }
+                        },
+                        "type": "object",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "type": "array",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "x-schemaName": "Tests",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "test metadata for a build\n"
+          }
+        },
+        "parameters": [
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "project",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "XXXXXXXXXX\n",
+            "in": "path",
+            "name": "build_num",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "XXXXXXXXX\n",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/projects": {
+      "get": {
+        "description": "List of all the projects you\u0027re following on CircleCI, with build information organized by branch.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "aws": {
+                        "properties": {
+                          "keypair": {
+                            "nullable": true,
+                            "type": "string",
+                            "in": "RESPONSE_BODY"
+                          }
+                        },
+                        "type": "object",
+                        "x-schemaName": "Aws",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "branches": {
+                        "type": "object",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "campfire_notify_prefs": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "campfire_room": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "campfire_subdomain": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "campfire_token": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "compile": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "default_branch": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "dependencies": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "extra": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "feature_flags": {
+                        "properties": {
+                          "build-fork-prs": {
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "fleet": {
+                            "nullable": true,
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "junit": {
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "oss": {
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "osx": {
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "set-github-status": {
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "trusty-beta": {
+                            "type": "boolean",
+                            "in": "RESPONSE_BODY"
+                          }
+                        },
+                        "type": "object",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "flowdock_api_token": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "followed": {
+                        "type": "boolean",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "has_usable_key": {
+                        "type": "boolean",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "heroku_deploy_user": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "hipchat_api_token": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "hipchat_notify": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "hipchat_notify_prefs": {
+                        "nullable": true,
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "hipchat_room": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "irc_channel": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "irc_keyword": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "irc_notify_prefs": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "irc_password": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "irc_server": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "irc_username": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "language": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "oss": {
+                        "type": "boolean",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "parallel": {
+                        "type": "integer",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "reponame": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "scopes": {
+                        "items": {
+                          "enum": [
+                            "write-settings",
+                            "view-builds",
+                            "read-settings",
+                            "trigger-builds",
+                            "all",
+                            "status",
+                            "none"
+                          ],
+                          "type": "string",
+                          "x-schemaName": "Scope",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "type": "array",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "setup": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "slack_api_token": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "slack_channel": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "slack_channel_override": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "slack_notify_prefs": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "slack_subdomain": {
+                        "nullable": true,
+                        "type": "string",
+                        "x-schemaName": "StringOrNull",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "slack_webhook_url": {
+                        "format": "uri",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "ssh_keys": {
+                        "items": {
+                          "type": "string",
+                          "in": "RESPONSE_BODY"
+                        },
+                        "type": "array",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "test": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "username": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "vcs_type": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "vcs_url": {
+                        "format": "uri",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      }
+                    },
+                    "type": "object",
+                    "x-schemaName": "Project",
+                    "in": "RESPONSE_BODY"
+                  },
+                  "type": "array",
+                  "x-schemaName": "Projects",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "List of all the projects you\u0027re following on CircleCI\n"
+          }
+        }
+      }
+    },
+    "/recent-builds": {
+      "get": {
+        "description": "Build summary for each of the last 30 recent builds, ordered by build_num.\n",
+        "parameters": [
+          {
+            "description": "The number of builds to return. Maximum 100, defaults to 30.\n",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 30.0,
+              "maximum": 100.0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The API returns builds starting from this offset, defaults to 0.\n",
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0.0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "body": {
+                        "description": "commit message body",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "branch": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "build_time_millis": {
+                        "type": "integer",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "build_url": {
+                        "format": "uri",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "committer_email": {
+                        "format": "email",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "committer_name": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "dont_build": {
+                        "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+                        "nullable": true,
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "lifecycle": {
+                        "enum": [
+                          "queued",
+                          "scheduled",
+                          "not_run",
+                          "not_running",
+                          "running",
+                          "finished"
+                        ],
+                        "type": "string",
+                        "x-schemaName": "Lifecycle",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "previous": {
+                        "description": "previous build",
+                        "properties": {
+                          "build_num": {
+                            "type": "integer",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "build_time_millis": {
+                            "type": "integer",
+                            "in": "RESPONSE_BODY"
+                          },
+                          "status": {
+                            "enum": [
+                              "retried",
+                              "canceled",
+                              "infrastructure_fail",
+                              "timedout",
+                              "not_run",
+                              "running",
+                              "failed",
+                              "queued",
+                              "scheduled",
+                              "not_running",
+                              "no_tests",
+                              "fixed",
+                              "success"
+                            ],
+                            "type": "string",
+                            "x-schemaName": "Status",
+                            "in": "RESPONSE_BODY"
+                          }
+                        },
+                        "type": "object",
+                        "x-schemaName": "PreviousBuild",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "queued_at": {
+                        "description": "time build was queued",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "reponame": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "retry_of": {
+                        "description": "build_num of the build this is a retry of",
+                        "nullable": true,
+                        "type": "integer",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "start_time": {
+                        "description": "time build started",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "stop_time": {
+                        "description": "time build finished",
+                        "format": "date-time",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "subject": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "username": {
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "vcs_url": {
+                        "format": "uri",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      },
+                      "why": {
+                        "description": "short string explaining the reason we built",
+                        "type": "string",
+                        "in": "RESPONSE_BODY"
+                      }
+                    },
+                    "type": "object",
+                    "x-schemaName": "Build",
+                    "in": "RESPONSE_BODY"
+                  },
+                  "type": "array",
+                  "x-schemaName": "Builds",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Build summary for each of the last 30 recent builds"
+          }
+        }
+      }
+    },
+    "/user/heroku-key": {
+      "post": {
+        "description": "Adds your Heroku API key to CircleCI, takes apikey as form param name.\n",
+        "responses": {
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "in": "RESPONSE_BODY"
+                    }
+                  },
+                  "type": "object",
+                  "required": true,
+                  "in": "response_body"
+                }
+              }
+            },
+            "description": "Your Heroku API key is invalid.\n"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "branch": {
+        "description": "The branch name should be url-encoded.\n",
+        "in": "path",
+        "name": "branch",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "build_num": {
+        "description": "XXXXXXXXXX\n",
+        "in": "path",
+        "name": "build_num",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "envvar_name": {
+        "description": "XXXXXXXXXX\n",
+        "in": "path",
+        "name": "name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "filter": {
+        "description": "Restricts which builds are returned.\nSet to \"completed\", \"successful\", \"failed\", \"running\", or defaults to no filter.\n",
+        "in": "query",
+        "name": "filter",
+        "schema": {
+          "enum": [
+            "completed",
+            "successful",
+            "failed",
+            "running"
+          ],
+          "type": "string"
+        }
+      },
+      "fingerprint": {
+        "description": "XXXXXXXXXX\n",
+        "in": "path",
+        "name": "fingerprint",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "limit": {
+        "description": "The number of builds to return. Maximum 100, defaults to 30.\n",
+        "in": "query",
+        "name": "limit",
+        "schema": {
+          "default": 30.0,
+          "maximum": 100.0,
+          "type": "integer"
+        }
+      },
+      "offset": {
+        "description": "The API returns builds starting from this offset, defaults to 0.\n",
+        "in": "query",
+        "name": "offset",
+        "schema": {
+          "default": 0.0,
+          "type": "integer"
+        }
+      },
+      "project": {
+        "description": "XXXXXXXXX\n",
+        "in": "path",
+        "name": "project",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "username": {
+        "description": "XXXXXXXXX\n",
+        "in": "path",
+        "name": "username",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "envvar": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "type": "object",
+              "x-schemaName": "Envvar"
+            }
+          }
+        },
+        "description": "XXX"
+      },
+      "envvars": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object",
+                "x-schemaName": "Envvar"
+              },
+              "type": "array",
+              "x-schemaName": "Envvars"
+            }
+          }
+        },
+        "description": "XXX"
+      },
+      "key": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "fingerprint": {
+                  "type": "string"
+                },
+                "preferred": {
+                  "type": "boolean"
+                },
+                "public_key": {
+                  "type": "string"
+                },
+                "time": {
+                  "description": "when the key was issued",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "can be \"deploy-key\" or \"github-user-key\"\n",
+                  "enum": [
+                    "deploy-key",
+                    "github-user-key"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object",
+              "x-schemaName": "Key"
+            }
+          }
+        },
+        "description": "checkout key"
+      }
+    },
+    "schemas": {
+      "Artifact": {
+        "properties": {
+          "node_index": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "pretty_path": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Artifact"
+      },
+      "Artifacts": {
+        "items": {
+          "properties": {
+            "node_index": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            },
+            "pretty_path": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "x-schemaName": "Artifact"
+        },
+        "type": "array",
+        "x-schemaName": "Artifacts"
+      },
+      "Aws": {
+        "properties": {
+          "keypair": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Aws"
+      },
+      "Build": {
+        "properties": {
+          "body": {
+            "description": "commit message body",
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "build_time_millis": {
+            "type": "integer"
+          },
+          "build_url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "committer_email": {
+            "format": "email",
+            "type": "string"
+          },
+          "committer_name": {
+            "type": "string"
+          },
+          "dont_build": {
+            "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+            "nullable": true,
+            "type": "string"
+          },
+          "lifecycle": {
+            "enum": [
+              "queued",
+              "scheduled",
+              "not_run",
+              "not_running",
+              "running",
+              "finished"
+            ],
+            "type": "string",
+            "x-schemaName": "Lifecycle"
+          },
+          "previous": {
+            "description": "previous build",
+            "properties": {
+              "build_num": {
+                "type": "integer"
+              },
+              "build_time_millis": {
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "retried",
+                  "canceled",
+                  "infrastructure_fail",
+                  "timedout",
+                  "not_run",
+                  "running",
+                  "failed",
+                  "queued",
+                  "scheduled",
+                  "not_running",
+                  "no_tests",
+                  "fixed",
+                  "success"
+                ],
+                "type": "string",
+                "x-schemaName": "Status"
+              }
+            },
+            "type": "object",
+            "x-schemaName": "PreviousBuild"
+          },
+          "queued_at": {
+            "description": "time build was queued",
+            "format": "date-time",
+            "type": "string"
+          },
+          "reponame": {
+            "type": "string"
+          },
+          "retry_of": {
+            "description": "build_num of the build this is a retry of",
+            "nullable": true,
+            "type": "integer"
+          },
+          "start_time": {
+            "description": "time build started",
+            "format": "date-time",
+            "type": "string"
+          },
+          "stop_time": {
+            "description": "time build finished",
+            "format": "date-time",
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "vcs_url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "why": {
+            "description": "short string explaining the reason we built",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Build"
+      },
+      "BuildDetail": {
+        "description": "previous build",
+        "properties": {
+          "all_commit_details": {
+            "items": {
+              "properties": {
+                "author_date": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "author_email": {
+                  "format": "email",
+                  "type": "string"
+                },
+                "author_login": {
+                  "type": "string"
+                },
+                "author_name": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "commit": {
+                  "type": "string",
+                  "x-schemaName": "Sha1"
+                },
+                "commit_url": {
+                  "format": "uri",
+                  "type": "string"
+                },
+                "committer_date": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "committer_email": {
+                  "format": "email",
+                  "type": "string"
+                },
+                "committer_login": {
+                  "type": "string"
+                },
+                "committer_name": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                }
+              },
+              "type": "object",
+              "x-schemaName": "CommitDetail"
+            },
+            "type": "array",
+            "x-schemaName": "CommitDetails"
+          },
+          "compare": {
+            "format": "uri",
+            "nullable": true,
+            "type": "string"
+          },
+          "job_name": {
+            "type": "string"
+          },
+          "node": {
+            "nullable": true
+          },
+          "previous_successful_build": {
+            "description": "previous build",
+            "properties": {
+              "build_num": {
+                "type": "integer"
+              },
+              "build_time_millis": {
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "retried",
+                  "canceled",
+                  "infrastructure_fail",
+                  "timedout",
+                  "not_run",
+                  "running",
+                  "failed",
+                  "queued",
+                  "scheduled",
+                  "not_running",
+                  "no_tests",
+                  "fixed",
+                  "success"
+                ],
+                "type": "string",
+                "x-schemaName": "Status"
+              }
+            },
+            "type": "object",
+            "x-schemaName": "PreviousBuild"
+          },
+          "retries": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "ssh_enabled": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "timedout": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "usage_queued_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "user": {
+            "properties": {
+              "admin": {
+                "type": "boolean"
+              },
+              "all_emails": {
+                "items": {
+                  "format": "email",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "analytics_id": {
+                "type": "string"
+              },
+              "avatar_url": {
+                "format": "uri",
+                "type": "string"
+              },
+              "basic_email_prefs": {
+                "type": "string"
+              },
+              "bitbucket": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "bitbucket_authorized": {
+                "type": "boolean"
+              },
+              "containers": {
+                "type": "integer"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "days_left_in_trial": {
+                "type": "integer"
+              },
+              "dev_admin": {
+                "type": "boolean"
+              },
+              "enrolled_betas": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "github_id": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "github_oauth_scopes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "gravatar_id": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "heroku_api_key": {
+                "nullable": true,
+                "type": "string"
+              },
+              "in_beta_program": {
+                "type": "boolean"
+              },
+              "login": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "organization_prefs": {
+                "type": "object"
+              },
+              "parallelism": {
+                "type": "integer"
+              },
+              "plan": {
+                "nullable": true,
+                "type": "string"
+              },
+              "projects": {
+                "type": "object"
+              },
+              "pusher_id": {
+                "type": "string"
+              },
+              "selected_email": {
+                "format": "email",
+                "type": "string"
+              },
+              "sign_in_count": {
+                "type": "integer"
+              },
+              "trial_end": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "x-schemaName": "User"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "BuildDetail"
+      },
+      "BuildParameters": {
+        "description": "Additional environment variables to inject into the build environment. A map of names to values.\n",
+        "type": "object",
+        "x-schemaName": "BuildParameters"
+      },
+      "BuildSummary": {
+        "properties": {
+          "added_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "build_num": {
+            "type": "integer"
+          },
+          "outcome": {
+            "enum": [
+              "canceled",
+              "infrastructure_fail",
+              "timedout",
+              "failed",
+              "no_tests",
+              "success"
+            ],
+            "type": "string",
+            "x-schemaName": "Outcome"
+          },
+          "pushed_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "retried",
+              "canceled",
+              "infrastructure_fail",
+              "timedout",
+              "not_run",
+              "running",
+              "failed",
+              "queued",
+              "scheduled",
+              "not_running",
+              "no_tests",
+              "fixed",
+              "success"
+            ],
+            "type": "string",
+            "x-schemaName": "Status"
+          },
+          "vcs_revision": {
+            "type": "string",
+            "x-schemaName": "Sha1"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "BuildSummary"
+      },
+      "Builds": {
+        "items": {
+          "properties": {
+            "body": {
+              "description": "commit message body",
+              "type": "string"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "build_time_millis": {
+              "type": "integer"
+            },
+            "build_url": {
+              "format": "uri",
+              "type": "string"
+            },
+            "committer_email": {
+              "format": "email",
+              "type": "string"
+            },
+            "committer_name": {
+              "type": "string"
+            },
+            "dont_build": {
+              "description": "reason why we didn\u0027t build, if we didn\u0027t build",
+              "nullable": true,
+              "type": "string"
+            },
+            "lifecycle": {
+              "enum": [
+                "queued",
+                "scheduled",
+                "not_run",
+                "not_running",
+                "running",
+                "finished"
+              ],
+              "type": "string",
+              "x-schemaName": "Lifecycle"
+            },
+            "previous": {
+              "description": "previous build",
+              "properties": {
+                "build_num": {
+                  "type": "integer"
+                },
+                "build_time_millis": {
+                  "type": "integer"
+                },
+                "status": {
+                  "enum": [
+                    "retried",
+                    "canceled",
+                    "infrastructure_fail",
+                    "timedout",
+                    "not_run",
+                    "running",
+                    "failed",
+                    "queued",
+                    "scheduled",
+                    "not_running",
+                    "no_tests",
+                    "fixed",
+                    "success"
+                  ],
+                  "type": "string",
+                  "x-schemaName": "Status"
+                }
+              },
+              "type": "object",
+              "x-schemaName": "PreviousBuild"
+            },
+            "queued_at": {
+              "description": "time build was queued",
+              "format": "date-time",
+              "type": "string"
+            },
+            "reponame": {
+              "type": "string"
+            },
+            "retry_of": {
+              "description": "build_num of the build this is a retry of",
+              "nullable": true,
+              "type": "integer"
+            },
+            "start_time": {
+              "description": "time build started",
+              "format": "date-time",
+              "type": "string"
+            },
+            "stop_time": {
+              "description": "time build finished",
+              "format": "date-time",
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "vcs_url": {
+              "format": "uri",
+              "type": "string"
+            },
+            "why": {
+              "description": "short string explaining the reason we built",
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "x-schemaName": "Build"
+        },
+        "type": "array",
+        "x-schemaName": "Builds"
+      },
+      "CommitDetail": {
+        "properties": {
+          "author_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "author_email": {
+            "format": "email",
+            "type": "string"
+          },
+          "author_login": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "commit": {
+            "type": "string",
+            "x-schemaName": "Sha1"
+          },
+          "commit_url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "committer_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "committer_email": {
+            "format": "email",
+            "type": "string"
+          },
+          "committer_login": {
+            "type": "string"
+          },
+          "committer_name": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "CommitDetail"
+      },
+      "CommitDetails": {
+        "items": {
+          "properties": {
+            "author_date": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "author_email": {
+              "format": "email",
+              "type": "string"
+            },
+            "author_login": {
+              "type": "string"
+            },
+            "author_name": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string",
+              "x-schemaName": "Sha1"
+            },
+            "commit_url": {
+              "format": "uri",
+              "type": "string"
+            },
+            "committer_date": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "committer_email": {
+              "format": "email",
+              "type": "string"
+            },
+            "committer_login": {
+              "type": "string"
+            },
+            "committer_name": {
+              "type": "string"
+            },
+            "subject": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "x-schemaName": "CommitDetail"
+        },
+        "type": "array",
+        "x-schemaName": "CommitDetails"
+      },
+      "Envvar": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Envvar"
+      },
+      "Envvars": {
+        "items": {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "x-schemaName": "Envvar"
+        },
+        "type": "array",
+        "x-schemaName": "Envvars"
+      },
+      "Key": {
+        "properties": {
+          "fingerprint": {
+            "type": "string"
+          },
+          "preferred": {
+            "type": "boolean"
+          },
+          "public_key": {
+            "type": "string"
+          },
+          "time": {
+            "description": "when the key was issued",
+            "format": "date-time",
+            "type": "string"
+          },
+          "type": {
+            "description": "can be \"deploy-key\" or \"github-user-key\"\n",
+            "enum": [
+              "deploy-key",
+              "github-user-key"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Key"
+      },
+      "Keys": {
+        "items": {
+          "properties": {
+            "fingerprint": {
+              "type": "string"
+            },
+            "preferred": {
+              "type": "boolean"
+            },
+            "public_key": {
+              "type": "string"
+            },
+            "time": {
+              "description": "when the key was issued",
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": {
+              "description": "can be \"deploy-key\" or \"github-user-key\"\n",
+              "enum": [
+                "deploy-key",
+                "github-user-key"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "x-schemaName": "Key"
+        },
+        "type": "array",
+        "x-schemaName": "Keys"
+      },
+      "Lifecycle": {
+        "enum": [
+          "queued",
+          "scheduled",
+          "not_run",
+          "not_running",
+          "running",
+          "finished"
+        ],
+        "type": "string",
+        "x-schemaName": "Lifecycle"
+      },
+      "Outcome": {
+        "enum": [
+          "canceled",
+          "infrastructure_fail",
+          "timedout",
+          "failed",
+          "no_tests",
+          "success"
+        ],
+        "type": "string",
+        "x-schemaName": "Outcome"
+      },
+      "Parallel": {
+        "description": "The number of containers to use to run the build. Default is null and the project default is used.\n",
+        "type": "string",
+        "x-schemaName": "Parallel"
+      },
+      "PreviousBuild": {
+        "description": "previous build",
+        "properties": {
+          "build_num": {
+            "type": "integer"
+          },
+          "build_time_millis": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "retried",
+              "canceled",
+              "infrastructure_fail",
+              "timedout",
+              "not_run",
+              "running",
+              "failed",
+              "queued",
+              "scheduled",
+              "not_running",
+              "no_tests",
+              "fixed",
+              "success"
+            ],
+            "type": "string",
+            "x-schemaName": "Status"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "PreviousBuild"
+      },
+      "Project": {
+        "properties": {
+          "aws": {
+            "properties": {
+              "keypair": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "x-schemaName": "Aws"
+          },
+          "branches": {
+            "type": "object"
+          },
+          "campfire_notify_prefs": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "campfire_room": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "campfire_subdomain": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "campfire_token": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "compile": {
+            "type": "string"
+          },
+          "default_branch": {
+            "type": "string"
+          },
+          "dependencies": {
+            "type": "string"
+          },
+          "extra": {
+            "type": "string"
+          },
+          "feature_flags": {
+            "properties": {
+              "build-fork-prs": {
+                "type": "boolean"
+              },
+              "fleet": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "junit": {
+                "type": "boolean"
+              },
+              "oss": {
+                "type": "boolean"
+              },
+              "osx": {
+                "type": "boolean"
+              },
+              "set-github-status": {
+                "type": "boolean"
+              },
+              "trusty-beta": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "flowdock_api_token": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "followed": {
+            "type": "boolean"
+          },
+          "has_usable_key": {
+            "type": "boolean"
+          },
+          "heroku_deploy_user": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "hipchat_api_token": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "hipchat_notify": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "hipchat_notify_prefs": {
+            "nullable": true,
+            "type": "string"
+          },
+          "hipchat_room": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "irc_channel": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "irc_keyword": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "irc_notify_prefs": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "irc_password": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "irc_server": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "irc_username": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "language": {
+            "type": "string"
+          },
+          "oss": {
+            "type": "boolean"
+          },
+          "parallel": {
+            "type": "integer"
+          },
+          "reponame": {
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "enum": [
+                "write-settings",
+                "view-builds",
+                "read-settings",
+                "trigger-builds",
+                "all",
+                "status",
+                "none"
+              ],
+              "type": "string",
+              "x-schemaName": "Scope"
+            },
+            "type": "array"
+          },
+          "setup": {
+            "type": "string"
+          },
+          "slack_api_token": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "slack_channel": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "slack_channel_override": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "slack_notify_prefs": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "slack_subdomain": {
+            "nullable": true,
+            "type": "string",
+            "x-schemaName": "StringOrNull"
+          },
+          "slack_webhook_url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "ssh_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "test": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "vcs_type": {
+            "type": "string"
+          },
+          "vcs_url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Project"
+      },
+      "Projects": {
+        "items": {
+          "properties": {
+            "aws": {
+              "properties": {
+                "keypair": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object",
+              "x-schemaName": "Aws"
+            },
+            "branches": {
+              "type": "object"
+            },
+            "campfire_notify_prefs": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "campfire_room": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "campfire_subdomain": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "campfire_token": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "compile": {
+              "type": "string"
+            },
+            "default_branch": {
+              "type": "string"
+            },
+            "dependencies": {
+              "type": "string"
+            },
+            "extra": {
+              "type": "string"
+            },
+            "feature_flags": {
+              "properties": {
+                "build-fork-prs": {
+                  "type": "boolean"
+                },
+                "fleet": {
+                  "nullable": true,
+                  "type": "boolean"
+                },
+                "junit": {
+                  "type": "boolean"
+                },
+                "oss": {
+                  "type": "boolean"
+                },
+                "osx": {
+                  "type": "boolean"
+                },
+                "set-github-status": {
+                  "type": "boolean"
+                },
+                "trusty-beta": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "flowdock_api_token": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "followed": {
+              "type": "boolean"
+            },
+            "has_usable_key": {
+              "type": "boolean"
+            },
+            "heroku_deploy_user": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "hipchat_api_token": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "hipchat_notify": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "hipchat_notify_prefs": {
+              "nullable": true,
+              "type": "string"
+            },
+            "hipchat_room": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "irc_channel": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "irc_keyword": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "irc_notify_prefs": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "irc_password": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "irc_server": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "irc_username": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "language": {
+              "type": "string"
+            },
+            "oss": {
+              "type": "boolean"
+            },
+            "parallel": {
+              "type": "integer"
+            },
+            "reponame": {
+              "type": "string"
+            },
+            "scopes": {
+              "items": {
+                "enum": [
+                  "write-settings",
+                  "view-builds",
+                  "read-settings",
+                  "trigger-builds",
+                  "all",
+                  "status",
+                  "none"
+                ],
+                "type": "string",
+                "x-schemaName": "Scope"
+              },
+              "type": "array"
+            },
+            "setup": {
+              "type": "string"
+            },
+            "slack_api_token": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "slack_channel": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "slack_channel_override": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "slack_notify_prefs": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "slack_subdomain": {
+              "nullable": true,
+              "type": "string",
+              "x-schemaName": "StringOrNull"
+            },
+            "slack_webhook_url": {
+              "format": "uri",
+              "type": "string"
+            },
+            "ssh_keys": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "test": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "vcs_type": {
+              "type": "string"
+            },
+            "vcs_url": {
+              "format": "uri",
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "x-schemaName": "Project"
+        },
+        "type": "array",
+        "x-schemaName": "Projects"
+      },
+      "Revision": {
+        "description": "The specific revision to build.\nDefault is null and the head of the branch is used. Cannot be used with tag parameter.\n",
+        "type": "string",
+        "x-schemaName": "Revision"
+      },
+      "Scope": {
+        "enum": [
+          "write-settings",
+          "view-builds",
+          "read-settings",
+          "trigger-builds",
+          "all",
+          "status",
+          "none"
+        ],
+        "type": "string",
+        "x-schemaName": "Scope"
+      },
+      "Sha1": {
+        "type": "string",
+        "x-schemaName": "Sha1"
+      },
+      "Status": {
+        "enum": [
+          "retried",
+          "canceled",
+          "infrastructure_fail",
+          "timedout",
+          "not_run",
+          "running",
+          "failed",
+          "queued",
+          "scheduled",
+          "not_running",
+          "no_tests",
+          "fixed",
+          "success"
+        ],
+        "type": "string",
+        "x-schemaName": "Status"
+      },
+      "StringOrNull": {
+        "nullable": true,
+        "type": "string",
+        "x-schemaName": "StringOrNull"
+      },
+      "Tag": {
+        "description": "The tag to build. Default is null. Cannot be used with revision parameter.\n",
+        "type": "string",
+        "x-schemaName": "Tag"
+      },
+      "Tests": {
+        "properties": {
+          "tests": {
+            "items": {
+              "properties": {
+                "classname": {
+                  "type": "string"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "result": {
+                  "enum": [
+                    "retried",
+                    "canceled",
+                    "infrastructure_fail",
+                    "timedout",
+                    "not_run",
+                    "running",
+                    "failed",
+                    "queued",
+                    "scheduled",
+                    "not_running",
+                    "no_tests",
+                    "fixed",
+                    "success"
+                  ],
+                  "type": "string",
+                  "x-schemaName": "Status"
+                },
+                "run_time": {
+                  "type": "number"
+                },
+                "source": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "Tests"
+      },
+      "User": {
+        "properties": {
+          "admin": {
+            "type": "boolean"
+          },
+          "all_emails": {
+            "items": {
+              "format": "email",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "analytics_id": {
+            "type": "string"
+          },
+          "avatar_url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "basic_email_prefs": {
+            "type": "string"
+          },
+          "bitbucket": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "bitbucket_authorized": {
+            "type": "boolean"
+          },
+          "containers": {
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "days_left_in_trial": {
+            "type": "integer"
+          },
+          "dev_admin": {
+            "type": "boolean"
+          },
+          "enrolled_betas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "github_id": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "github_oauth_scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "gravatar_id": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "heroku_api_key": {
+            "nullable": true,
+            "type": "string"
+          },
+          "in_beta_program": {
+            "type": "boolean"
+          },
+          "login": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization_prefs": {
+            "type": "object"
+          },
+          "parallelism": {
+            "type": "integer"
+          },
+          "plan": {
+            "nullable": true,
+            "type": "string"
+          },
+          "projects": {
+            "type": "object"
+          },
+          "pusher_id": {
+            "type": "string"
+          },
+          "selected_email": {
+            "format": "email",
+            "type": "string"
+          },
+          "sign_in_count": {
+            "type": "integer"
+          },
+          "trial_end": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-schemaName": "User"
+      }
+    },
+    "securitySchemes": {
+      "apikey": {
+        "in": "query",
+        "name": "circle-token",
+        "type": "apiKey"
+      }
+    }
+  }
+}

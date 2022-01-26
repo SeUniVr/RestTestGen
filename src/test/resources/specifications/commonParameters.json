@@ -1,0 +1,136 @@
+{
+  "openapi": "3.0.0",
+  "info" : {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "query",
+          "schema": {
+            "type": "number"
+          }
+        },
+        {
+          "name": "additional",
+          "in": "cookie",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "mySpecial",
+          "in": "header",
+          "schema": {
+            "$ref": "#/components/schemas/SpecialString"
+          }
+        },
+        {
+          "$ref": "#/components/parameters/referredString"
+        }
+      ],
+      "post": {
+        "operationId": "postRoot",
+        "parameters": [
+          {
+            "name" : "category",
+            "in" : "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response description"
+          }
+        }
+      },
+      "get": {
+        "operationId": "getRoot",
+        "responses": {
+          "200": {
+            "description": "Response description"
+          }
+        }
+      },
+      "put": {
+        "operationId": "putRoot",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/referredString"
+          },
+          {
+            "name": "id",
+            "in": "cookie",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response description"
+          }
+        }
+      },
+      "head": {
+        "operationId": "headRoot",
+        "description": "This operation is not valid. Just for testing purpose!",
+        "parameters": [
+          {
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response description"
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "SpecialString": {
+        "type": "string",
+        "default": "special!"
+      }
+    },
+    "parameters": {
+      "referredString": {
+        "name": "refString",
+        "in": "cookie",
+        "schema": {
+          "$ref": "#/components/schemas/SpecialString"
+        }
+      }
+    }
+  }
+}

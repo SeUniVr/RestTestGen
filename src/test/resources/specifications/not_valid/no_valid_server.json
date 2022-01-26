@@ -1,0 +1,27 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Swagger Petstore",
+    "description": "This is a fork of Petstore server specification.  You can find out more about Swagger at [http://swagger.io](http://swagger.io). For this sample, you can use the api key `special-key` to test the authorization filters."
+    },
+  "servers": [
+    {
+      "url": "not valid"
+    },
+    {
+      "url": "http ?"
+    },
+    {
+      "url": 3
+    }
+  ],
+  "paths": {
+  },
+  "components": {
+    "schemas": {
+      "ASchema": {
+        "type": "string"
+      }
+    }
+  }
+}

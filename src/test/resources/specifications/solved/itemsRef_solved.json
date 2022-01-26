@@ -1,0 +1,84 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "test specification",
+    "title": "test",
+    "version": "0.4"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/{id}": {
+      "get": {
+        "operationId": "getRoot",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-schemaName": "CustomString"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "x-schemaName": "CustomString"
+            }
+          },
+          {
+            "name": "hParam",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "x-schemaName": "CustomString"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomString": {
+        "type": "string",
+        "x-schemaName": "CustomString"
+      },
+      "MyBaseSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "x-schemaName": "MyBaseSchema"
+      },
+      "MyRefSchema": {
+        "properties": {
+          "baseSchemas": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "x-schemaName": "MyBaseSchema"
+            }
+          }
+        },
+        "x-schemaName": "MyRefSchema"
+      }
+    }
+  }
+}

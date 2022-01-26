@@ -1,0 +1,70 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getRoot",
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimpleString": {
+        "type": "string",
+        "maxLength": 10.0,
+        "x-schemaName": "SimpleString"
+      },
+      "SimpleStringS": {
+        "items": {
+          "type": "string",
+          "maxLength": 10.0,
+          "x-schemaName": "SimpleString"
+        },
+        "x-schemaName": "SimpleStringS"
+      },
+      "SimpleStringSAlias": {
+        "x-schemaName": "SimpleStringS",
+        "items": {
+          "type": "string",
+          "maxLength": 10.0,
+          "x-schemaName": "SimpleString"
+        }
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "firstNames": {
+            "items": {
+              "type": "string",
+              "maxLength": 10.0,
+              "x-schemaName": "SimpleString"
+            }
+          },
+          "lastNames": {
+            "items": {
+              "type": "string",
+              "maxLength": 10.0,
+              "x-schemaName": "SimpleString"
+            },
+            "x-schemaName": "SimpleStringS"
+          }
+        },
+        "x-schemaName": "Person"
+      }
+    }
+  }
+}

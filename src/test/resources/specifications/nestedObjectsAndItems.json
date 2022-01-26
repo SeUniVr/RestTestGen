@@ -1,0 +1,86 @@
+{
+  "openapi": "3.0.0",
+  "info" : {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "postRoot",
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topLevelArray"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/topLevelArray"
+                  }
+                }
+              }
+            }
+          }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+
+      "baseObject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          }
+        }
+      },
+
+      "baseArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/baseObject"
+        }
+      },
+
+      "objectWithNestedArray": {
+        "type": "object",
+        "properties": {
+          "first": {
+            "$ref": "#/components/schemas/baseArray"
+          },
+          "second": {
+            "$ref": "#/components/schemas/baseArray"
+          }
+        }
+      },
+
+      "topLevelArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/objectWithNestedArray"
+        }
+      }
+
+    }
+  }
+}
