@@ -8,12 +8,15 @@ A framework for automated black-box testing of RESTful APIs.
 
 > **Citing our work:** please cite our latest journal paper about RestTestGen: *Automated Black-Box Testing of Nominal and Error Scenarios in RESTful APIs*. BibTeX:
 > ```
-> @article{article,
->     author  = {Davide Corradini, Amedeo Zampieri, Michele Pasqua, Emanuele Viglianisi, Michael Dallago, Mariano Ceccato},
->     title   = {Automated Black-Box Testing of Nominal and Error Scenarios in RESTful APIs},
->     journal = {Software: Testing, Verification and Reliability},
->     year    = 2022,
->     doi     = {10.1002/stvr.1808},
+> @article{Corradini2022,
+>     doi = {10.1002/stvr.1808},
+>     url = {https://doi.org/10.1002/stvr.1808},
+>     year = {2022},
+>     month = jan,
+>     publisher = {Wiley},
+>     author = {Davide Corradini and Amedeo Zampieri and Michele Pasqua and Emanuele Viglianisi and Michael Dallago and Mariano Ceccato},
+>     title = {Automated black-box testing of nominal and error scenarios in RESTful APIs},
+>     journal = {Software Testing, Verification and Reliability}
 > }
 > ```
 
@@ -28,7 +31,8 @@ RestTestGen comes with a built-in default configuration that works for most test
 ## <a id="core-features"></a> Features
 The core of the RestTestGen framework provides the following features:
 - custom parser for OpenAPI specifications v3 in JSON format (we dropped Swagger Codegen that caused instability)
-  - please convert Swagger 2.0 files or YAML specifications to JSON v3 specification using [https://editor.swagger.io/](https://editor.swagger.io/) 
+  - please convert Swagger 2.0 files or YAML specifications to JSON v3 specification using [https://editor.swagger.io/](https://editor.swagger.io/)
+  - combined parameter schemas (OneOf, AllOf, AnyOf) are supported by the parser, but currently not used in our strategies (wip)
 - the Operation Dependency Graph (ODG), that models data dependency among operations
 - dictionaries storing values observed at testing time
 - smart parameter management using hierarchical data structures
