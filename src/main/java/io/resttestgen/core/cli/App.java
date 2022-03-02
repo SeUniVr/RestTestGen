@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -20,7 +19,7 @@ import java.lang.reflect.Method;
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class);
-    private static final String toolVersion = "22.01";
+    private static final String toolVersion = "22.02";
     private static final String messageHeader = "RestTestGen Core " + toolVersion;
     private static final String helpMessage = messageHeader + "\n"
             + "Arguments:\n"
@@ -49,9 +48,9 @@ public class App {
         checkArguments(args, configuration);
 
         // Set up the environment (parses specification, creates ODG, etc.) starting from the configuration
-        Environment environment = null;
+        Environment environment = Environment.getInstance();
         try {
-            environment = new Environment(configuration);
+            environment.setUp(configuration);
         } catch (CannotParseOpenAPIException e) {
             logger.error("Cannot parse the provided OpenAPI specification.");
             System.exit(-1);
@@ -65,25 +64,18 @@ public class App {
         }
 
         // Launch the testing strategy class with reflections
-        logger.info("Launching strategy with class name '" + environment.configuration.getStrategyName() + "'");
-        final String strategyClassFullName = strategyPackageName + "." + environment.configuration.getStrategyName();
+        logger.info("Launching strategy with class name '" + environment.getConfiguration().getStrategyName() + "'");
+        final String strategyClassFullName = strategyPackageName + "." + environment.getConfiguration().getStrategyName();
         try {
-            // TODO: call constructor at first, passing the environment, then call the start method.
             Class<?> strategyClass = Class.forName(strategyClassFullName);
-            Constructor<?> strategyConstructor = strategyClass.getConstructor(Environment.class);
-            Strategy strategy = (Strategy) strategyConstructor.newInstance(environment);
-            //Strategy strategy = (Strategy) strategyClass.getDeclaredConstructor().newInstance();
+            Strategy strategy = (Strategy) strategyClass.getDeclaredConstructor().newInstance();
             Method startMethod = strategyClass.getMethod("start");
             startMethod.invoke(strategy);
         } catch (ClassNotFoundException e) {
             logger.error("Strategy class with name '" + strategyClassFullName + "' not found.");
         } catch (NoSuchMethodException e) {
             logger.error("Method 'start' not found in class '" + strategyClassFullName + "'.");
-        } /*catch (Exception e) {
-            logger.error("Could not launch the strategy. See stack trace for more information.");
-            e.printStackTrace();
-        }*/ // TODO: remove
-        catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

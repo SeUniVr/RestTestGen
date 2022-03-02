@@ -1,6 +1,9 @@
 package io.resttestgen.core.testing;
 
+import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
+
+import java.io.IOException;
 
 /**
  * This abstract class is used to write a test interaction or a test sequence to file. Different implementations provide
@@ -8,11 +11,10 @@ import io.resttestgen.core.Environment;
  */
 public abstract class Writer {
 
-    protected Environment environment;
+    protected Configuration configuration = Environment.getInstance().getConfiguration();
     protected TestSequence testSequence;
 
-    public Writer(Environment environment, TestSequence testSequence) {
-        this.environment = environment;
+    public Writer(TestSequence testSequence) {
         this.testSequence = testSequence;
     }
 
@@ -21,10 +23,11 @@ public abstract class Writer {
     /**
      * Writes a test sequence to file.
      */
-    public abstract void write();
+    public abstract void write() throws IOException;
 
+    // FIXME: make path compatible with Windows
     public String getOutputPath() {
-        return environment.configuration.getOutputPath() + environment.configuration.getTestingSessionName() + "/" +
-                getOutputFormatName() + "/" + testSequence.getGenerator() + "/";
+        return configuration.getOutputPath() + configuration.getTestingSessionName() + "/" + getOutputFormatName() +
+                "/" + testSequence.getGenerator() + "/";
     }
 }

@@ -1,5 +1,6 @@
 package io.resttestgen.core.helper;
 
+import io.resttestgen.core.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HTTPMethod;
 import io.resttestgen.core.datatype.parameter.*;
@@ -16,18 +17,16 @@ import java.util.stream.Collectors;
 
 public class RequestManager {
 
-    private OkHttpClient client;
-    private Environment environment;
+    private final OkHttpClient client;
     private final Operation source;
-    private Operation operation;
+    private final Operation operation;
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private static final Logger logger = LogManager.getLogger(RequestManager.class);
 
-    public RequestManager(Environment environment, Operation operation) {
-        this.environment = environment;
-        this.client = environment.httpClient;
+    public RequestManager(Operation operation) {
+        this.client = new OkHttpClient();
         this.source = operation;
         this.operation = operation;
     }
@@ -83,7 +82,7 @@ public class RequestManager {
 
         // To avoid okhttp crashes, remove parameters with null values
         removeUninitializedParameters();
-        URL server = environment.openAPI.getDefaultServer();
+        URL server = Environment.getInstance().getOpenAPI().getDefaultServer();
         HttpUrl.Builder httpBuilder = new HttpUrl.Builder();
         Request.Builder requestBuilder = new Request.Builder();
 
@@ -97,9 +96,15 @@ public class RequestManager {
         Matcher matcher = Pattern.compile("\\{[^{}]*\\}").matcher(endpoint);
         while (matcher.find()) {
             String parameterName = matcher.group().substring(1, matcher.group().length() - 1);
-            ParameterElement pathParameter =
-                    pathParameters.stream().filter(p -> p.getName().toString().equals(parameterName)).findFirst().get();
-            endpoint = endpoint.replaceFirst("\\{" + parameterName + "\\}", pathParameter.getValueAsFormattedString());
+
+            // FIXME: had to add optional because it happened that the value was not present. Check with Amedeo
+            Optional<ParameterElement> pathParameter =
+                    pathParameters.stream().filter(p -> p.getName().toString().equals(parameterName)).findFirst();
+
+            if (pathParameter.isPresent()) {
+                endpoint = endpoint.replaceFirst("\\{" + parameterName + "\\}",
+                        pathParameter.get().getValueAsFormattedString());
+            }
         }
 
         httpBuilder.addPathSegments(endpoint);
@@ -140,36 +145,36 @@ public class RequestManager {
         );
 
         // Apply authorization
-        Map<String, String> auth = this.environment.getAuth();
+        AuthenticationInfo auth = Environment.getInstance().getAuth();
         if (auth != null) {
 
             if (!asFuzzed) {
 
                 if (dropAuth) {
-                    switch (auth.get("in")) {
-                        case "header":
-                            requestBuilder.removeHeader(auth.get("name"));
+                    switch (auth.getIn()) {
+                        case HEADER:
+                            requestBuilder.removeHeader(auth.getName().toString());
                             break;
-                        case "query":
-                            queryParametersMap.remove(auth.get("name"));
+                        case QUERY:
+                            queryParametersMap.remove(auth.getName());
                             break;
-                        case "cookie":
+                        case COOKIE:
                             logger.warn("Cookie parameters are not already supported.");
                             break;
                     }
                 } else {
-                    String authToken = auth.get("value");
+                    String authToken = auth.getValue();
                     if (token != null) {
                         authToken = token;
                     }
-                    switch (auth.get("in")) {
-                        case "header":
-                            requestBuilder.header(auth.get("name"), authToken);
+                    switch (auth.getIn()) {
+                        case HEADER:
+                            requestBuilder.header(auth.getName().toString(), authToken);
                             break;
-                        case "query":
-                            queryParametersMap.put(auth.get("name"), authToken);
+                        case QUERY:
+                            queryParametersMap.put(auth.getName().toString(), authToken);
                             break;
-                        case "cookie":
+                        case COOKIE:
                             logger.warn("Cookie parameters are not already supported.");
                             break;
                     }

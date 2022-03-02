@@ -11,49 +11,57 @@ import io.resttestgen.core.openapi.InvalidOpenAPIException;
 import io.resttestgen.core.openapi.OpenAPI;
 import io.resttestgen.core.openapi.OpenAPIParser;
 import io.resttestgen.core.operationdependencygraph.OperationDependencyGraph;
-import okhttp3.OkHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
- * A container class for all the environment elements of the RestTestGen Core, such as the parsed specification,
+ * A container class for all the environment components of the RestTestGen Core, such as the parsed specification,
  * dictionaries, the Operation Dependency Graph, etc.
+ * Implemented as singleton for easy access from any class.
  */
 public class Environment {
 
     private static final Logger logger = LogManager.getLogger(Environment.class);
 
-    public Configuration configuration;
-    public OpenAPI openAPI;
-    public OperationDependencyGraph operationDependencyGraph;
-    public Dictionary dictionary;
-    public ResponseAnalyzer responseAnalyzer;
-    public OkHttpClient httpClient;
-    public ExtendedRandom random;
-    private Map<String, String> auth;
+    private static Environment instance = null;
+
+    private Configuration configuration;
+    private OpenAPI openAPI;
+    private OperationDependencyGraph operationDependencyGraph;
+    private Dictionary globalDictionary;
+    private ResponseAnalyzer responseAnalyzer;
+    private ExtendedRandom random;
+    private List<AuthenticationInfo> authInfo;
+
+    Environment() {
+
+    }
 
     /**
      * Given the configuration, the constructor parses the OpenAPI specification, builds the Operation Dependency Graph,
      * fills the default dictionary and prepares the response dictionary. These objects can be used by strategies,
      * fuzzers and oracles to
-     * @param configuration
+     * @param configuration the provided configuration.
      */
-    public Environment(Configuration configuration) throws CannotParseOpenAPIException, InvalidOpenAPIException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, IOException, InterruptedException {
+    public void setUp(Configuration configuration) throws CannotParseOpenAPIException, InvalidOpenAPIException,
+            InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+            IOException, InterruptedException {
+
         this.configuration = configuration;
         NormalizedParameterName.setQualifiableNames(configuration.getQualifiableNames());
         this.openAPI = new OpenAPIParser(Paths.get(configuration.getSpecificationFileName())).parse();
-        this.operationDependencyGraph = new OperationDependencyGraph(this.openAPI, this.configuration);
-        this.dictionary = new Dictionary();
-        this.responseAnalyzer = new ResponseAnalyzer(this);
-        //this.defaultDictionary = loadDefaultDictionary(configuration);
-        //this.responseDictionary = prepareResponseDictionary();
+        this.operationDependencyGraph = new OperationDependencyGraph(openAPI);
+        this.globalDictionary = new Dictionary();
+        this.responseAnalyzer = new ResponseAnalyzer();
         this.random = new ExtendedRandom();
 
         // Exec auth command
@@ -66,7 +74,6 @@ public class Environment {
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-
         StringBuilder stringBuilder = new StringBuilder();
         String s;
         while ((s = stdError.readLine()) != null) {
@@ -76,38 +83,78 @@ public class Environment {
             stringBuilder.append(s);
         }
 
-        try {
-            this.auth = new Gson().fromJson(stringBuilder.toString(), Map.class);
+        Map<String, Object>[] maps = new Map[0];
+        try {     
+            maps = new Gson().fromJson(stringBuilder.toString(), Map[].class);
         } catch (JsonSyntaxException e) {
             logger.error("Authorization script must return a valid json. Instead, its result was:\n" + stringBuilder);
         }
-        // Check that the json contains all and only the required fields
-        if (this.auth.size() != 4 || !this.auth.containsKey("name") || !this.auth.containsKey("value") ||
-                !this.auth.containsKey("in") || !this.auth.containsKey("timeout")) {
-            logger.error("Authorization script must return a json containing all and only the fields" +
-                    "'name', 'value', 'in', 'timeout'. Instead, its result was:\n" + stringBuilder);
+        
+        this.authInfo = new LinkedList<>();
+        for (Map<String, Object> map : maps) {
+            this.authInfo.add(AuthenticationInfo.parse(map));
         }
     }
 
-    /**
-     * Loads the values of the default dictionary from file
-     * @param configuration
-     */
-    private static Dictionary loadDefaultDictionary(Configuration configuration) {
-        // TODO: load default dictionary either form the resources or from file if provided
-        return null;
+    public static Environment getInstance() {
+        if (instance == null) {
+            instance = new Environment();
+        }
+        return instance;
     }
 
-    /**
-     *
-     * @return
-     */
-    private static Dictionary prepareResponseDictionary() {
-        // TODO: prepare an empty response dictionary
-        return null;
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
-    public Map<String, String> getAuth() {
-        return Collections.unmodifiableMap(this.auth);
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    public OpenAPI getOpenAPI() {
+        return openAPI;
+    }
+
+    public void setOpenAPI(OpenAPI openAPI) {
+        this.openAPI = openAPI;
+    }
+
+    public OperationDependencyGraph getOperationDependencyGraph() {
+        return operationDependencyGraph;
+    }
+
+    public void setOperationDependencyGraph(OperationDependencyGraph operationDependencyGraph) {
+        this.operationDependencyGraph = operationDependencyGraph;
+    }
+
+    public Dictionary getGlobalDictionary() {
+        return globalDictionary;
+    }
+
+    public void setGlobalDictionary(Dictionary dictionary) {
+        this.globalDictionary = dictionary;
+    }
+
+    public ResponseAnalyzer getResponseAnalyzer() {
+        return responseAnalyzer;
+    }
+
+    public void setResponseAnalyzer(ResponseAnalyzer responseAnalyzer) {
+        this.responseAnalyzer = responseAnalyzer;
+    }
+
+    public ExtendedRandom getRandom() {
+        return random;
+    }
+
+    public void setRandom(ExtendedRandom random) {
+        this.random = random;
+    }
+
+    public AuthenticationInfo getAuth() {
+        if (this.authInfo.size() > 0) {
+            return this.authInfo.get(0);
+        }
+        return null;
     }
 }

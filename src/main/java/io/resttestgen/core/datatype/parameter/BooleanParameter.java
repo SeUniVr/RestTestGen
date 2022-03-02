@@ -1,5 +1,6 @@
 package io.resttestgen.core.datatype.parameter;
 
+import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,7 +55,7 @@ public class BooleanParameter extends ParameterLeaf {
     public Object generateCompliantValue() {
 
         // Generate random value
-        Object generatedValue = random.nextBoolean();
+        Object generatedValue = Environment.getInstance().getRandom().nextBoolean();
 
         // Log the generated value
         logger.debug("Generated boolean value for parameter " + normalizedName + " (" + name + "): " + generatedValue);

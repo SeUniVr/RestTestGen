@@ -1,6 +1,5 @@
-package io.resttestgen.core.testing;
+package io.resttestgen.core.testing.operationsorter;
 
-import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
 
 import java.util.LinkedList;
@@ -10,11 +9,6 @@ import java.util.LinkedList;
  * execution), so the complete queue of operations can be returned anytime.
  */
 public abstract class StaticOperationsSorter extends OperationsSorter {
-
-
-    public StaticOperationsSorter(Environment environment) {
-        super(environment);
-    }
 
     public LinkedList<Operation> getOperationsQueue() {
         return queue;

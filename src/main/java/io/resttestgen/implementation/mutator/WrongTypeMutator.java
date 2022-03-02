@@ -1,5 +1,6 @@
 package io.resttestgen.implementation.mutator;
 
+import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.mutator.Mutator;
 import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.helper.ExtendedRandom;
@@ -10,8 +11,6 @@ public class WrongTypeMutator extends Mutator {
 
     private static final Logger logger = LogManager.getLogger(WrongTypeMutator.class);
 
-    private static final ExtendedRandom random = new ExtendedRandom();
-
     @Override
     public boolean isParameterMutable(ParameterLeaf parameter) {
         return parameter instanceof StringParameter || parameter instanceof NumberParameter ||
@@ -20,6 +19,8 @@ public class WrongTypeMutator extends Mutator {
 
     @Override
     public ParameterLeaf mutate(ParameterLeaf parameter) {
+
+        ExtendedRandom random = Environment.getInstance().getRandom();
 
         ParameterLeaf mutatedParameter;
 

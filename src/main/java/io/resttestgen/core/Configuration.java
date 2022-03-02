@@ -1,7 +1,6 @@
 package io.resttestgen.core;
 
 import com.google.gson.Gson;
-import io.resttestgen.core.helper.ExtendedRandom;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +26,7 @@ public class Configuration {
     private String specificationFileName;
     private String authCommand;
     private String strategyName;
-    private List<String> qualifiableNames;
+    private final List<String> qualifiableNames;
     private String odgFileName;
 
     /**
@@ -37,7 +36,6 @@ public class Configuration {
         // Choose random testing session name with date and random number
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         LocalDateTime now = LocalDateTime.now();
-        ExtendedRandom random = new ExtendedRandom();
         testingSessionName = "testing-session-" + dtf.format(now);
 
         outputPath = System.getProperty("user.dir") + "/output/";

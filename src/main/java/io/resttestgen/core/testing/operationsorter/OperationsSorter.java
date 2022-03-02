@@ -1,6 +1,5 @@
-package io.resttestgen.core.testing;
+package io.resttestgen.core.testing.operationsorter;
 
-import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
 
 import java.util.LinkedList;
@@ -10,11 +9,7 @@ import java.util.LinkedList;
  */
 public abstract class OperationsSorter {
 
-    protected LinkedList<Operation> queue;
-
-    public OperationsSorter(Environment environment) {
-        queue = new LinkedList<>();
-    }
+    protected LinkedList<Operation> queue = new LinkedList<>();
 
     public boolean isEmpty() {
         return queue.isEmpty();

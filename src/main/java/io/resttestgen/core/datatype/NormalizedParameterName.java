@@ -11,8 +11,8 @@ import java.util.*;
 public class NormalizedParameterName {
 
     private static Set<String> qualifiableNames;
-    private static PorterStemmer stemmer = new PorterStemmer();
-    private static Set<String> qualifiedNames = new HashSet<>();
+    private final static PorterStemmer stemmer = new PorterStemmer();
+    private final static Set<String> qualifiedNames = new HashSet<>();
 
     private String normalizedParameterName;
 

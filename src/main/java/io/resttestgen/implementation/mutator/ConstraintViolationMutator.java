@@ -1,5 +1,6 @@
 package io.resttestgen.implementation.mutator;
 
+import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.mutator.Mutator;
 import io.resttestgen.core.datatype.parameter.NumberParameter;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
@@ -15,8 +16,6 @@ import java.util.Optional;
 public class ConstraintViolationMutator extends Mutator {
 
     private static final Logger logger = LogManager.getLogger(ConstraintViolationMutator.class);
-
-    private static final ExtendedRandom random = new ExtendedRandom();
 
     @Override
     public boolean isParameterMutable(ParameterLeaf parameter) {
@@ -75,6 +74,8 @@ public class ConstraintViolationMutator extends Mutator {
      */
     private void mutateString(StringParameter parameter) {
 
+        ExtendedRandom random = Environment.getInstance().getRandom();
+
         // Save to this list the possible lengths of the mutated string
         List<Integer> lengths = new ArrayList<>();
         if (parameter.getMinLength() != null && parameter.getMinLength() > 1) {
@@ -105,6 +106,9 @@ public class ConstraintViolationMutator extends Mutator {
      * @param parameter the parameter to mutate
      */
     private void mutateNumber(NumberParameter parameter) {
+
+        ExtendedRandom random = Environment.getInstance().getRandom();
+
         List<Double> values = new ArrayList<>();
         if (parameter.getMinimum() != null && parameter.getMinimum() > Double.MIN_VALUE) {
             values.add(random.nextDouble(Double.MIN_VALUE, parameter.getMinimum()));

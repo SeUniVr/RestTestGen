@@ -1,6 +1,7 @@
 package io.resttestgen.core.operationdependencygraph;
 
 import io.resttestgen.core.Configuration;
+import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.parameter.ParameterElement;
 import io.resttestgen.core.openapi.OpenAPI;
@@ -31,17 +32,15 @@ import java.util.stream.Collectors;
 public class OperationDependencyGraph {
 
     private static final Logger logger = LogManager.getLogger(OperationDependencyGraph.class);
-    private Configuration configuration;
+    private final Configuration configuration = Environment.getInstance().getConfiguration();
 
-    private Graph<OperationNode, DependencyEdge> graph = new DirectedMultigraph<>(DependencyEdge.class);
+    private final Graph<OperationNode, DependencyEdge> graph = new DirectedMultigraph<>(DependencyEdge.class);
 
     /**
      * Constructor that builds the Operation Dependency Graph from the provided parsed OpenAPI specification
      * @param openAPI the parsed, valid OpenAPI specification
      */
-    public OperationDependencyGraph(OpenAPI openAPI, Configuration configuration) {
-
-        this.configuration = configuration;
+    public OperationDependencyGraph(OpenAPI openAPI) {
 
         // Get operations from specification and add them to the graph as vertices
         logger.debug("Collecting operations from OpenAPI specification.");

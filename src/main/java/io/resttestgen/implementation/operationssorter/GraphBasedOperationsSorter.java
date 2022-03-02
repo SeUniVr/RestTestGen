@@ -7,7 +7,7 @@ import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.operationdependencygraph.OperationDependencyGraph;
 import io.resttestgen.core.operationdependencygraph.OperationNode;
-import io.resttestgen.core.testing.DynamicOperationsSorter;
+import io.resttestgen.core.testing.operationsorter.DynamicOperationsSorter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,13 +18,10 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
 
     private static final int MAX_ATTEMPTS = 10;
 
-    private OperationDependencyGraph graph;
-    private ExtendedRandom random;
+    private OperationDependencyGraph graph = Environment.getInstance().getOperationDependencyGraph();
+    private ExtendedRandom random = Environment.getInstance().getRandom();
 
-    public GraphBasedOperationsSorter(Environment environment) {
-        super(environment);
-        this.graph = environment.operationDependencyGraph;
-        this.random = environment.random;
+    public GraphBasedOperationsSorter() {
         refresh();
     }
 

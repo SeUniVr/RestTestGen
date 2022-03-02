@@ -10,7 +10,8 @@ public class TestingEnvironmentGenerator {
     public static Environment getTestingEnvironment() {
         Configuration c = new Configuration(true);
         try {
-            Environment e = new Environment(c);
+            Environment e = Environment.getInstance();
+            e.setUp(c);
             return e;
         } catch (Exception e) {
             logger.error(e);
@@ -22,7 +23,8 @@ public class TestingEnvironmentGenerator {
         Configuration c = new Configuration(true);
         c.setSpecificationFileName(filename);
         try {
-            Environment e = new Environment(c);
+            Environment e = new Environment();
+            e.setUp(c);
             return e;
         } catch (Exception e) {
             e.printStackTrace();

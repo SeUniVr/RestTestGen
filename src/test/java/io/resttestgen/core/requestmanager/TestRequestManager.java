@@ -9,6 +9,7 @@ import io.resttestgen.core.openapi.Operation;
 import okhttp3.Request;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -19,16 +20,22 @@ public class TestRequestManager {
 
     private static final Logger logger = LogManager.getLogger(TestRequestManager.class);
 
+    private static Environment e;
+
+    @BeforeAll
+    public void setUp() {
+        e = TestingEnvironmentGenerator.getTestingEnvironment("build/resources/test/specifications/medium_petstore.json");
+    }
+
     // TODO: this is just a blueprint of the tests. Implement real tests.
     @Test
-    public void TestBaseExecution() {
+    public static void TestBaseExecution() {
         logger.info("Test Requests creation");
-        Environment e = TestingEnvironmentGenerator.getTestingEnvironment("build/resources/test/specifications/medium_petstore.json");
 
-        Operation findPetsByStatus = e.openAPI.getOperations().stream().filter(o -> o.getOperationId().equals("findPetsByStatus"))
+        Operation findPetsByStatus = e.getOpenAPI().getOperations().stream().filter(o -> o.getOperationId().equals("findPetsByStatus"))
                 .findFirst().get();
         logger.debug("Testing " + findPetsByStatus);
-        RequestManager rm = new RequestManager(e, findPetsByStatus);
+        RequestManager rm = new RequestManager(findPetsByStatus);
         StringParameter status = (StringParameter) rm.getOperation().getQueryParameters().stream().findAny().get();
         status.setValue("available");
         logger.debug("Status: " + status.getValueAsFormattedString());
@@ -72,10 +79,10 @@ public class TestRequestManager {
             ex.printStackTrace();
         }
 
-        Operation findByTags = e.openAPI.getOperations().stream().filter(o -> o.getOperationId().equals("findPetsByTags"))
+        Operation findByTags = e.getOpenAPI().getOperations().stream().filter(o -> o.getOperationId().equals("findPetsByTags"))
                 .findFirst().get();
         logger.debug("Testing " + findByTags);
-        rm = new RequestManager(e, findByTags);
+        rm = new RequestManager(findByTags);
         ParameterArray tags = (ParameterArray) rm.getOperation().getQueryParameters().stream().findAny().get();
         for (int i = 1; i < 3; ++i) {
             StringParameter tag = new StringParameter((ParameterLeaf) tags.getReferenceElement());
@@ -90,10 +97,10 @@ public class TestRequestManager {
             ex.printStackTrace();
         }
 
-        Operation petId = e.openAPI.getOperations().stream().filter(o -> o.getOperationId().equals("getPetById"))
+        Operation petId = e.getOpenAPI().getOperations().stream().filter(o -> o.getOperationId().equals("getPetById"))
                 .findFirst().get();
         logger.debug("Testing " + petId);
-        rm = new RequestManager(e, petId);
+        rm = new RequestManager(petId);
         NumberParameter parameterPetId = (NumberParameter) rm.getOperation().getPathParameters().stream().findAny().get();
         parameterPetId.setValue(10);
         try {
@@ -102,10 +109,10 @@ public class TestRequestManager {
             ex.printStackTrace();
         }
 
-        Operation user = e.openAPI.getOperations().stream().filter(o -> o.getOperationId().equals("createUser"))
+        Operation user = e.getOpenAPI().getOperations().stream().filter(o -> o.getOperationId().equals("createUser"))
                 .findFirst().get();
         logger.debug("Testing " + user);
-        rm = new RequestManager(e, user);
+        rm = new RequestManager(user);
         user = rm.getOperation();
         ParameterObject userBody = (ParameterObject) rm.getOperation().getRequestBody();
         ((ParameterLeaf) userBody.getProperties().stream().filter(p -> p.getName().equals(new ParameterName("id"))).findFirst().get())
@@ -142,10 +149,10 @@ public class TestRequestManager {
             ex.printStackTrace();
         }
 
-        Operation createWithList = e.openAPI.getOperations().stream().filter(o -> o.getOperationId().equals("createUsersWithListInput"))
+        Operation createWithList = e.getOpenAPI().getOperations().stream().filter(o -> o.getOperationId().equals("createUsersWithListInput"))
                 .findFirst().get();
         logger.debug("Testing " + createWithList);
-        rm = new RequestManager(e, createWithList);
+        rm = new RequestManager(createWithList);
         ParameterArray listBody = (ParameterArray) rm.getOperation().getRequestBody();
         for (int i = 1; i < 3; ++i) {
             ParameterObject newUser = (ParameterObject) listBody.getReferenceElement().deepClone();

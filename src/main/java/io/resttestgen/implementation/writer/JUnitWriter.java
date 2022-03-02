@@ -1,13 +1,14 @@
 package io.resttestgen.implementation.writer;
 
-import io.resttestgen.core.Environment;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.Writer;
 
+import java.io.IOException;
+
 public class JUnitWriter extends Writer {
 
-    public JUnitWriter(Environment environment, TestSequence testSequence) {
-        super(environment, testSequence);
+    public JUnitWriter(TestSequence testSequence) {
+        super(testSequence);
     }
 
     @Override
@@ -16,7 +17,7 @@ public class JUnitWriter extends Writer {
     }
 
     @Override
-    public void write() {
-        // TODO: implement JUnit writer
+    public void write() throws IOException {
+        throw new InternalError("The JUnitWriter is not available yet.");
     }
 }

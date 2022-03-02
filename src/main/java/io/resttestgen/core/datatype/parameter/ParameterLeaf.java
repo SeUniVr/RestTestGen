@@ -1,8 +1,6 @@
 package io.resttestgen.core.datatype.parameter;
 
 import io.resttestgen.core.dictionary.Dictionary;
-import io.resttestgen.core.dictionary.DictionaryEntry;
-import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
 import io.resttestgen.core.openapi.Operation;
@@ -19,8 +17,6 @@ import java.util.Map;
 public abstract class ParameterLeaf extends ParameterElement {
 
     private static final Logger logger = LogManager.getLogger(ParameterLeaf.class);
-
-    protected static final ExtendedRandom random = new ExtendedRandom();
 
     protected Object value;
 
@@ -101,19 +97,6 @@ public abstract class ParameterLeaf extends ParameterElement {
 
     public int countValuesInDictionary(Dictionary dictionary) {
         return dictionary.getEntriesByParameterName(name, type).size();
-    }
-
-    public Object getValueFromDictionary(Dictionary dictionary) {
-        List<DictionaryEntry> entries = dictionary.getEntriesByParameterName(name, type);
-        DictionaryEntry chosen = entries.get(random.nextInt(entries.size()));
-        return chosen.getValue();
-    }
-
-    public Object getValueFromNormalizedDictionary(Dictionary dictionary) {
-        return dictionary.getEntriesByNormalizedParameterName(normalizedName, type)
-                .get(random.nextInt(dictionary.getEntriesByNormalizedParameterName(normalizedName, type).size()))
-                .getValue();
-
     }
 
     public abstract Object generateCompliantValue();

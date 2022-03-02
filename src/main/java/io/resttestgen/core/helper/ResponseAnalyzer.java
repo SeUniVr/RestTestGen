@@ -22,13 +22,9 @@ public class ResponseAnalyzer {
 
     private boolean responseUpdateGraph = true;
     private boolean responseDataIsAddedToDictionary = true;
-    private OperationDependencyGraph graph;
-    private Dictionary dictionary;
-
-    public ResponseAnalyzer(Environment environment) {
-        this.dictionary = environment.dictionary;
-        this.graph = environment.operationDependencyGraph;
-    }
+    private final OperationDependencyGraph graph = Environment.getInstance().getOperationDependencyGraph();
+    private final Dictionary globalDictionary = Environment.getInstance().getGlobalDictionary();
+    private Dictionary localDictionary;
 
     public boolean doesResponseUpdateGraph() {
         return responseUpdateGraph;
@@ -79,27 +75,59 @@ public class ResponseAnalyzer {
 
                         Object val = ((LinkedTreeMap<?, ?>) o).get(key);
                         if (val instanceof String) {
-                            dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, (String) val));
+                            DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, (String) val);
+                            globalDictionary.addEntry(entry);
+                            if (localDictionary != null) {
+                                localDictionary.addEntry(entry);
+                            }
                         } else if (val instanceof Double) {
                             if (((Double) val % 1) == 0) {
-                                dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, ((Double) val).intValue()));
+                                DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, ((Double) val).intValue());
+                                globalDictionary.addEntry(entry);
+                                if (localDictionary != null) {
+                                    localDictionary.addEntry(entry);
+                                }
                             } else {
-                                dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, (Double) val));
+                                DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, (Double) val);
+                                globalDictionary.addEntry(entry);
+                                if (localDictionary != null) {
+                                    localDictionary.addEntry(entry);
+                                }
                             }
                         } else if (val instanceof Boolean) {
-                            dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, (Boolean) val));
+                            DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, (Boolean) val);
+                            globalDictionary.addEntry(entry);
+                            if (localDictionary != null) {
+                                localDictionary.addEntry(entry);
+                            }
                         } else if (val instanceof ArrayList) {
                             for (Object arrayElement : (ArrayList) val) {
                                 if (arrayElement instanceof String) {
-                                    dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, (String) arrayElement));
+                                    DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, (String) arrayElement);
+                                    globalDictionary.addEntry(entry);
+                                    if (localDictionary != null) {
+                                        localDictionary.addEntry(entry);
+                                    }
                                 } else if (arrayElement instanceof Double) {
                                     if (((Double) val % 1) == 0) {
-                                        dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, ((Double) arrayElement).intValue()));
+                                        DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, ((Double) arrayElement).intValue());
+                                        globalDictionary.addEntry(entry);
+                                        if (localDictionary != null) {
+                                            localDictionary.addEntry(entry);
+                                        }
                                     } else {
-                                        dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, (Double) arrayElement));
+                                        DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, (Double) arrayElement);
+                                        globalDictionary.addEntry(entry);
+                                        if (localDictionary != null) {
+                                            localDictionary.addEntry(entry);
+                                        }
                                     }
                                 } else if (arrayElement instanceof Boolean) {
-                                    dictionary.addEntry(new DictionaryEntry(new ParameterName(key), null, (Boolean) arrayElement));
+                                    DictionaryEntry entry = new DictionaryEntry(new ParameterName(key), null, (Boolean) arrayElement);
+                                    globalDictionary.addEntry(entry);
+                                    if (localDictionary != null) {
+                                        localDictionary.addEntry(entry);
+                                    }
                                 } else if (arrayElement instanceof LinkedTreeMap) {
                                     queue.add(arrayElement);
                                 }
@@ -123,7 +151,19 @@ public class ResponseAnalyzer {
         }
     }
 
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+    /**
+     * Changes the local dictionary on which the response analyzer operates.
+     * @param dictionary the new local dictionary to use.
+     */
+    public void setLocalDictionary(Dictionary dictionary) {
+        this.localDictionary = dictionary;
+    }
+
+    /**
+     * Get the current local dictionary.
+     * @return the current local dictionary.
+     */
+    public Dictionary getLocalDictionary() {
+        return localDictionary;
     }
 }

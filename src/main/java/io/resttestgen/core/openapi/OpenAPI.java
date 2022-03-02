@@ -8,8 +8,8 @@ import java.util.Set;
 
 public class OpenAPI {
 
-    private ArrayList<URL> servers;
-    private Set<Operation> operations;
+    private final ArrayList<URL> servers;
+    private final Set<Operation> operations;
 
     public OpenAPI () {
         this.servers = new ArrayList<>();

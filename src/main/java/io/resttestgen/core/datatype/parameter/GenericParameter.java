@@ -1,6 +1,5 @@
 package io.resttestgen.core.datatype.parameter;
 
-import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,18 +60,6 @@ public class GenericParameter extends ParameterLeaf {
         return new GenericParameter(this, operation, parent);
     }
 
-    // FIXME: return all types
-    @Override
-    public Object getValueFromDictionary(Dictionary dictionary) {
-        return null;
-    }
-
-    // FIXME: return all types
-    @Override
-    public Object getValueFromNormalizedDictionary(Dictionary dictionary) {
-        return null;
-    }
-
     @Override
     public Object generateCompliantValue() {
         return null;
@@ -84,6 +71,6 @@ public class GenericParameter extends ParameterLeaf {
      */
     @Override
     public Collection<ParameterArray> getArrays() {
-        return new LinkedList<ParameterArray>();
+        return new LinkedList<>();
     }
 }

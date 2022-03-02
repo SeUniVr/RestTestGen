@@ -1,17 +1,17 @@
 package io.resttestgen.implementation.writer;
 
 import com.google.gson.GsonBuilder;
-import io.resttestgen.core.Environment;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.Writer;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class ReportWriter extends Writer {
 
-    public ReportWriter(Environment environment, TestSequence testSequence) {
-        super(environment, testSequence);
+    public ReportWriter(TestSequence testSequence) {
+        super(testSequence);
     }
 
     @Override
@@ -21,22 +21,19 @@ public class ReportWriter extends Writer {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void write() {
-        try {
-            File file = new File(getOutputPath());
+    public void write() throws IOException {
 
-            file.mkdirs();
+        File file = new File(getOutputPath());
 
-            FileWriter writer = new FileWriter(getOutputPath() +
-                    testSequence.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".json");
+        file.mkdirs();
 
-            // Convert map to JSON File
-            new GsonBuilder().setPrettyPrinting().create().toJson(testSequence, writer);
+        FileWriter writer = new FileWriter(getOutputPath() +
+                testSequence.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".json");
 
-            // Close the writer
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Convert map to JSON File
+        new GsonBuilder().setPrettyPrinting().create().toJson(testSequence, writer);
+
+        // Close the writer
+        writer.close();
     }
 }

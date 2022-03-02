@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jgrapht.alg.util.Pair;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -25,11 +26,9 @@ public class ErrorFuzzer extends Fuzzer {
 
     private TestSequence testSequenceToMutate;
     private Set<Mutator> mutators;
-    private Environment environment;
 
-    public ErrorFuzzer(Environment environment, TestSequence testSequenceToMutate) {
+    public ErrorFuzzer(TestSequence testSequenceToMutate) {
         this.testSequenceToMutate = testSequenceToMutate;
-        this.environment = environment;
         mutators = new HashSet<>();
         mutators.add(new MissingRequiredMutator());
         mutators.add(new WrongTypeMutator());
@@ -68,7 +67,7 @@ public class ErrorFuzzer extends Fuzzer {
                 });
 
                 // Choose a random mutation pair
-                Optional<Pair<ParameterLeaf, Mutator>> mutable = environment.random.nextElement(mutableParameters);
+                Optional<Pair<ParameterLeaf, Mutator>> mutable = Environment.getInstance().getRandom().nextElement(mutableParameters);
 
                 if (mutable.isPresent()) {
 
@@ -84,7 +83,6 @@ public class ErrorFuzzer extends Fuzzer {
 
                     // Execute test sequence
                     TestRunner testRunner = TestRunner.getInstance();
-                    testRunner.setEnvironment(environment);
                     testRunner.run(currentTestSequence);
 
                     // Evaluate sequence with oracles
@@ -92,8 +90,12 @@ public class ErrorFuzzer extends Fuzzer {
                     errorStatusCodeOracle.assertTestSequence(currentTestSequence);
 
                     // Write report to file
-                    ReportWriter reportWriter = new ReportWriter(environment, currentTestSequence);
-                    reportWriter.write();
+                    try {
+                        ReportWriter reportWriter = new ReportWriter(currentTestSequence);
+                        reportWriter.write();
+                    } catch (IOException e) {
+                        logger.warn("Could not write report to file.");
+                    }
 
                     testSequences.add(currentTestSequence);
                 }

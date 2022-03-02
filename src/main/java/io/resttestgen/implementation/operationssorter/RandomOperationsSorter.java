@@ -1,16 +1,15 @@
 package io.resttestgen.implementation.operationssorter;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.testing.StaticOperationsSorter;
+import io.resttestgen.core.testing.operationsorter.StaticOperationsSorter;
 
 import java.util.Collections;
 import java.util.LinkedList;
 
 public class RandomOperationsSorter extends StaticOperationsSorter {
 
-    public RandomOperationsSorter(Environment environment) {
-        super(environment);
-        queue = new LinkedList<>(environment.openAPI.getOperations());
+    public RandomOperationsSorter() {
+        queue = new LinkedList<>(Environment.getInstance().getOpenAPI().getOperations());
         Collections.shuffle(queue);
     }
 }

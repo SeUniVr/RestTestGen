@@ -1,8 +1,7 @@
 package io.resttestgen.implementation.strategy;
 
-import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
-import io.resttestgen.core.testing.OperationsSorter;
+import io.resttestgen.core.testing.operationsorter.OperationsSorter;
 import io.resttestgen.core.testing.Strategy;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.implementation.fuzzer.ErrorFuzzer;
@@ -16,21 +15,16 @@ public class NominalAndErrorStrategy extends Strategy {
 
     private static final Logger logger = LogManager.getLogger(NominalAndErrorStrategy.class);
 
-    private final TestSequence globalNominalTestSequence;
-
-    public NominalAndErrorStrategy(Environment environment) {
-        super(environment);
-        globalNominalTestSequence = new TestSequence();
-    }
+    private final TestSequence globalNominalTestSequence = new TestSequence();
 
     public void start() {
 
         // According to the order provided by the graph, execute the nominal fuzzer
-        OperationsSorter sorter = new GraphBasedOperationsSorter(environment);
+        OperationsSorter sorter = new GraphBasedOperationsSorter();
         while (!sorter.isEmpty()) {
             Operation operationToTest = sorter.getFirst();
             logger.debug("Testing operation " + operationToTest);
-            NominalFuzzer nominalFuzzer = new NominalFuzzer(environment, operationToTest);
+            NominalFuzzer nominalFuzzer = new NominalFuzzer(operationToTest);
             globalNominalTestSequence.append(nominalFuzzer.generateTestSequences(5));
             sorter.removeFirst();
         }
@@ -38,7 +32,7 @@ public class NominalAndErrorStrategy extends Strategy {
         // Keep only successful test interactions in the sequence
         globalNominalTestSequence.filterBySuccessfulStatusCode();
 
-        ErrorFuzzer errorFuzzer = new ErrorFuzzer(environment, globalNominalTestSequence);
+        ErrorFuzzer errorFuzzer = new ErrorFuzzer(globalNominalTestSequence);
         errorFuzzer.generateTestSequences(5);
     }
 }

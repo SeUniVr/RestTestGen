@@ -11,9 +11,9 @@ import java.util.*;
 
 public class Operation {
 
-    private String endpoint;
-    private HTTPMethod method;
-    private String operationId;
+    private final String endpoint;
+    private final HTTPMethod method;
+    private final String operationId;
 
     private Set<ParameterElement> headerParameters;
     private Set<ParameterElement> pathParameters;

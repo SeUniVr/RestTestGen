@@ -210,7 +210,7 @@ public class ExtendedRandom extends Random {
      * @return the date
      */
     public String nextDateTime(LocalDateTime min, LocalDateTime max) {
-        return nextDateTime(min, max, "yyyy/MM/ddTHH:mm:ssZ");
+        return nextDateTime(min, max, "yyyy/MM/dd HH:mm:ss");
     }
 
     public String nextTime()

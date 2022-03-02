@@ -1,4 +1,4 @@
 {
   "specificationFileName": "resources/openapi.json",
-  "authCommand": "echo {\"name\":\"api_key\",\"value\":\"special-key\",\"in\":\"header\",\"timeout\":30}"
+  "authCommand": "echo [{\"name\":\"api_key\",\"value\":\"special-key\",\"in\":\"header\",\"timeout\":30}]"
 }

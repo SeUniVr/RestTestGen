@@ -4,9 +4,12 @@ import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.helper.ObjectHelper;
-import io.resttestgen.core.openapi.*;
+import io.resttestgen.core.openapi.EditReadOnlyOperationException;
+import io.resttestgen.core.openapi.OpenAPIParser;
+import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 
 /*
@@ -24,9 +27,9 @@ public abstract class ParameterElement {
     protected boolean required;
     protected ParameterType type;
     protected ParameterTypeFormat format;
-    private ParameterLocation location; // Position of the parameter (e.g. path, header, query, etc. )
+    private final ParameterLocation location; // Position of the parameter (e.g. path, header, query, etc. )
     private ParameterStyle style;
-    private boolean explode;
+    private final boolean explode;
 
     protected Object defaultValue;
     protected Set<Object> enumValues;
@@ -80,15 +83,7 @@ public abstract class ParameterElement {
         }
 
         Boolean specExplode = (Boolean) parameterMap.get("explode");
-        if (specExplode == null) {
-            if (this.style == ParameterStyle.FORM) {
-                this.explode = true;
-            } else {
-                this.explode = false;
-            }
-        } else {
-            this.explode = specExplode;
-        }
+        this.explode = Objects.requireNonNullElseGet(specExplode, () -> this.style == ParameterStyle.FORM);
 
         this.type = ParameterType.getTypeFromString((String) sourceMap.get("type"));
         this.format = ParameterTypeFormat.getFormatFromString((String) sourceMap.get("format"));
@@ -217,8 +212,8 @@ public abstract class ParameterElement {
     }
 
     /**
-     * Method to get the parameter as a JSON string. It can be used to construct JSON request bodies
-     * @return
+     * Method to get the parameter as a JSON string. It can be used to construct JSON request bodies.
+     * @return the JSON string.
      */
     public abstract String getJSONString();
 
@@ -231,9 +226,9 @@ public abstract class ParameterElement {
     public abstract String getValueAsFormattedString (ParameterStyle style, boolean explode);
 
     /**
-     * Shorthand for getValueAsFormattedString where the value of 'explode' is the same of the instance one
-     * @param style
-     * @return A string with the rendered value
+     * Shorthand for getValueAsFormattedString where the value of 'explode' is the same of the instance one.
+     * @param style the style to be used for the rendering.
+     * @return a string with the rendered value.
      */
     public String getValueAsFormattedString (ParameterStyle style) {
         return getValueAsFormattedString (style, this.explode);
@@ -362,7 +357,7 @@ public abstract class ParameterElement {
                 Objects.equals(operation, parameter.operation) &&
                 // If even one of the parameters has null parent, then ignore normalized name. Else, consider it.
                 // This behaviour is to restrict the most possible the use of normalizedName in equals
-                (parent != null && parameter.parent != null ? Objects.equals(normalizedName, parameter.normalizedName) : true);
+                (parent == null || parameter.parent == null || Objects.equals(normalizedName, parameter.normalizedName));
     }
 
     @Override
@@ -391,9 +386,9 @@ public abstract class ParameterElement {
      * operation instead referencing the same operation of the original parameter. New parent is necessary for the same
      * reason, since structured parameters need to give the clones of their elements/properties the reference to
      * themselves instead to the old parent.
-     * @param operation New operation to be referenced
-     * @param parent New parent to be referenced
-     * @return
+     * @param operation New operation to be referenced.
+     * @param parent New parent to be referenced.
+     * @return the cloned parameter.
      */
     public abstract ParameterElement deepClone(Operation operation, ParameterElement parent);
 

@@ -4,8 +4,7 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HTTPMethod;
 import io.resttestgen.core.datatype.HTTPStatusCode;
 import io.resttestgen.core.helper.RequestManager;
-import io.resttestgen.implementation.responseprocessor.DictionaryResponseProcessor;
-import io.resttestgen.implementation.responseprocessor.GraphResponseProcessor;
+import io.resttestgen.implementation.responseprocessor.JSONParserResponseProcessor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -42,8 +41,9 @@ public class TestRunner {
      * external initializations.
      */
     private TestRunner() {
-        addResponseProcessor(new DictionaryResponseProcessor());
-        addResponseProcessor(new GraphResponseProcessor());
+        addResponseProcessor(new JSONParserResponseProcessor());
+        //addResponseProcessor(new DictionaryResponseProcessor());
+        //addResponseProcessor(new GraphResponseProcessor());
         addInvalidStatusCode(new HTTPStatusCode(429));
     }
 
@@ -132,7 +132,7 @@ public class TestRunner {
     private void executeTestInteraction(TestInteraction testInteraction) throws IOException {
 
         // Build request with RequestManager
-        RequestManager requestManager = new RequestManager(environment, testInteraction.getOperation());
+        RequestManager requestManager = new RequestManager(testInteraction.getOperation());
         Request request = requestManager.buildRequest();
 
         // Update test interaction with request info
@@ -155,19 +155,17 @@ public class TestRunner {
                 response.headers().toString(), responseBody,
                 new Timestamp(response.sentRequestAtMillis()),
                 new Timestamp(response.receivedResponseAtMillis()));
+
+        // FIXME: process only valid responses (move outside this method)
+        processResponse(testInteraction);
     }
 
     /**
      * Process responses with response processor
-     * @param response OkHttp response
-     * @param responseBody response body
+     * @param testInteraction the test interaction containing the response to process
      */
-    private void processResponse(Response response, String responseBody) {
-        responseProcessors.forEach(responseProcessor -> responseProcessor.process(response, responseBody));
-    }
-
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
+    private void processResponse(TestInteraction testInteraction) {
+        responseProcessors.forEach(responseProcessor -> responseProcessor.process(testInteraction));
     }
 
     public void addResponseProcessor(ResponseProcessor responseProcessor) {

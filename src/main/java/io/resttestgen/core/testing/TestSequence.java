@@ -47,8 +47,23 @@ public class TestSequence {
         this.testInteractions = testInteractions;
     }
 
+    /**
+     * Returns the number of test interactions inside the test sequence.
+     * @return the number of test interactions inside the test sequence.
+     */
     public int size() {
         return testInteractions.size();
+    }
+
+    public TestInteraction getFirst() {
+        return testInteractions.get(0);
+    }
+
+    public TestInteraction get(int index) {
+        if (index > testInteractions.size() || index < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        return testInteractions.get(index);
     }
 
     public TestInteraction getLast() {

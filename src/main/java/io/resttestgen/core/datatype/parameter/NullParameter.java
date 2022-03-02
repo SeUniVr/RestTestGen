@@ -1,6 +1,5 @@
 package io.resttestgen.core.datatype.parameter;
 
-import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.openapi.Operation;
 
 import java.util.Collection;
@@ -40,13 +39,6 @@ public class NullParameter extends ParameterLeaf {
         return false;
     }
 
-
-    @Override
-    public Object getValueFromDictionary(Dictionary dictionary) {
-        this.value = "null";
-        return "null";
-    }
-
     @Override
     public Object generateCompliantValue() {
         return "null";
@@ -58,7 +50,7 @@ public class NullParameter extends ParameterLeaf {
      */
     @Override
     public Collection<ParameterArray> getArrays() {
-        return new LinkedList<ParameterArray>();
+        return new LinkedList<>();
     }
 
     @Override

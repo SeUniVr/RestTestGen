@@ -67,6 +67,74 @@ public class TestInteraction {
         this.responseBody = responseBody;
     }
 
+    public HTTPMethod getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(HTTPMethod requestMethod) {
+        this.requestMethod = requestMethod;
+    }
+
+    public String getRequestURL() {
+        return requestURL;
+    }
+
+    public void setRequestURL(String requestURL) {
+        this.requestURL = requestURL;
+    }
+
+    public String getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public void setRequestHeaders(String requestHeaders) {
+        this.requestHeaders = requestHeaders;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public void setRequestBody(String requestBody) {
+        this.requestBody = requestBody;
+    }
+
+    public Timestamp getRequestSentAt() {
+        return requestSentAt;
+    }
+
+    public void setRequestSentAt(Timestamp requestSentAt) {
+        this.requestSentAt = requestSentAt;
+    }
+
+    public String getResponseProtocol() {
+        return responseProtocol;
+    }
+
+    public void setResponseProtocol(String responseProtocol) {
+        this.responseProtocol = responseProtocol;
+    }
+
+    public void setResponseHeaders(String responseHeaders) {
+        this.responseHeaders = responseHeaders;
+    }
+
+    public Timestamp getResponseReceivedAt() {
+        return responseReceivedAt;
+    }
+
+    public void setResponseReceivedAt(Timestamp responseReceivedAt) {
+        this.responseReceivedAt = responseReceivedAt;
+    }
+
+    public Timestamp getExecutionTime() {
+        return executionTime;
+    }
+
+    public void setExecutionTime(Timestamp executionTime) {
+        this.executionTime = executionTime;
+    }
+
     public TestStatus getTestStatus() {
         return testStatus;
     }

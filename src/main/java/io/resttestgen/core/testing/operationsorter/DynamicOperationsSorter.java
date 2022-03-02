@@ -1,13 +1,8 @@
-package io.resttestgen.core.testing;
+package io.resttestgen.core.testing.operationsorter;
 
-import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
 
 public abstract class DynamicOperationsSorter extends OperationsSorter {
-
-    public DynamicOperationsSorter(Environment environment) {
-        super(environment);
-    }
 
     @Override
     public boolean isEmpty() {

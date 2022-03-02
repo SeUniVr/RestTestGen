@@ -1,5 +1,7 @@
 package io.resttestgen.core.datatype.parameter;
 
+import io.resttestgen.core.Environment;
+import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -116,6 +118,8 @@ public class NumberParameter extends ParameterLeaf {
     @Override
     public Object generateCompliantValue() {
 
+        ExtendedRandom random = Environment.getInstance().getRandom();
+
         // Initialize value container
         Object generatedValue = null;
 
@@ -197,6 +201,9 @@ public class NumberParameter extends ParameterLeaf {
      * @return the inferred format.
      */
     private ParameterTypeFormat inferFormat() {
+
+        ExtendedRandom random = Environment.getInstance().getRandom();
+
         switch (format) {
             case INT8:
                 return ParameterTypeFormat.INT8;

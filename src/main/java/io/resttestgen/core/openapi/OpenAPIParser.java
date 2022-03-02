@@ -21,7 +21,7 @@ public class OpenAPIParser {
     private static final String INVALID_SPEC = "Failed to load spec at '%s'";
     private static final Logger logger = LogManager.getLogger(OpenAPIParser.class);
 
-    private Map<String, Object> openAPIMap; // Map parsed by gson
+    private final Map<String, Object> openAPIMap; // Map parsed by gson
 
     /**
      * Constructor for creating an OpenAPI parser given an OpenAPI specification

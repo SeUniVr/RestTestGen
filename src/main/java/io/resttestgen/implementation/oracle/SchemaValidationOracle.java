@@ -8,6 +8,6 @@ public class SchemaValidationOracle extends Oracle {
 
     @Override
     public TestResult assertTestSequence(TestSequence testSequence) {
-        return null;
+        throw new InternalError("The SchemaValidationOracle is not available yet.");
     }
 }

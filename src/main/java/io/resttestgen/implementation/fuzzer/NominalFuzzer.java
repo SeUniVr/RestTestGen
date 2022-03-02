@@ -5,20 +5,21 @@ import io.resttestgen.core.datatype.parameter.ParameterArray;
 import io.resttestgen.core.datatype.parameter.ParameterElement;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.dictionary.Dictionary;
-import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.helper.ResponseAnalyzer;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Fuzzer;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestRunner;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
 import io.resttestgen.implementation.oracle.StatusCodeOracle;
+import io.resttestgen.implementation.parametervalueprovider.multi.RandomProviderParameterValueProvider;
 import io.resttestgen.implementation.writer.ReportWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,14 +31,12 @@ public class NominalFuzzer extends Fuzzer {
 
     private static final Logger logger = LogManager.getLogger(NominalFuzzer.class);
 
-    private Environment environment;
-    private Operation operation;
-    private Dictionary dictionary;
+    private final Operation operation;
+    private ParameterValueProvider parameterValueProvider = new RandomProviderParameterValueProvider();
+    private Dictionary localDictionary;
     
-    public NominalFuzzer(Environment environment, Operation operation) {
-        this.environment = environment;
+    public NominalFuzzer(Operation operation) {
         this.operation = operation;
-        this.dictionary = environment.dictionary;
     }
 
     public List<TestSequence> generateTestSequences(int numberOfSequences) {
@@ -73,7 +72,7 @@ public class NominalFuzzer extends Fuzzer {
         LinkedList<ParameterArray> queue = new LinkedList<>(arrays);
         while (!queue.isEmpty()) {
             ParameterArray array = queue.getFirst();
-            int n = environment.random.nextLength(0, 5); // FIXME: with actual limits from the array, or move this logic to the array class
+            int n = Environment.getInstance().getRandom().nextLength(0, 5); // FIXME: with actual limits from the array, or move this logic to the array class
             for (int i = 0; i < n; i++) {
                 ParameterElement referenceElementCopy = array.getReferenceElement().deepClone();
                 array.addElement(referenceElementCopy);
@@ -85,7 +84,12 @@ public class NominalFuzzer extends Fuzzer {
         // Assign values to leaves and remove random non-mandatory leaves
         Collection<ParameterLeaf> leaves = editableOperation.getLeaves();
         for (ParameterLeaf leaf : leaves) {
-            assignValue(leaf, environment.random, dictionary);
+
+            // Set value with 70% probability, if parameter is not mandatory. Null parameters will be removed by the
+            // request manager
+            if (leaf.isRequired() || Environment.getInstance().getRandom().nextInt(100) < 70) {
+                leaf.setValue(parameterValueProvider.provideValueFor(leaf));
+            }
         }
 
         // Create a test interaction from the request
@@ -98,7 +102,6 @@ public class NominalFuzzer extends Fuzzer {
 
         // Run test sequence
         TestRunner testRunner = TestRunner.getInstance();
-        testRunner.setEnvironment(environment);
         testRunner.run(testSequence);
 
         // Evaluate sequence with oracles
@@ -106,12 +109,14 @@ public class NominalFuzzer extends Fuzzer {
         statusCodeOracle.assertTestSequence(testSequence);
 
         // Write report to file
-        ReportWriter reportWriter = new ReportWriter(environment, testSequence);
-        reportWriter.write();
+        try {
+            ReportWriter reportWriter = new ReportWriter(testSequence);
+            reportWriter.write();
+        } catch (IOException e) {
+            logger.warn("Could not write report to file.");
+        }
 
-
-        ResponseAnalyzer responseAnalyzer = new ResponseAnalyzer(environment);
-        responseAnalyzer.setDictionary(dictionary); // FIXME: move to setDictionary method
+        ResponseAnalyzer responseAnalyzer = new ResponseAnalyzer();
         responseAnalyzer.analyzeResponse(editableOperation, testInteraction.getResponseStatusCode(),
                 testInteraction.getResponseBody());
 
@@ -119,78 +124,11 @@ public class NominalFuzzer extends Fuzzer {
         return testSequence;
     }
 
-
-    /**
-     * Assign value to a leaf.
-     * Required parameters are always assigned with a value, non-required parameters have a 50% probability to have a
-     * value assigned.
-     * @param leaf the leaf to which assign the value
-     */
-    private void assignValue(ParameterLeaf leaf, ExtendedRandom random, Dictionary dictionary) {
-
-        // Set value with 70% probability, if parameter is not mandatory. Null parameters will be removed
-        if (leaf.isRequired() || random.nextInt(100) < 70) {
-
-            List<String> sources = new LinkedList<>();
-            sources.add("random");
-            if (leaf.getDefaultValue() != null) {
-                sources.add("default");
-            }
-            if (leaf.getEnumValues().size() > 0) {
-                leaf.getEnumValues().forEach(v -> sources.add("enum"));
-            }
-            if (leaf.getExamples().size() > 0) {
-                leaf.getEnumValues().forEach(v -> sources.add("examples"));
-            }
-            if (leaf.countValuesInNormalizedDictionary(dictionary) > 0) {
-                for (int i = 0; i < leaf.countValuesInNormalizedDictionary(dictionary); i++) {
-                    sources.add("normalizedDictionary");
-                }
-            }
-            if (leaf.countValuesInDictionary(dictionary) > 0) {
-                for (int i = 0; i < leaf.countValuesInDictionary(dictionary); i++) {
-                    sources.add("dictionary");
-                }
-            }
-
-            int source_index = random.nextInt(sources.size());
-            switch (sources.get(source_index)) {
-                case "random": {
-                    Object val = leaf.generateCompliantValue();
-                    leaf.setValue(val);
-                    break;
-                }
-                case "default": {
-                    Object val = leaf.getDefaultValue();
-                    leaf.setValue(val);
-                    break;
-                }
-                case "enum": {
-                    Object val = new ArrayList<>(leaf.getEnumValues()).get(random.nextInt(leaf.getEnumValues().size()));
-                    leaf.setValue(val);
-                    break;
-                }
-                case "examples": {
-                    Object val = new ArrayList<>(leaf.getExamples()).get(random.nextInt(leaf.getExamples().size()));
-                    leaf.setValue(val);
-                    break;
-                }
-                case "normalizedDictionary": {
-                    Object val = leaf.getValueFromNormalizedDictionary(dictionary);
-                    leaf.setValue(val);
-                    break;
-                }
-                case "dictionary": {
-                    Object val = leaf.getValueFromDictionary(dictionary);
-                    leaf.setValue(val);
-                    break;
-                }
-            }
-
-        }
+    public void setParameterValueProvider(ParameterValueProvider parameterValueProvider) {
+        this.parameterValueProvider = parameterValueProvider;
     }
 
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+    public void setLocalDictionary(Dictionary localDictionary) {
+        this.localDictionary = localDictionary;
     }
 }

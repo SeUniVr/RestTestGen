@@ -4,8 +4,6 @@ import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Map;
 
 public class OneOfParameter extends CombinedSchemaParameter {
