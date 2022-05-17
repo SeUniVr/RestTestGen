@@ -35,6 +35,9 @@ public class ExtendedRandom extends Random {
      * @return an integer value among minLength (or 0 if null) and maxLength, or without bound if maxLength == null
      */
     public Integer nextLength(Integer minLength, Integer maxLength) {
+        if (maxLength != null && maxLength == 0) {
+            return 0;
+        }
         if (minLength == null || minLength < 0) {
             minLength = 0;
         }
@@ -497,7 +500,7 @@ public class ExtendedRandom extends Random {
     {
         String[] domain = new String[] {"gmail.com", "live.com", "outlook.com"};
 
-        String email = "";
+        String email;
         if (nextIntBetweenInclusive(0, 100) < 80) {
             email = domain[nextInt(domain.length)];
         }

@@ -185,9 +185,15 @@ public class RequestManager {
         // TODO: implement raw http logger
 
         // Add query parameters
-        StringBuilder queryString = new StringBuilder();
-        queryParametersMap.values().forEach(queryString::append);
-        httpBuilder.query(queryString.toString());
+        if (queryParametersMap.size() > 0) {
+            StringBuilder queryString = new StringBuilder();
+            String prefix = "";
+            for (String renderedParameter : queryParametersMap.values()) {
+                queryString.append(prefix).append(renderedParameter);
+                prefix = "&";
+            }
+            httpBuilder.query(queryString.toString());
+        }
 
         requestBuilder.url(httpBuilder.build());
         return requestBuilder.build();
@@ -204,7 +210,7 @@ public class RequestManager {
     /**
      * Adds the given parameter to the operation. If another parameter that results equals to it is already defined,
      * it will be substituted.
-     * @param parameter
+     * @param parameter the parameter to be added.
      */
     public void addParameter(ParameterElement parameter) {
         switch (parameter.getLocation()) {
@@ -286,7 +292,7 @@ public class RequestManager {
             logger.warn("Empty-valued path parameter '" + p.getName() + "' found in operation '" + this.operation
                     + "'. It will be valued with its name.");
             newPathParameters.remove(p);
-            StringParameter sp = new StringParameter((ParameterLeaf) p);
+            StringParameter sp = new StringParameter(p);
             sp.setValue(sp.getName().toString());
             newPathParameters.add(sp);
         });

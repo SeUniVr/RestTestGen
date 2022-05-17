@@ -4,6 +4,8 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HTTPMethod;
 import io.resttestgen.core.datatype.HTTPStatusCode;
 import io.resttestgen.core.helper.RequestManager;
+import io.resttestgen.implementation.responseprocessor.DictionaryResponseProcessor;
+import io.resttestgen.implementation.responseprocessor.GraphResponseProcessor;
 import io.resttestgen.implementation.responseprocessor.JSONParserResponseProcessor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -42,8 +44,8 @@ public class TestRunner {
      */
     private TestRunner() {
         addResponseProcessor(new JSONParserResponseProcessor());
-        //addResponseProcessor(new DictionaryResponseProcessor());
-        //addResponseProcessor(new GraphResponseProcessor());
+        addResponseProcessor(new DictionaryResponseProcessor());
+        addResponseProcessor(new GraphResponseProcessor());
         addInvalidStatusCode(new HTTPStatusCode(429));
     }
 

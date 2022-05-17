@@ -1,6 +1,9 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.JsonPrimitive;
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
@@ -9,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 
 public class NumberParameter extends ParameterLeaf {
 
@@ -63,6 +67,32 @@ public class NumberParameter extends ParameterLeaf {
         this.value = "null";
     }
 
+    public NumberParameter(JsonPrimitive jsonPrimitive, Operation operation, ParameterElement parent, String name) {
+        super(operation, parent);
+
+        double doubleValue = jsonPrimitive.getAsDouble();
+        int integerValue = jsonPrimitive.getAsInt();
+        long longValue = jsonPrimitive.getAsLong();
+
+        if (doubleValue % 1 == 0) {
+            this.type = ParameterType.INTEGER;
+            if (longValue == (long) integerValue) {
+                this.format = ParameterTypeFormat.INT32;
+                setValue(integerValue);
+            } else {
+                this.format = ParameterTypeFormat.INT64;
+                setValue(longValue);
+            }
+        } else {
+            this.type = ParameterType.NUMBER;
+            this.format = ParameterTypeFormat.DOUBLE;
+            setValue(doubleValue);
+        }
+
+        this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
+        this.normalizedName = NormalizedParameterName.computeParameterNormalizedName(this);
+    }
+
     public NumberParameter merge(ParameterElement other) {
         if (!(other instanceof NumberParameter)) {
             throw new IllegalArgumentException("Cannot merge a " + this.getClass() + " instance with a "
@@ -111,6 +141,9 @@ public class NumberParameter extends ParameterLeaf {
     public boolean isObjectTypeCompliant(Object o) {
         if (o == null) {
             return false;
+        }
+        if (o instanceof  NumberParameter) {
+            return true;
         }
         return Number.class.isAssignableFrom(o.getClass());
     }
@@ -274,10 +307,10 @@ public class NumberParameter extends ParameterLeaf {
 
     @Override
     public String getJSONString() {
-        if (value instanceof Integer) {
-            return getJSONHeading() + ((Integer) value).toString();
-        }
-        return getJSONHeading() + value.toString();
+        /*if (getConcreteValue() instanceof Integer) {
+            return getJSONHeading() + getConcreteValue();
+        }*/
+        return getJSONHeading() + getConcreteValue().toString();
     }
 
 }

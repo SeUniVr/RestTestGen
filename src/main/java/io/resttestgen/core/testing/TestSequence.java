@@ -13,12 +13,13 @@ import java.util.stream.Collectors;
  */
 public class TestSequence {
 
-    private String generator;
+    private String generator = "UserInstantiated";
     private String name;
+    private String tag;
     private List<TestInteraction> testInteractions = new LinkedList<>();
 
     // Time information
-    private Timestamp generatedAt;
+    private final Timestamp generatedAt;
 
     // Outcome
     private Map<Oracle, TestResult> testResults = new HashMap<>();
@@ -79,6 +80,11 @@ public class TestSequence {
      * @param testSequence the test sequence to append to the current one
      */
     public void append(TestSequence testSequence) {
+        if (testInteractions.size() == 0) {
+            this.generator = testSequence.generator;
+        } else if (!this.generator.endsWith(testSequence.generator)){
+            this.generator = this.generator + "+" + testSequence.generator;
+        }
         testInteractions.addAll(testSequence.getTestInteractions());
     }
 
@@ -123,6 +129,14 @@ public class TestSequence {
 
     public Timestamp getGeneratedAt() {
         return generatedAt;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public void addTestResult(Oracle oracle, TestResult testResult) {

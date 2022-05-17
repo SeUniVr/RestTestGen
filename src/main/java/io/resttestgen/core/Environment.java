@@ -5,7 +5,6 @@ import com.google.gson.JsonSyntaxException;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.helper.ExtendedRandom;
-import io.resttestgen.core.helper.ResponseAnalyzer;
 import io.resttestgen.core.openapi.CannotParseOpenAPIException;
 import io.resttestgen.core.openapi.InvalidOpenAPIException;
 import io.resttestgen.core.openapi.OpenAPI;
@@ -38,7 +37,6 @@ public class Environment {
     private OpenAPI openAPI;
     private OperationDependencyGraph operationDependencyGraph;
     private Dictionary globalDictionary;
-    private ResponseAnalyzer responseAnalyzer;
     private ExtendedRandom random;
     private List<AuthenticationInfo> authInfo;
 
@@ -61,7 +59,6 @@ public class Environment {
         this.openAPI = new OpenAPIParser(Paths.get(configuration.getSpecificationFileName())).parse();
         this.operationDependencyGraph = new OperationDependencyGraph(openAPI);
         this.globalDictionary = new Dictionary();
-        this.responseAnalyzer = new ResponseAnalyzer();
         this.random = new ExtendedRandom();
 
         // Exec auth command
@@ -83,16 +80,14 @@ public class Environment {
             stringBuilder.append(s);
         }
 
-        Map<String, Object>[] maps = new Map[0];
-        try {     
-            maps = new Gson().fromJson(stringBuilder.toString(), Map[].class);
-        } catch (JsonSyntaxException e) {
+        try {
+            Map<String, Object>[] maps = new Gson().fromJson(stringBuilder.toString(), Map[].class);
+            this.authInfo = new LinkedList<>();
+            for (Map<String, Object> map : maps) {
+                this.authInfo.add(AuthenticationInfo.parse(map));
+            }
+        } catch (JsonSyntaxException | NullPointerException e) {
             logger.error("Authorization script must return a valid json. Instead, its result was:\n" + stringBuilder);
-        }
-        
-        this.authInfo = new LinkedList<>();
-        for (Map<String, Object> map : maps) {
-            this.authInfo.add(AuthenticationInfo.parse(map));
         }
     }
 
@@ -135,14 +130,6 @@ public class Environment {
         this.globalDictionary = dictionary;
     }
 
-    public ResponseAnalyzer getResponseAnalyzer() {
-        return responseAnalyzer;
-    }
-
-    public void setResponseAnalyzer(ResponseAnalyzer responseAnalyzer) {
-        this.responseAnalyzer = responseAnalyzer;
-    }
-
     public ExtendedRandom getRandom() {
         return random;
     }
@@ -152,7 +139,7 @@ public class Environment {
     }
 
     public AuthenticationInfo getAuth() {
-        if (this.authInfo.size() > 0) {
+        if (this.authInfo != null && this.authInfo.size() > 0) {
             return this.authInfo.get(0);
         }
         return null;

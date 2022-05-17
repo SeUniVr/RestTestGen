@@ -20,6 +20,7 @@ public abstract class StructuredParameterElement extends ParameterElement {
 
     protected StructuredParameterElement(StructuredParameterElement other) {
         super(other);
+        this.keepIfEmpty = other.keepIfEmpty;
     }
 
     protected StructuredParameterElement(StructuredParameterElement other, Operation operation, ParameterElement parent) {
@@ -28,6 +29,10 @@ public abstract class StructuredParameterElement extends ParameterElement {
 
     protected StructuredParameterElement(ParameterElement other) {
         super(other);
+    }
+
+    public StructuredParameterElement(Operation operation, ParameterElement parent) {
+        super(operation, parent);
     }
 
     @Override

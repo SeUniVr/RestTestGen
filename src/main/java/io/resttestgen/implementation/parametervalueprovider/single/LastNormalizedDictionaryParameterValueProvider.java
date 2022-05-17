@@ -4,12 +4,11 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.dictionary.DictionaryEntry;
-import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
-import java.util.Optional;
+import java.util.List;
 
-public class NormalizedDictionaryParameterValueProvider implements CountableParameterValueProvider {
+public class LastNormalizedDictionaryParameterValueProvider implements CountableParameterValueProvider {
 
     // Get values from global dictionary by default
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
@@ -21,10 +20,18 @@ public class NormalizedDictionaryParameterValueProvider implements CountablePara
 
     @Override
     public Object provideValueFor(ParameterLeaf parameterLeaf) {
-        ExtendedRandom random = Environment.getInstance().getRandom();
-        Optional<DictionaryEntry> entry = random.nextElement(
-                dictionary.getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(), parameterLeaf.getType()));
-        return entry.map(DictionaryEntry::getSource).orElse(null);
+        List<DictionaryEntry> entries = dictionary
+                .getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(), parameterLeaf.getType());
+        if (entries.size() > 0) {
+            DictionaryEntry lastEntry = entries.get(0);
+            for (DictionaryEntry entry : entries) {
+                if (entry.getDiscoveryTime().after(lastEntry.getDiscoveryTime())) {
+                    lastEntry = entry;
+                }
+            }
+            return lastEntry;
+        }
+        return null;
     }
 
     /**

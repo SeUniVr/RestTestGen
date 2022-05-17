@@ -26,7 +26,7 @@ public class Configuration {
     private String specificationFileName;
     private String authCommand;
     private String strategyName;
-    private final List<String> qualifiableNames;
+    private List<String> qualifiableNames;
     private String odgFileName;
 
     /**
@@ -59,9 +59,15 @@ public class Configuration {
                 Gson gson = new Gson();
                 Reader reader = Files.newBufferedReader(configurationPath);
                 Configuration tempConfiguration = gson.fromJson(reader, Configuration.class);
-                this.authCommand = tempConfiguration.authCommand;
 
-                setSpecificationFileName(tempConfiguration.getSpecificationFileName());
+                this.logVerbosity = tempConfiguration.logVerbosity;
+                this.testingSessionName = tempConfiguration.testingSessionName;
+                this.outputPath = tempConfiguration.outputPath;
+                this.specificationFileName = tempConfiguration.specificationFileName;
+                this.authCommand = tempConfiguration.authCommand;
+                this.strategyName = tempConfiguration.strategyName;
+                this.qualifiableNames = tempConfiguration.qualifiableNames;
+                this.odgFileName = tempConfiguration.odgFileName;
             } catch (IOException e) {
                 logger.warn("Could not read configuration from file. Using default configuration.");
             }

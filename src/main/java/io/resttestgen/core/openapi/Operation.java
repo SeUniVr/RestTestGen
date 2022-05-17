@@ -22,6 +22,7 @@ public class Operation {
     private StructuredParameterElement requestBody;
 
     private final Map<String, StructuredParameterElement> outputParameters;
+    private StructuredParameterElement responseBody;
 
     private boolean isReadOnly; // Field to avoid changes to template operation parsed from specification
 
@@ -171,11 +172,11 @@ public class Operation {
         other.cookieParameters.forEach(p -> cookieParameters.add(p.deepClone(this, null)));
 
         requestBody = other.requestBody != null ? other.requestBody.deepClone(this, null) : null;
+        responseBody = other.responseBody != null ? other.responseBody.deepClone(this, null) : null;
 
         outputParameters = new HashMap<>();
-        other.outputParameters.entrySet().forEach(
-                pair -> outputParameters.put(pair.getKey(), pair.getValue().deepClone(this, null))
-        );
+        other.outputParameters.forEach((key, value) ->
+                outputParameters.put(key, value.deepClone(this, null)));
 
         isReadOnly = false;
     }
@@ -222,6 +223,10 @@ public class Operation {
 
     public StructuredParameterElement getRequestBody() {
         return requestBody;
+    }
+
+    public StructuredParameterElement getResponseBody() {
+        return responseBody;
     }
 
     public Collection<ParameterLeaf> getLeaves() {
@@ -364,10 +369,15 @@ public class Operation {
         this.requestBody = requestBody;
     }
 
+    public void setResponseBody(StructuredParameterElement responseBody) {
+        this.responseBody = responseBody;
+    }
+
     // TODO: add getFuzzableParameterSet (exclude not fuzzable params, e.g., auth)?
     // FIXME: add combined parameter management
+    // The commented part is the old implementation. Newer implementation should work better
     public Set<ParameterElement> getInputParametersSet() {
-        Set<ParameterElement> parameters = new HashSet<>(pathParameters);
+        /*Set<ParameterElement> parameters = new HashSet<>(pathParameters);
         parameters.addAll(headerParameters);
         parameters.addAll(queryParameters);
         parameters.addAll(cookieParameters);
@@ -376,6 +386,19 @@ public class Operation {
             parameters.addAll(requestBody.getLeaves());
             requestBody.getArrays().forEach(parameterArray ->
                     parameters.addAll(parameterArray.getReferenceElement().getLeaves()));
+        }
+
+        return parameters;*/
+
+        Set<ParameterElement> parameters = new HashSet<>();
+
+        pathParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
+        headerParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
+        queryParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
+        cookieParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
+
+        if (requestBody != null) {
+            parameters.addAll(requestBody.getReferenceLeaves());
         }
 
         return parameters;
@@ -388,15 +411,51 @@ public class Operation {
         return outputParameters;
     }
 
+    public Set<ParameterElement> getFirstLevelInputParameters() {
+        Set<ParameterElement> firstLevelInputParameters = new HashSet<>();
+        firstLevelInputParameters.addAll(headerParameters);
+        firstLevelInputParameters.addAll(pathParameters);
+        firstLevelInputParameters.addAll(queryParameters);
+        firstLevelInputParameters.addAll(cookieParameters);
+        firstLevelInputParameters.addAll(getFirstLevelParameters(requestBody));
+        return firstLevelInputParameters;
+    }
+
+    public Set<ParameterElement> getFirstLevelOutputParameters() {
+        Set<ParameterElement> firstLevelOutputParameters = new HashSet<>();
+        outputParameters.values().forEach(p -> firstLevelOutputParameters.addAll(getFirstLevelParameters(p)));
+        return firstLevelOutputParameters;
+    }
+
+    private Set<ParameterElement> getFirstLevelParameters(ParameterElement element) {
+        Set<ParameterElement> firstLevelParameters = new HashSet<>();
+        if (element instanceof ParameterObject) {
+            firstLevelParameters.addAll(((ParameterObject) element).getProperties());
+        } else if (element instanceof ParameterArray) {
+            firstLevelParameters.addAll(getFirstLevelParameters(((ParameterArray) element).getReferenceElement()));
+        } else if (element instanceof ParameterLeaf) {
+            firstLevelParameters.add(element);
+        }
+        return firstLevelParameters;
+    }
+
     // FIXME: add combined parameter management
+    // The commented part is the old implementation. Newer implementation should work better
     public Set<ParameterElement> getOutputParametersSet() {
-         Set<ParameterElement> outParams = new HashSet<>();
+         /*Set<ParameterElement> outParams = new HashSet<>();
 
          for (StructuredParameterElement responseBody : outputParameters.values()) {
              outParams.addAll(responseBody.getLeaves());
              responseBody.getArrays().forEach(parameterArray ->
                      outParams.addAll(parameterArray.getReferenceElement().getLeaves()));
          }
+
+        return outParams;*/
+        Set<ParameterElement> outParams = new HashSet<>();
+
+        for (StructuredParameterElement responseBody : outputParameters.values()) {
+            outParams.addAll(responseBody.getReferenceLeaves());
+        }
 
         return outParams;
     }

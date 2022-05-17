@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.fuzzer;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.mutator.Mutator;
+import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.testing.Fuzzer;
 import io.resttestgen.core.testing.TestInteraction;
@@ -24,8 +24,8 @@ public class ErrorFuzzer extends Fuzzer {
 
     private static final Logger logger = LogManager.getLogger(Environment.class);
 
-    private TestSequence testSequenceToMutate;
-    private Set<Mutator> mutators;
+    private final TestSequence testSequenceToMutate;
+    private final Set<Mutator> mutators;
 
     public ErrorFuzzer(TestSequence testSequenceToMutate) {
         this.testSequenceToMutate = testSequenceToMutate;
@@ -58,13 +58,11 @@ public class ErrorFuzzer extends Fuzzer {
 
                 // Get set of applicable mutations to this operation
                 Set<Pair<ParameterLeaf, Mutator>> mutableParameters = new HashSet<>();
-                mutableInteraction.getOperation().getLeaves().forEach(leaf -> {
-                    mutators.forEach(mutator -> {
-                            if (mutator.isParameterMutable(leaf)) {
-                                mutableParameters.add(new Pair<>(leaf, mutator));
-                            }
-                    });
-                });
+                mutableInteraction.getOperation().getLeaves().forEach(leaf -> mutators.forEach(mutator -> {
+                        if (mutator.isParameterMutable(leaf)) {
+                            mutableParameters.add(new Pair<>(leaf, mutator));
+                        }
+                }));
 
                 // Choose a random mutation pair
                 Optional<Pair<ParameterLeaf, Mutator>> mutable = Environment.getInstance().getRandom().nextElement(mutableParameters);

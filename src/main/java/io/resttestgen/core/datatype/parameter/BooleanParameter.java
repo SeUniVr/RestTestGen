@@ -1,6 +1,9 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.JsonPrimitive;
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 
 public class BooleanParameter extends ParameterLeaf {
 
@@ -38,6 +42,16 @@ public class BooleanParameter extends ParameterLeaf {
         super(source);
     }
 
+    public BooleanParameter(JsonPrimitive jsonPrimitive, Operation operation, ParameterElement parent, String name) {
+        super(operation, parent);
+
+        setValue(jsonPrimitive.getAsBoolean());
+
+        this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
+        this.normalizedName = NormalizedParameterName.computeParameterNormalizedName(this);
+        this.type = ParameterType.BOOLEAN;
+    }
+
     public BooleanParameter merge(ParameterElement other) {
         // No additional behavior/constraints in boolean parameter
         return this;
@@ -47,6 +61,9 @@ public class BooleanParameter extends ParameterLeaf {
     public boolean isObjectTypeCompliant(Object o) {
         if (o == null) {
             return false;
+        }
+        if (o instanceof BooleanParameter) {
+            return true;
         }
         return Boolean.class.isAssignableFrom(o.getClass());
     }
@@ -75,7 +92,7 @@ public class BooleanParameter extends ParameterLeaf {
 
     @Override
     public String getJSONString() {
-        return getJSONHeading() + value.toString();
+        return getJSONHeading() + getConcreteValue().toString();
     }
 
     @Override

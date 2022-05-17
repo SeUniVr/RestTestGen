@@ -1,9 +1,13 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.JsonElement;
+import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.openapi.Operation;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class NullParameter extends ParameterLeaf {
 
@@ -29,6 +33,16 @@ public class NullParameter extends ParameterLeaf {
         this.value = "null";
     }
 
+    public NullParameter(JsonElement jsonElement, Operation operation, ParameterElement parent, String name) {
+        super(operation, parent);
+
+        setValue(null);
+
+        this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
+        this.normalizedName = NormalizedParameterName.computeParameterNormalizedName(this);
+        this.type = ParameterType.UNKNOWN;
+    }
+
     public NullParameter merge(ParameterElement other) {
         // No additional behavior/constraints in null parameter
         return this;
@@ -36,7 +50,7 @@ public class NullParameter extends ParameterLeaf {
 
     @Override
     public boolean isObjectTypeCompliant(Object o) {
-        return false;
+        return o == null;
     }
 
     @Override

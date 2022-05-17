@@ -43,6 +43,7 @@ public class Dictionary {
         // Otherwise, update similar entry with new discovery time
         else {
             matchingEntries.get(0).setDiscoveryTime(dictionaryEntry.getDiscoveryTime());
+            matchingEntries.get(0).setSource(dictionaryEntry.getSource());
         }
     }
 

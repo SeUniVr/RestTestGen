@@ -1,5 +1,6 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.*;
 import io.resttestgen.core.openapi.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,6 +61,28 @@ public class ParameterFactory {
 
     public static ParameterElement getParameterElement(ParameterElement parent, Map<String, Object> elementMap, Operation operation) {
         return getParameterElement(parent, elementMap, operation, null);
+    }
+
+    public static ParameterElement getParameterElement(ParameterElement parent, JsonElement jsonElement, Operation operation, String name) {
+        if (jsonElement instanceof JsonObject) {
+            return new ParameterObject((JsonObject) jsonElement, operation, parent, name);
+        } else if (jsonElement instanceof JsonArray) {
+            return new ParameterArray((JsonArray) jsonElement, operation, parent, name);
+        } else if (jsonElement instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive) jsonElement;
+            if (primitive.isString()) {
+                return new StringParameter(primitive, operation, parent, name);
+            } else if (primitive.isNumber()) {
+                return new NumberParameter(primitive, operation, parent, name);
+            } else if (primitive.isBoolean()) {
+                return new BooleanParameter(primitive, operation, parent, name);
+            }
+        } else if (jsonElement instanceof JsonNull) {
+            return new NullParameter(jsonElement, operation, parent, name);
+        }
+
+        // Fallback: return null if the jsonElement is not what is expected
+        return null;
     }
 
     public static StructuredParameterElement getStructuredParameter (ParameterElement parent, Map<String, Object> elementMap, Operation operation, String name) {

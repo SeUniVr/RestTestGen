@@ -1,4 +1,4 @@
-package io.resttestgen.core.datatype.mutator;
+package io.resttestgen.core.testing;
 
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 
@@ -17,9 +17,9 @@ public abstract class Mutator {
     }
 
     /**
-     *
-     * @param parameter
-     * @return
+     * Check if a parameter is mutable.
+     * @param parameter the parameter to check.
+     * @return true if the passed parameter is mutable.
      */
     public abstract boolean isParameterMutable(ParameterLeaf parameter);
 

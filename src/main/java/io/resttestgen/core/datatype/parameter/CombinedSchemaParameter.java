@@ -146,15 +146,34 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
     public Collection<ParameterLeaf> getLeaves() {
         Collection<ParameterLeaf> leaves = new LinkedList<>();
 
-        // If the output parameter schema is already defined, add its arrays
+        // If the output parameter schema is already defined, add its leaves
         if (outputParameterSchema != null) {
             leaves.addAll(outputParameterSchema.getLeaves());
         }
 
-        // Otherwise, add the arrays of each possible schema.
+        // Otherwise, add the leaves of each possible schema.
         else {
             for(ParameterElement element : parametersSchemas) {
                 leaves.addAll(element.getLeaves());
+            }
+        }
+
+
+        return leaves;
+    }
+
+    public Collection<ParameterLeaf> getReferenceLeaves() {
+        Collection<ParameterLeaf> leaves = new LinkedList<>();
+
+        // If the output parameter schema is already defined, add its leaves
+        if (outputParameterSchema != null) {
+            leaves.addAll(outputParameterSchema.getReferenceLeaves());
+        }
+
+        // Otherwise, add the leaves of each possible schema.
+        else {
+            for(ParameterElement element : parametersSchemas) {
+                leaves.addAll(element.getReferenceLeaves());
             }
         }
 
@@ -233,6 +252,18 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
         }
 
         return arrays;
+    }
+
+    // FIXME: currently not supported
+    @Override
+    public Collection<ParameterObject> getObjects() {
+        return new LinkedList<>();
+    }
+
+    // FIXME: currently not supported
+    @Override
+    public Collection<ParameterObject> getReferenceObjects() {
+        return new LinkedList<>();
     }
 
     @Override

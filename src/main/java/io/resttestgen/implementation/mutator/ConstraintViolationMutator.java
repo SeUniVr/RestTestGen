@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.mutator.Mutator;
+import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.datatype.parameter.NumberParameter;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.datatype.parameter.StringParameter;

@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.mutator.Mutator;
+import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.helper.ExtendedRandom;
 import org.apache.logging.log4j.LogManager;

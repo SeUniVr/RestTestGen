@@ -38,6 +38,8 @@ public abstract class ParameterElement {
     private Operation operation; // Operation to which the parameter is associated
     private ParameterElement parent; // Reference to the parent Parameter if any; else null
 
+    private String tag; // Custom tag that can be added by strategies
+
     private static final String castedWarn = "' was not compliant to parameter type, but it has been " +
             "cast to fit the right type.";
     private static final String discardedWarn = "' is not compliant to parameter type. The value will be discarded.";
@@ -171,7 +173,7 @@ public abstract class ParameterElement {
         normalizedName = other.normalizedName;
         schemaName = other.schemaName;
         required = other.required;
-        type = ParameterType.getTypeFromString(other.type.name());
+        type = other.type; // Amedeo did: ParameterType.getTypeFromString(other.type.name());
         format = other.format;
         location = other.location;
         style = other.style;
@@ -183,6 +185,8 @@ public abstract class ParameterElement {
 
         operation = other.operation;
         parent = other.parent;
+
+        tag = other.tag;
     }
 
     protected ParameterElement(ParameterElement other, Operation operation, ParameterElement parent) {
@@ -190,6 +194,17 @@ public abstract class ParameterElement {
 
         this.operation = operation;
         this.parent = parent;
+
+        this.tag = other.tag;
+    }
+
+    protected ParameterElement(Operation operation, ParameterElement parent) {
+        this.operation = operation;
+        this.parent = parent;
+        this.location = ParameterLocation.RESPONSE_BODY;
+        this.explode = false;
+        this.enumValues = new HashSet<>();
+        this.examples = new HashSet<>();
     }
 
     public abstract ParameterElement merge(ParameterElement other);
@@ -288,6 +303,14 @@ public abstract class ParameterElement {
         this.required = required;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public boolean addExample(Object o) {
         if (operation.isReadOnly()) {
             throw new EditReadOnlyOperationException(operation);
@@ -372,6 +395,9 @@ public abstract class ParameterElement {
 
     public void setParent(ParameterElement parent) {
         this.parent = parent;
+
+        // Also update operation of the parameter, to match the one of the new parent
+        this.operation = parent.getOperation();
     }
 
     /**
@@ -393,16 +419,36 @@ public abstract class ParameterElement {
     public abstract ParameterElement deepClone(Operation operation, ParameterElement parent);
 
     /**
-     * Returns a collection containing the arrays in the parameter element and underlying elements.
-     * @return the collection of arrays in the parameter
+     * Return a collection containing the arrays in the parameter element and underlying elements.
+     * @return the collection of arrays in the parameter.
      */
     public abstract Collection<ParameterArray> getArrays();
+
+    /**
+     * Return a collection containing the objects in the parameter element and underlying elements.
+     * @return the collection of objects in the parameter.
+     */
+    public abstract Collection<ParameterObject> getObjects();
+
+    /**
+     * Return a collection containing the objects in the parameter element and underlying elements. In case of arrays,
+     * only the objects in reference element are returned.
+     * @return the collection of objects in the parameter.
+     */
+    public abstract Collection<ParameterObject> getReferenceObjects();
 
     /**
      * Returns a collection containing the leaves in the parameter element and underlying elements.
      * @return the collection of leaves in the parameter
      */
     public abstract Collection<ParameterLeaf> getLeaves();
+
+    /**
+     * Get the leaves of the parameters. In case of arrays, the returned leaves are part of the reference element of the
+     * array.
+     * @return the reference leaves in the parameter.
+     */
+    public abstract Collection<ParameterLeaf> getReferenceLeaves();
 
     /**
      * Returns a collection containing the combined schemas in the parameter element and underlying elements.

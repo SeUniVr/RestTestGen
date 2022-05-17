@@ -18,8 +18,8 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
 
     private static final int MAX_ATTEMPTS = 10;
 
-    private OperationDependencyGraph graph = Environment.getInstance().getOperationDependencyGraph();
-    private ExtendedRandom random = Environment.getInstance().getRandom();
+    private final OperationDependencyGraph graph = Environment.getInstance().getOperationDependencyGraph();
+    private final ExtendedRandom random = Environment.getInstance().getRandom();
 
     public GraphBasedOperationsSorter() {
         refresh();
@@ -48,7 +48,12 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
                                 .filter(dependencyEdge -> !dependencyEdge.isSatisfied()).count()))
 
                 // Sort nodes by number of testing attempts
-                .sorted(Comparator.comparing(OperationNode::getTestingAttempts)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(OperationNode::getTestingAttempts))
+
+                // Sort noted by number of input parameters
+                .sorted(Comparator.comparing(n -> n.getOperation().getInputParametersSet().size()))
+
+                .collect(Collectors.toList());
 
         notTestedNodes.forEach(n -> queue.add(n.getOperation()));
     }

@@ -42,13 +42,23 @@ public abstract class ParameterLeaf extends ParameterElement {
         super(other);
     }
 
-    public String getValueAsFormattedString (ParameterStyle style, boolean explode) {
+    public ParameterLeaf(Operation operation, ParameterElement parent) {
+        super(operation, parent);
+    }
+
+    public String getValueAsFormattedString(ParameterStyle style, boolean explode) {
         if (value == null) {
             logger.warn("Called 'getValueAsFormattedString' function on null-valued parameter.");
             return "";
         }
 
-        String encodedValue = URLEncoder.encode(value.toString(), StandardCharsets.UTF_8);
+        Object renderedValue = value;
+
+        if (renderedValue instanceof ParameterLeaf) {
+            renderedValue = ((ParameterLeaf) renderedValue).getValue();
+        }
+
+        String encodedValue = URLEncoder.encode(renderedValue.toString(), StandardCharsets.UTF_8);
         switch (style) {
             case MATRIX:
                 return ";" + getName().toString() + "=" + encodedValue;
@@ -79,6 +89,17 @@ public abstract class ParameterLeaf extends ParameterElement {
         return value;
     }
 
+    /**
+     * @return the concrete value of the parameter, i.e., if the value is a reference to another leaf, the concrete
+     * value of that leaf is returned.
+     */
+    public Object getConcreteValue() {
+        if (value instanceof ParameterLeaf) {
+            return ((ParameterLeaf) value).getConcreteValue();
+        }
+        return value;
+    }
+
     public void setValue(Object value) {
         if (getOperation().isReadOnly()) {
             throw new EditReadOnlyOperationException(getOperation());
@@ -89,6 +110,10 @@ public abstract class ParameterLeaf extends ParameterElement {
             logger.warn("Setting value '" + value + "' to parameter '" +
                     this.getName() + "' is not possible due to type mismatch.");
         }
+    }
+
+    public void removeValue() {
+        this.value = null;
     }
 
     public int countValuesInNormalizedDictionary(Dictionary dictionary) {
@@ -162,6 +187,21 @@ public abstract class ParameterLeaf extends ParameterElement {
         Collection<ParameterLeaf> leaves = new LinkedList<>();
         leaves.add(this);
         return leaves;
+    }
+
+    @Override
+    public Collection<ParameterLeaf> getReferenceLeaves() {
+        return getLeaves();
+    }
+
+    @Override
+    public Collection<ParameterObject> getObjects() {
+        return new LinkedList<>();
+    }
+
+    @Override
+    public Collection<ParameterObject> getReferenceObjects() {
+        return new LinkedList<>();
     }
 
     @Override

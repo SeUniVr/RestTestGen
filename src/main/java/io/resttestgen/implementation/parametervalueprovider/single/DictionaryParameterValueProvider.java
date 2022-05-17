@@ -24,7 +24,7 @@ public class DictionaryParameterValueProvider implements CountableParameterValue
         ExtendedRandom random = Environment.getInstance().getRandom();
         Optional<DictionaryEntry> entry = random.nextElement(
                 dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType()));
-        return entry.map(DictionaryEntry::getValue).orElse(null);
+        return entry.map(DictionaryEntry::getSource).orElse(null);
     }
 
     /**

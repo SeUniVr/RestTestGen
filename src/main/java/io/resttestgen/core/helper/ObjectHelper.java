@@ -2,7 +2,9 @@ package io.resttestgen.core.helper;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.datatype.parameter.ParameterType;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,8 @@ public class ObjectHelper {
             return (T) Float.valueOf((Float) o);
         } else if (o instanceof Double) {
             return (T) Double.valueOf((Double) o);
+        } else if (o instanceof ParameterLeaf) {
+            return o;
         } else {
             String json = new Gson().toJson(o);
             return new Gson().fromJson(json, new TypeToken<>() {
@@ -123,10 +127,10 @@ public class ObjectHelper {
 
     /**
      * This casting function converts booleans and numbers in strings. Since every object can be cast to a string,
-     * the behavior is limited to the aforementioned classes throwing in the other cases a ClassCastException
-     * @param o The object to be converted
-     * @return The object passed as parameter cast to a String
-     * @throws ClassCastException
+     * the behavior is limited to the aforementioned classes throwing in the other cases a ClassCastException.
+     * @param o The object to be converted.
+     * @return The object passed as parameter cast to a String.
+     * @throws ClassCastException if cast fails.
      */
     public static String castToString(Object o) throws ClassCastException {
         if (o == null) {

@@ -1,9 +1,9 @@
 package io.resttestgen.core.dictionary;
 
-import io.resttestgen.core.datatype.parameter.ParameterType;
-import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
+import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.ParameterType;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -16,44 +16,22 @@ public class DictionaryEntry {
     private ParameterName parameterName;
     private NormalizedParameterName normalizedParameterName;
     private ParameterType type;
-    private Operation source; // The operation that generated that value (if null it is a default value)
+    private ParameterLeaf source;
     private Timestamp discoveryTime;
     private Object value;
 
-    public DictionaryEntry(ParameterName parameterName, Operation source, String value) {
-        this.parameterName = parameterName;
-        this.normalizedParameterName = new NormalizedParameterName(parameterName);
-        this.type = ParameterType.STRING;
-        this.source = source;
-        this.discoveryTime = Timestamp.from(Instant.now());
-        setValue(value);
-    }
-
-    public DictionaryEntry(ParameterName parameterName, Operation source, Integer value) {
-        this.parameterName = parameterName;
-        this.normalizedParameterName = new NormalizedParameterName(parameterName);
-        this.type = ParameterType.INTEGER;
-        this.source = source;
-        this.discoveryTime = Timestamp.from(Instant.now());
-        setValue(value);
-    }
-
-    public DictionaryEntry(ParameterName parameterName, Operation source, Double value) {
-        this.parameterName = parameterName;
-        this.normalizedParameterName = new NormalizedParameterName(parameterName);
-        this.type = ParameterType.NUMBER;
-        this.source = source;
-        this.discoveryTime = Timestamp.from(Instant.now());
-        setValue(value);
-    }
-
-    public DictionaryEntry(ParameterName parameterName, Operation source, Boolean value) {
-        this.parameterName = parameterName;
-        this.normalizedParameterName = new NormalizedParameterName(parameterName);
-        this.type = ParameterType.BOOLEAN;
-        this.source = source;
-        this.discoveryTime = Timestamp.from(Instant.now());
-        setValue(value);
+    public DictionaryEntry(ParameterLeaf leaf) {
+        if (leaf.getName() != null && leaf.getNormalizedName() != null && leaf.getType() != null &&
+                leaf.getOperation() != null && leaf.getValue() != null) {
+            this.parameterName = leaf.getName();
+            this.normalizedParameterName = leaf.getNormalizedName();
+            this.type = leaf.getType();
+            this.source = leaf;
+            this.discoveryTime = Timestamp.from(Instant.now());
+            this.value = leaf.getValue();
+        } else {
+            throw new RuntimeException("Can not create dictionary entry from leaf with some null values.");
+        }
     }
 
     public ParameterName getParameterName() {
@@ -80,11 +58,11 @@ public class DictionaryEntry {
         this.type = type;
     }
 
-    public Operation getSource() {
+    public ParameterLeaf getSource() {
         return source;
     }
 
-    public void setSource(Operation source) {
+    public void setSource(ParameterLeaf source) {
         this.source = source;
     }
 

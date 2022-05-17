@@ -1,11 +1,16 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
+import io.resttestgen.core.openapi.OpenAPIParser;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.openapi.UnsupportedSpecificationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 
 public class ParameterArray extends StructuredParameterElement {
@@ -13,11 +18,25 @@ public class ParameterArray extends StructuredParameterElement {
     private ParameterElement referenceElement;
     private List<ParameterElement> elements;
 
+    private Integer minItems;
+    private Integer maxItems;
+    private boolean uniqueItems;
+
     private static final Logger logger = LogManager.getLogger(ParameterArray.class);
 
     public ParameterArray(ParameterElement parent, Map<String, Object> schema, Operation operation, String name) {
         super(parent, schema, operation, name);
         elements = new LinkedList<>();
+
+        minItems = schema.containsKey("minItems") ?
+                OpenAPIParser.safeGet(schema, "minItems", Double.class).intValue() :
+                null;
+        maxItems = schema.containsKey("maxItems") ?
+                OpenAPIParser.safeGet(schema, "maxItems", Double.class).intValue() :
+                null;
+        uniqueItems = schema.containsKey("uniqueItems") ?
+                OpenAPIParser.safeGet(schema, "uniqueItems", Boolean.class) :
+                false;
 
         setNormalizedName(NormalizedParameterName.computeParameterNormalizedName(this));
 
@@ -40,7 +59,7 @@ public class ParameterArray extends StructuredParameterElement {
             }
 
         } catch (UnsupportedSpecificationFeature e) {
-            throw new ParameterCreationException("Unable to parse  reference element for property \"" + name +
+            throw new ParameterCreationException("Unable to parse reference element for property \"" + name +
                     "\" (normalized as: \"" + name + "\") " +
                     "due to an unsupported feature in OpenAPI specification.");
 
@@ -54,14 +73,20 @@ public class ParameterArray extends StructuredParameterElement {
         referenceElement = other.referenceElement.deepClone();
         elements = new LinkedList<>();
         other.elements.forEach(e -> elements.add(e.deepClone()));
+        minItems = other.minItems;
+        maxItems = other.maxItems;
+        uniqueItems = other.uniqueItems;
     }
 
     private ParameterArray(ParameterArray other, Operation operation, ParameterElement parent) {
         super(other, operation, parent);
 
-        referenceElement = other.referenceElement.deepClone(operation, this);
+        referenceElement = other.referenceElement != null ? other.referenceElement.deepClone(operation, this) : null;
         elements = new LinkedList<>();
         other.elements.forEach(e -> elements.add(e.deepClone(operation, this)));
+        minItems = other.minItems;
+        maxItems = other.maxItems;
+        uniqueItems = other.uniqueItems;
     }
 
     public ParameterArray(ParameterElement other) {
@@ -69,6 +94,23 @@ public class ParameterArray extends StructuredParameterElement {
 
         referenceElement = null;
         elements = new LinkedList<>();
+    }
+
+    public ParameterArray(JsonArray jsonArray, Operation operation, ParameterElement parent, String name) {
+        super(operation, parent);
+
+        this.elements = new LinkedList<>();
+        this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
+        this.normalizedName = NormalizedParameterName.computeParameterNormalizedName(this);
+        this.type = ParameterType.ARRAY;
+
+        for (JsonElement jsonElement : jsonArray) {
+            ParameterElement p =
+                    ParameterFactory.getParameterElement(this, jsonElement, operation, this.name.toString());
+            if (p != null) {
+                elements.add(p);
+            }
+        }
     }
 
     public ParameterArray merge(ParameterElement other) {
@@ -82,6 +124,30 @@ public class ParameterArray extends StructuredParameterElement {
         merged.referenceElement = this.referenceElement.merge(stringParameter.referenceElement);
 
         return merged;
+    }
+
+    public Integer getMinItems() {
+        return minItems;
+    }
+
+    public void setMinItems(Integer minItems) {
+        this.minItems = minItems;
+    }
+
+    public Integer getMaxItems() {
+        return maxItems;
+    }
+
+    public void setMaxItems(Integer maxItems) {
+        this.maxItems = maxItems;
+    }
+
+    public boolean isUniqueItems() {
+        return uniqueItems;
+    }
+
+    public void setUniqueItems(boolean uniqueItems) {
+        this.uniqueItems = uniqueItems;
     }
 
     @Override
@@ -107,9 +173,14 @@ public class ParameterArray extends StructuredParameterElement {
         return leaves;
     }
 
+    @Override
+    public Collection<ParameterLeaf> getReferenceLeaves() {
+        return new LinkedList<>(referenceElement.getReferenceLeaves());
+    }
+
     /**
      * A ParameterArray is considered empty when it has no elements.
-     * @return True if the instance has no elements; false otherwise
+     * @return true if the instance has no elements; false otherwise.
      */
     @Override
     public boolean isEmpty() {
@@ -362,7 +433,17 @@ public class ParameterArray extends StructuredParameterElement {
 
     @Override
     public String toString() {
-        return getName() + ": [" + referenceElement.toString() + "]";
+        if (elements != null && elements.size() > 0) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(getName()).append(": [");
+            elements.forEach(e -> stringBuilder.append(e.toString()).append(", "));
+            stringBuilder.append("]");
+            return stringBuilder.toString();
+        } else if (referenceElement != null) {
+            return getName() + ": [" + referenceElement.toString() + "]";
+        } else {
+            return getName() + ": []";
+        }
     }
 
     /**
@@ -382,6 +463,18 @@ public class ParameterArray extends StructuredParameterElement {
         }
 
         return arrays;
+    }
+
+    @Override
+    public Collection<ParameterObject> getObjects() {
+        Collection<ParameterObject> objects = new LinkedList<>();
+        elements.forEach(ParameterElement::getObjects);
+        return objects;
+    }
+
+    @Override
+    public Collection<ParameterObject> getReferenceObjects() {
+        return referenceElement.getReferenceObjects();
     }
 
     @Override

@@ -1,6 +1,9 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.JsonPrimitive;
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.Operation;
@@ -10,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 
 public class StringParameter extends ParameterLeaf {
 
@@ -74,6 +78,16 @@ public class StringParameter extends ParameterLeaf {
         this.value = null;
     }
 
+    public StringParameter(JsonPrimitive jsonPrimitive, Operation operation, ParameterElement parent, String name) {
+        super(operation, parent);
+
+        setValue(jsonPrimitive.getAsString());
+
+        this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
+        this.normalizedName = NormalizedParameterName.computeParameterNormalizedName(this);
+        this.type = ParameterType.STRING;
+    }
+
     public void setMinLength(Integer minLength) {
         this.minLength = minLength;
     }
@@ -113,6 +127,9 @@ public class StringParameter extends ParameterLeaf {
     public boolean isObjectTypeCompliant(Object o) {
         if (o == null) {
             return false;
+        }
+        if (o instanceof StringParameter) {
+            return true;
         }
         return String.class.isAssignableFrom(o.getClass());
     }
@@ -329,12 +346,12 @@ public class StringParameter extends ParameterLeaf {
 
     @Override
     public String getJSONString() {
+
         // If leaf is inside an array, don't print the leaf name
         if (this.getParent() instanceof ParameterArray) {
-            return "\"" + value + "\"";
+            return "\"" + getConcreteValue() + "\"";
         } else {
-            return getJSONHeading() + "\"" + value + "\"";
+            return getJSONHeading() + "\"" + getConcreteValue() + "\"";
         }
     }
-
 }

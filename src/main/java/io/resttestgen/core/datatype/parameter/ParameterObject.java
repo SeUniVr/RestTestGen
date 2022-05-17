@@ -1,5 +1,6 @@
 package io.resttestgen.core.datatype.parameter;
 
+import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
@@ -9,6 +10,7 @@ import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.openapi.UnsupportedSpecificationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,6 +81,23 @@ public class ParameterObject extends StructuredParameterElement {
         this.properties = new LinkedList<>();
     }
 
+    public ParameterObject(JsonObject jsonObject, Operation operation, ParameterElement parent, String name) {
+        super(operation, parent);
+
+        this.properties = new LinkedList<>();
+        this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
+        this.normalizedName = NormalizedParameterName.computeParameterNormalizedName(this);
+        this.type = ParameterType.OBJECT;
+
+        for (String entryName : jsonObject.keySet()) {
+            ParameterElement p =
+                    ParameterFactory.getParameterElement(this, jsonObject.get(entryName), operation, entryName);
+            if (p != null) {
+                properties.add(p);
+            }
+        }
+    }
+
     @Override
     public ParameterObject merge(ParameterElement other) {
         if (!(other instanceof ParameterObject)) {
@@ -98,8 +117,8 @@ public class ParameterObject extends StructuredParameterElement {
 
         List<ParameterElement> merged = new LinkedList<>();
         HashSet<ParameterName> commonNames = new HashSet<>(
-                this.properties.stream().map(p -> p.getName()).collect(Collectors.toSet()).stream().filter(
-                        p -> other.stream().map(p2 -> p2.getName()).collect(Collectors.toSet()).contains(p)
+                this.properties.stream().map(ParameterElement::getName).collect(Collectors.toSet()).stream().filter(
+                        p -> other.stream().map(ParameterElement::getName).collect(Collectors.toSet()).contains(p)
                 ).collect(Collectors.toSet())
         );
 
@@ -132,7 +151,7 @@ public class ParameterObject extends StructuredParameterElement {
         if (getParent() instanceof ParameterArray) {
             stringBuilder.append("{");
         } else {
-            stringBuilder.append(getJSONHeading() + "{");
+            stringBuilder.append(getJSONHeading()).append("{");
         }
         properties.forEach(p -> stringBuilder.append(p.getJSONString()).append(", "));
         int index = stringBuilder.lastIndexOf(",");
@@ -141,7 +160,8 @@ public class ParameterObject extends StructuredParameterElement {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(super.getNormalizedName() + ": {");
+        //StringBuilder stringBuilder = new StringBuilder(super.getNormalizedName() + ": {");
+        StringBuilder stringBuilder = new StringBuilder(getNormalizedName() + ": {");
         properties.forEach(p -> stringBuilder.append(p.toString()).append(", "));
         int index = stringBuilder.lastIndexOf(",");
         return stringBuilder.substring(0, index > 0 ? index : stringBuilder.length()) + "}";
@@ -370,13 +390,18 @@ public class ParameterObject extends StructuredParameterElement {
         List<ParameterLeaf> leaves = new LinkedList<>();
 
         for (ParameterElement property : properties) {
-            if (StructuredParameterElement.class.isAssignableFrom(property.getClass())) {
-                leaves.addAll(((StructuredParameterElement) property).getLeaves());
-            } else if (CombinedSchemaParameter.class.isAssignableFrom(property.getClass())) {
-                leaves.addAll(((CombinedSchemaParameter) property).getLeaves());
-            } else {
-                leaves.add((ParameterLeaf) property);
-            }
+            leaves.addAll((property).getLeaves());
+        }
+
+        return leaves;
+    }
+
+    @Override
+    public List<ParameterLeaf> getReferenceLeaves() {
+        List<ParameterLeaf> leaves = new LinkedList<>();
+
+        for (ParameterElement property : properties) {
+            leaves.addAll(property.getReferenceLeaves());
         }
 
         return leaves;
@@ -477,7 +502,7 @@ public class ParameterObject extends StructuredParameterElement {
      */
     @Override
     public Collection<ParameterArray> getArrays() {
-        Collection<ParameterArray> arrays = new LinkedList<ParameterArray>();
+        Collection<ParameterArray> arrays = new LinkedList<>();
 
         // For each property contained in the object, add their arrays.
         for (ParameterElement property : properties) {
@@ -488,8 +513,24 @@ public class ParameterObject extends StructuredParameterElement {
     }
 
     @Override
+    public Collection<ParameterObject> getObjects() {
+        Collection<ParameterObject> objects = new LinkedList<>();
+        objects.add(this);
+        properties.forEach(ParameterElement::getObjects);
+        return objects;
+    }
+
+    @Override
+    public Collection<ParameterObject> getReferenceObjects() {
+        Collection<ParameterObject> objects = new LinkedList<>();
+        objects.add(this);
+        properties.forEach(ParameterElement::getReferenceObjects);
+        return objects;
+    }
+
+    @Override
     public Collection<CombinedSchemaParameter> getCombinedSchemas() {
-        Collection<CombinedSchemaParameter> combinedSchemas = new LinkedList<CombinedSchemaParameter>();
+        Collection<CombinedSchemaParameter> combinedSchemas = new LinkedList<>();
 
         for (ParameterElement element : properties) {
             combinedSchemas.addAll(element.getCombinedSchemas());

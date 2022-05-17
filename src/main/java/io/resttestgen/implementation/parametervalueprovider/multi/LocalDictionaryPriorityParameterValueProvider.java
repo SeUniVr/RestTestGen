@@ -8,6 +8,7 @@ import io.resttestgen.implementation.parametervalueprovider.single.*;
 /**
  * This parameter value provider prioritize the usage of values available in the local dictionary
  */
+@SuppressWarnings("unused")
 public class LocalDictionaryPriorityParameterValueProvider implements ParameterValueProvider {
 
     private Dictionary localDictionary;
