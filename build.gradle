@@ -6,6 +6,8 @@ plugins {
 group 'io.resttestgen'
 version '22.06'
 
+mainClassName ='io.resttestgen.core.cli.App'
+
 repositories {
     mavenCentral()
 }
