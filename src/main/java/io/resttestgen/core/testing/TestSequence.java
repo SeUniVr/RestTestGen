@@ -1,6 +1,10 @@
 package io.resttestgen.core.testing;
 
+import io.resttestgen.core.Environment;
+import io.resttestgen.core.helper.ExtendedRandom;
+
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.stream.Collectors;
 public class TestSequence {
 
     private String generator = "UserInstantiated";
-    private String name;
+    private String name = generateRandomTestSequenceName();
     private String tag;
     private List<TestInteraction> testInteractions = new LinkedList<>();
 
@@ -22,6 +26,7 @@ public class TestSequence {
     private final Timestamp generatedAt;
 
     // Outcome
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private Map<Oracle, TestResult> testResults = new HashMap<>();
 
     public TestSequence() {
@@ -112,6 +117,9 @@ public class TestSequence {
     }
 
     public void setName(String name) {
+        if (name == null || name.length() == 0) {
+            throw new IllegalArgumentException("The name for a test sequence must not be null or an empty string.");
+        }
         this.name = name;
     }
 
@@ -143,6 +151,19 @@ public class TestSequence {
         testResults.put(oracle, testResult);
     }
 
+    /**
+     * Checks if all the test interactions composing a sequence have been executed
+     * @return true if all interaction in the sequence have been executed.
+     */
+    public boolean isExecuted() {
+        for (TestInteraction testInteraction : testInteractions) {
+            if (testInteraction.getTestStatus() != TestStatus.EXECUTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void reset() {
         testInteractions.forEach(TestInteraction::reset);
         testResults = new HashMap<>();
@@ -152,5 +173,15 @@ public class TestSequence {
         TestSequence target = new TestSequence();
         this.testInteractions.forEach(testInteraction -> target.append(testInteraction.deepClone()));
         return target;
+    }
+
+    private String generateRandomTestSequenceName() {
+        ExtendedRandom random = Environment.getInstance().getRandom();
+        return random.nextWord() + "-" + random.nextWord();
+    }
+
+    public void appendGeneratedAtTimestampToSequenceName() {
+        SimpleDateFormat dformat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        this.name = this.name + "-" + dformat.format(getGeneratedAt());
     }
 }

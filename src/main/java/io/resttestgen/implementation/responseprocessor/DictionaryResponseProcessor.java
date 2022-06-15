@@ -11,7 +11,7 @@ import io.resttestgen.core.testing.TestInteraction;
 
 import java.util.Optional;
 
-public class DictionaryResponseProcessor implements ResponseProcessor {
+public class DictionaryResponseProcessor extends ResponseProcessor {
 
     private static final Dictionary globalDictionary = Environment.getInstance().getGlobalDictionary();
     private Optional<Dictionary> localDictionary = Optional.empty();
@@ -23,7 +23,7 @@ public class DictionaryResponseProcessor implements ResponseProcessor {
 
         // If the parsed response body is null, try to parse it
         if (responseBody == null) {
-            JSONParserResponseProcessor jsonParserResponseProcessor = new JSONParserResponseProcessor();
+            JsonParserResponseProcessor jsonParserResponseProcessor = new JsonParserResponseProcessor();
             jsonParserResponseProcessor.process(testInteraction);
             responseBody = testInteraction.getOperation().getResponseBody();
         }

@@ -107,3 +107,12 @@ The core of the RestTestGen framework provides the following features:
 - coverage measurements
   - operations coverage (wip)
   - status code coverage (wip)
+
+
+## Contributing
+
+Contributions by researchers, practitioners, and developers are welcome.
+
+To extend the RestTestGen framework and its core components, please contribute in the `io.resttestgen.core` package. If you are developing a novel testing strategy, please contribute in the `io.resttestgen.implementaion` package.
+ 
+Please submit your contribution by means of a pull request. Thank you!

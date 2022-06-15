@@ -44,7 +44,7 @@ public class  OperationDependencyGraphTest {
         for (DependencyEdge edge : environment.getOperationDependencyGraph().getGraph().edgeSet()) {
 
             Set<NormalizedParameterName> parametersNormalizedNames = new HashSet<>();
-            for (ParameterElement parameter : environment.getOperationDependencyGraph().getGraph().getEdgeSource(edge).getOperation().getInputParametersSet()) {
+            for (ParameterElement parameter : environment.getOperationDependencyGraph().getGraph().getEdgeSource(edge).getOperation().getReferenceLeaves()) {
                 if (parameter.getNormalizedName() != null) {
                     parametersNormalizedNames.add(parameter.getNormalizedName());
                 }

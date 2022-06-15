@@ -1,7 +1,7 @@
 package io.resttestgen.core.testing;
 
-import io.resttestgen.core.datatype.HTTPMethod;
-import io.resttestgen.core.datatype.HTTPStatusCode;
+import io.resttestgen.core.datatype.HttpMethod;
+import io.resttestgen.core.datatype.HttpStatusCode;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +17,7 @@ public class TestInteraction {
 
     // Request fields
     private transient Operation operation;
-    private HTTPMethod requestMethod;
+    private HttpMethod requestMethod;
     private String requestURL;
     private String requestHeaders;
     private String requestBody;
@@ -25,7 +25,7 @@ public class TestInteraction {
 
     // Response fields
     private String responseProtocol;
-    private HTTPStatusCode responseStatusCode;
+    private HttpStatusCode responseStatusCode;
     private String responseHeaders;
     private String responseBody;
     private Timestamp responseReceivedAt;
@@ -47,11 +47,11 @@ public class TestInteraction {
         this.operation = operation;
     }
 
-    public void setResponseStatusCode(HTTPStatusCode statusCode) {
+    public void setResponseStatusCode(HttpStatusCode statusCode) {
         this.responseStatusCode = statusCode;
     }
 
-    public HTTPStatusCode getResponseStatusCode() {
+    public HttpStatusCode getResponseStatusCode() {
         return responseStatusCode;
     }
 
@@ -67,11 +67,11 @@ public class TestInteraction {
         this.responseBody = responseBody;
     }
 
-    public HTTPMethod getRequestMethod() {
+    public HttpMethod getRequestMethod() {
         return requestMethod;
     }
 
-    public void setRequestMethod(HTTPMethod requestMethod) {
+    public void setRequestMethod(HttpMethod requestMethod) {
         this.requestMethod = requestMethod;
     }
 
@@ -143,14 +143,14 @@ public class TestInteraction {
         this.testStatus = testStatus;
     }
 
-    public void setRequestInfo(HTTPMethod httpMethod, String requestURL, String requestHeaders, String requestBody) {
+    public void setRequestInfo(HttpMethod httpMethod, String requestURL, String requestHeaders, String requestBody) {
         this.requestMethod = httpMethod;
         this.requestURL = requestURL;
         this.requestHeaders = requestHeaders;
         this.requestBody = requestBody;
     }
 
-    public void setResponseInfo(String responseProtocol, HTTPStatusCode responseStatusCode, String responseHeaders,
+    public void setResponseInfo(String responseProtocol, HttpStatusCode responseStatusCode, String responseHeaders,
                                 String responseBody, Timestamp requestSentAt, Timestamp responseReceivedAt) {
         this.responseProtocol = responseProtocol;
         this.responseStatusCode = responseStatusCode;

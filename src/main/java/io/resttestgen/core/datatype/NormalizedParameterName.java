@@ -79,7 +79,8 @@ public class NormalizedParameterName {
         String name = parameter.getName().toString();
 
         // Check that name is qualifiable. Skip header parameters.
-        if (qualifiableNames.contains(stemmer.stem(name)) && !parameter.getLocation().equals(ParameterLocation.HEADER)) {
+        if (qualifiableNames != null && qualifiableNames.contains(stemmer.stem(name)) &&
+                !parameter.getLocation().equals(ParameterLocation.HEADER)) {
 
             // First, check out if it has a parent
             ParameterElement parent = parameter.getParent();
@@ -138,8 +139,8 @@ public class NormalizedParameterName {
      * creation.
      * Alternative approach to name qualification. If a parameter has an associated schema name return it as qualified
      * name.
-     * @param parameter
-     * @return
+     * @param parameter the parameter for which a qualified name should be computed.
+     * @return the qualified name.
      */
     public static String alternativeQualifyName(ParameterElement parameter) {
 

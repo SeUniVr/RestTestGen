@@ -1,18 +1,11 @@
 package io.resttestgen.core.testing.operationsorter;
 
-import io.resttestgen.core.openapi.Operation;
-
 public abstract class DynamicOperationsSorter extends OperationsSorter {
 
     @Override
     public boolean isEmpty() {
         refresh();
         return super.isEmpty();
-    }
-
-    @Override
-    public Operation getFirst() {
-        return super.getFirst();
     }
 
     /**

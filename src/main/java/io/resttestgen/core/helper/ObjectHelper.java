@@ -12,6 +12,11 @@ import java.util.Map;
 public class ObjectHelper {
 
     public static <T> T deepCloneObject(T o) {
+        if (o instanceof Number) {
+            return o;
+
+            // The following is commented because it might be useless
+        /*
         if (o instanceof Integer) {
             return (T) Integer.valueOf((Integer) o);
         } else if (o instanceof Long) {
@@ -20,6 +25,7 @@ public class ObjectHelper {
             return (T) Float.valueOf((Float) o);
         } else if (o instanceof Double) {
             return (T) Double.valueOf((Double) o);
+        }*/
         } else if (o instanceof ParameterLeaf) {
             return o;
         } else {
@@ -67,7 +73,7 @@ public class ObjectHelper {
                 return false;
             }
             try {
-                Double parsedVal = Double.parseDouble(stringO);
+                double parsedVal = Double.parseDouble(stringO);
                 if (parsedVal == 1) {
                     return true;
                 } else if (parsedVal == 0) {

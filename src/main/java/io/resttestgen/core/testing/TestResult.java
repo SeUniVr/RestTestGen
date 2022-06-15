@@ -1,5 +1,6 @@
 package io.resttestgen.core.testing;
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class TestResult {
 
     private enum TestResultEnum { PENDING, PASS, FAIL, ERROR, UNKNOWN }
@@ -9,44 +10,52 @@ public class TestResult {
     private String message = "Pending evaluation.";
 
 
-    public void setPass() {
+    public TestResult setPass() {
         this.result = TestResultEnum.PASS;
         this.message = defaultMessage;
+        return this;
     }
 
-    public void setPass(String message) {
+    public TestResult setPass(String message) {
         this.result = TestResultEnum.PASS;
         this.message = message;
+        return this;
     }
 
-    public void setFail() {
+    public TestResult setFail() {
         this.result = TestResultEnum.FAIL;
         this.message = defaultMessage;
+        return this;
     }
 
-    public void setFail(String message) {
+    public TestResult setFail(String message) {
         this.result = TestResultEnum.FAIL;
         this.message = message;
+        return this;
     }
 
-    public void setError() {
+    public TestResult setError() {
         this.result = TestResultEnum.ERROR;
         this.message = defaultMessage;
+        return this;
     }
 
-    public void setError(String message) {
+    public TestResult setError(String message) {
         this.result = TestResultEnum.ERROR;
         this.message = message;
+        return this;
     }
 
-    public void setUnknown() {
+    public TestResult setUnknown() {
         this.result = TestResultEnum.UNKNOWN;
         this.message = defaultMessage;
+        return this;
     }
 
-    public void setUnknown(String message) {
+    public TestResult setUnknown(String message) {
         this.result = TestResultEnum.UNKNOWN;
         this.message = message;
+        return this;
     }
 
     public boolean isPending() {

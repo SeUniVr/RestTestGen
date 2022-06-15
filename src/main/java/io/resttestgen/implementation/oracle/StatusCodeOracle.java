@@ -13,15 +13,18 @@ public class StatusCodeOracle extends Oracle {
 
     @Override
     public TestResult assertTestSequence(TestSequence testSequence) {
+
         TestResult testResult = new TestResult();
+
+        if (!testSequence.isExecuted()) {
+            return testResult.setError("One or more interaction in the sequence have not been executed.");
+        }
+
         for (TestInteraction testInteraction : testSequence.getTestInteractions()) {
             if (testInteraction.getResponseStatusCode().isSuccessful()) {
                 testResult.setPass("The test sequence was executed successfully.");
             } else if (testInteraction.getResponseStatusCode().isServerError()) {
                 testResult.setFail("A server error occurred during the execution of the sequence.");
-                break;
-            } else if (testInteraction.getResponseStatusCode().getCode() == null) {
-                testResult.setError("An error occurred during the evaluation of the test sequence.");
                 break;
             } else if (testResult.isPending() && testInteraction.getResponseStatusCode().isClientError()) {
                 testResult.setUnknown("The obtained status code is not informative enough to determine the outcome " +

@@ -85,7 +85,7 @@ public class OperationDependencyGraph {
 
             // Get all the operations with input parameters, excluding the current source operation
             Set<Operation> targetOperations = openAPI.getOperations().stream()
-                    .filter(operation -> operation.getInputParametersSet().size() > 0).collect(Collectors.toSet());
+                    .filter(operation -> operation.getReferenceLeaves().size() > 0).collect(Collectors.toSet());
             targetOperations.remove(sourceOperation);
 
             // For each combination of "source -> target" operations
@@ -99,7 +99,7 @@ public class OperationDependencyGraph {
                     if (outputParameter.getNormalizedName() != null) {
 
                         // For each input parameter of target operation
-                        for (ParameterElement inputParameter : targetOperation.getInputParametersSet()) {
+                        for (ParameterElement inputParameter : targetOperation.getReferenceLeaves()) {
 
                             // If input and output parameters have the same normalized name
                             if (outputParameter.getNormalizedName().equals(inputParameter.getNormalizedName())) {
@@ -107,9 +107,9 @@ public class OperationDependencyGraph {
                                 DependencyEdge edge = new DependencyEdge(outputParameter, inputParameter);
 
                                 // If the input parameter is not required, this edge can be marked as satisfied
-                                if (!inputParameter.isRequired()) {
+                                /*if (!inputParameter.isRequired()) {
                                     edge.setAsSatisfied();
-                                }
+                                }*/
 
                                 graph.addEdge(getNodeFromOperation(targetOperation), getNodeFromOperation(sourceOperation), edge);
                                 commonParametersNames.add(outputParameter.getNormalizedName());

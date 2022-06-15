@@ -33,7 +33,7 @@ public class TestOpenAPIParser {
 
         Set<ParameterElement> params = new HashSet<>();
         for (Operation op : openAPI.getOperations()) {
-            params.addAll(op.getInputParametersSet());
+            params.addAll(op.getReferenceLeaves());
             params.addAll(op.getOutputParametersSet());
         }
 

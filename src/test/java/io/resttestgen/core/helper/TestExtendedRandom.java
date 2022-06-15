@@ -144,7 +144,7 @@ public class TestExtendedRandom {
     @Test
     public void testIntBetween() {
         for (int i = 1; i < 10000; i++) {
-            int number = random.nextIntBetween(0, i);
+            int number = random.nextInt(0, i);
             System.out.println(number);
             Assertions.assertTrue(number >= 0 && number < i);
         }
@@ -161,8 +161,8 @@ public class TestExtendedRandom {
 
     @Test
     public void testLong() {
-        for (int i = 1; i < 10000; i++) {
-            long number = random.nextLong(0, i);
+        for (long i = 1; i < 10000; i++) {
+            long number = random.nextLong(0L, i);
             System.out.println(number);
             Assertions.assertTrue(number >= 0 && number < i);
         }

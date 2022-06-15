@@ -13,9 +13,9 @@ import org.apache.logging.log4j.Logger;
 /**
  * WORK IN PROGRESS: parses JSON response bodies to the internal parameter structure
  */
-public class JSONParserResponseProcessor implements ResponseProcessor {
+public class JsonParserResponseProcessor extends ResponseProcessor {
 
-    private static final Logger logger = LogManager.getLogger(JSONParserResponseProcessor.class);
+    private static final Logger logger = LogManager.getLogger(JsonParserResponseProcessor.class);
 
     @Override
     public void process(TestInteraction testInteraction) {

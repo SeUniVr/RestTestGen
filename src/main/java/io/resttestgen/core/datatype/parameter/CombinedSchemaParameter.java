@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 
 public abstract class CombinedSchemaParameter extends ParameterElement {
 
-    protected List<ParameterElement> parametersSchemas;
+    protected final List<ParameterElement> parametersSchemas;
     protected ParameterElement outputParameterSchema;
-    protected List<ParameterElement> properties;
+    protected final List<ParameterElement> properties;
 
     private static final Logger logger = LogManager.getLogger(CombinedSchemaParameter.class);
 

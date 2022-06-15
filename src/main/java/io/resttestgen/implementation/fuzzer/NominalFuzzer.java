@@ -9,11 +9,10 @@ import io.resttestgen.core.testing.Fuzzer;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
-import io.resttestgen.implementation.parametervalueprovider.multi.RandomProviderParameterValueProvider;
+import io.resttestgen.implementation.parametervalueprovider.multi.EnumAndExamplePriorityParameterValueProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class NominalFuzzer extends Fuzzer {
     private static final Logger logger = LogManager.getLogger(NominalFuzzer.class);
 
     private final Operation operation;
-    private ParameterValueProvider parameterValueProvider = new RandomProviderParameterValueProvider();
+    private ParameterValueProvider parameterValueProvider = new EnumAndExamplePriorityParameterValueProvider();
     
     public NominalFuzzer(Operation operation) {
         this.operation = operation;
@@ -94,8 +93,11 @@ public class NominalFuzzer extends Fuzzer {
 
         // Encapsulate test interaction into test sequence
         TestSequence testSequence = new TestSequence(this, testInteraction);
-        SimpleDateFormat dformat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        testSequence.setName(editableOperation.getOperationId() + "_" + dformat.format(testSequence.getGeneratedAt()));
+        String sequenceName = editableOperation.getOperationId().length() > 0 ?
+                editableOperation.getOperationId() :
+                editableOperation.getMethod().toString() + "-" + editableOperation.getEndpoint();
+        testSequence.setName(sequenceName);
+        testSequence.appendGeneratedAtTimestampToSequenceName();
 
         // Create and return test sequence containing the test interaction
         return testSequence;

@@ -31,7 +31,7 @@ public class NominalAndErrorStrategy extends Strategy {
             Operation operationToTest = sorter.getFirst();
             logger.debug("Testing operation " + operationToTest);
             NominalFuzzer nominalFuzzer = new NominalFuzzer(operationToTest);
-            List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(5);
+            List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(8);
 
             for (TestSequence testSequence : nominalSequences) {
 

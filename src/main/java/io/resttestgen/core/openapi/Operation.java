@@ -1,7 +1,7 @@
 package io.resttestgen.core.openapi;
 
 import com.google.gson.internal.LinkedTreeMap;
-import io.resttestgen.core.datatype.HTTPMethod;
+import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.parameter.*;
 import org.apache.logging.log4j.LogManager;
@@ -12,7 +12,7 @@ import java.util.*;
 public class Operation {
 
     private final String endpoint;
-    private final HTTPMethod method;
+    private final HttpMethod method;
     private final String operationId;
 
     private Set<ParameterElement> headerParameters;
@@ -28,7 +28,7 @@ public class Operation {
 
     private static final Logger logger = LogManager.getLogger(Operation.class);
 
-    public Operation(String endpoint, HTTPMethod method, Map<String, Object> operationMap) throws InvalidOpenAPIException {
+    public Operation(String endpoint, HttpMethod method, Map<String, Object> operationMap) throws InvalidOpenAPIException {
         this.endpoint = endpoint;
         this.method = method;
 
@@ -156,7 +156,7 @@ public class Operation {
 
     private Operation(Operation other) {
         endpoint = other.endpoint;
-        method = HTTPMethod.getMethod(other.method.toString());
+        method = HttpMethod.getMethod(other.method.toString());
         operationId = other.operationId;
 
         headerParameters = new HashSet<>();
@@ -185,7 +185,7 @@ public class Operation {
         return endpoint;
     }
 
-    public HTTPMethod getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
@@ -376,7 +376,7 @@ public class Operation {
     // TODO: add getFuzzableParameterSet (exclude not fuzzable params, e.g., auth)?
     // FIXME: add combined parameter management
     // The commented part is the old implementation. Newer implementation should work better
-    public Set<ParameterElement> getInputParametersSet() {
+    public List<ParameterLeaf> getReferenceLeaves() {
         /*Set<ParameterElement> parameters = new HashSet<>(pathParameters);
         parameters.addAll(headerParameters);
         parameters.addAll(queryParameters);
@@ -390,7 +390,7 @@ public class Operation {
 
         return parameters;*/
 
-        Set<ParameterElement> parameters = new HashSet<>();
+        List<ParameterLeaf> parameters = new LinkedList<>();
 
         pathParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
         headerParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
@@ -460,9 +460,9 @@ public class Operation {
         return outParams;
     }
 
-    public List<ParameterElement> searchInputParameterByNormalizedName(NormalizedParameterName normalizedParameterName) {
-        List<ParameterElement> foundParameters = new LinkedList<>();
-        getInputParametersSet().forEach(p -> {
+    public List<ParameterLeaf> searchInputParameterByNormalizedName(NormalizedParameterName normalizedParameterName) {
+        List<ParameterLeaf> foundParameters = new LinkedList<>();
+        getReferenceLeaves().forEach(p -> {
             if (p.getNormalizedName().equals(normalizedParameterName)) {
                 foundParameters.add(p);
             }

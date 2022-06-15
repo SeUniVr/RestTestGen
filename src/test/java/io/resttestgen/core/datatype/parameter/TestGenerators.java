@@ -72,6 +72,6 @@ public class TestGenerators {
     @Test
     public void testGenerators() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Operation operation = TestingOperationGenerator.getTestingOperation();
-        System.out.println(operation.getInputParametersSet());
+        System.out.println(operation.getReferenceLeaves());
     }
 }

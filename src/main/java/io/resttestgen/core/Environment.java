@@ -138,10 +138,17 @@ public class Environment {
         this.random = random;
     }
 
-    public AuthenticationInfo getAuth() {
-        if (this.authInfo != null && this.authInfo.size() > 0) {
-            return this.authInfo.get(0);
+    public AuthenticationInfo getAuthenticationInfo(int index) {
+        if (this.authInfo != null && index >= 0 && index < authInfo.size()) {
+            return authInfo.get(index);
         }
         return null;
     }
-}
+    public AuthenticationInfo getAuthenticationInfo(String description) {
+        return authInfo.stream().filter(i -> i.getDescription().equals(description)).findFirst().orElse(null);
+    }
+
+    public List<AuthenticationInfo> getAuthenticationInfoList() {
+        return this.authInfo;
+    }
+ }

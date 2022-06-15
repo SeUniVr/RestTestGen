@@ -11,9 +11,9 @@ import io.resttestgen.core.testing.TestInteraction;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GraphResponseProcessor implements ResponseProcessor {
+public class GraphResponseProcessor extends ResponseProcessor {
 
-    OperationDependencyGraph operationDependencyGraph = Environment.getInstance().getOperationDependencyGraph();
+    final OperationDependencyGraph operationDependencyGraph = Environment.getInstance().getOperationDependencyGraph();
 
     @Override
     public void process(TestInteraction testInteraction) {
@@ -27,7 +27,7 @@ public class GraphResponseProcessor implements ResponseProcessor {
 
         // If the parsed response body is null, try to parse it
         if (responseBody == null) {
-            JSONParserResponseProcessor jsonParserResponseProcessor = new JSONParserResponseProcessor();
+            JsonParserResponseProcessor jsonParserResponseProcessor = new JsonParserResponseProcessor();
             jsonParserResponseProcessor.process(testInteraction);
             responseBody = testInteraction.getOperation().getResponseBody();
         }

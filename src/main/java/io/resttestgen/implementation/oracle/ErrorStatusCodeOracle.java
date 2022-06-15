@@ -12,7 +12,13 @@ public class ErrorStatusCodeOracle extends Oracle {
 
     @Override
     public TestResult assertTestSequence(TestSequence testSequence) {
+
         TestResult testResult = new TestResult();
+
+        if (!testSequence.isExecuted()) {
+            return testResult.setError("One or more interaction in the sequence have not been executed.");
+        }
+
         if (testSequence.size() > 0) {
             TestInteraction testInteraction = testSequence.getLast();
             if (testInteraction.getResponseStatusCode().isClientError()) {
@@ -21,8 +27,6 @@ public class ErrorStatusCodeOracle extends Oracle {
                 testResult.setFail("The erroneous test sequence was accepted as valid by the server.");
             } else if (testInteraction.getResponseStatusCode().isServerError()) {
                 testResult.setFail("A server error occurred during the execution of the sequence.");
-            } else if (testInteraction.getResponseStatusCode().getCode() == null) {
-                testResult.setError("An error occurred during the evaluation of the test sequence.");
             }
         }
         testSequence.addTestResult(this, testResult);

@@ -116,11 +116,10 @@ public class ParameterObject extends StructuredParameterElement {
     private List<ParameterElement> mergeProperties(List<ParameterElement> other) {
 
         List<ParameterElement> merged = new LinkedList<>();
-        HashSet<ParameterName> commonNames = new HashSet<>(
-                this.properties.stream().map(ParameterElement::getName).collect(Collectors.toSet()).stream().filter(
-                        p -> other.stream().map(ParameterElement::getName).collect(Collectors.toSet()).contains(p)
-                ).collect(Collectors.toSet())
-        );
+        HashSet<ParameterName> commonNames = this.properties.stream().map(ParameterElement::getName)
+                .collect(Collectors.toSet()).stream().filter(p -> other.stream().map(ParameterElement::getName)
+                .collect(Collectors.toSet()).contains(p))
+                .collect(Collectors.toCollection(HashSet::new));
 
         this.properties.forEach(p -> {
             if (commonNames.contains(p.getName())) {
@@ -229,7 +228,6 @@ public class ParameterObject extends StructuredParameterElement {
                         stringBuilder.append("=");
                         stringBuilder.append(p.getValueAsFormattedString(ParameterStyle.SIMPLE));
                     });
-                    return stringBuilder.toString();
                 } else {
                     // ;color=R,100,G,200,B,150
                     stringBuilder.append(";");
@@ -244,8 +242,8 @@ public class ParameterObject extends StructuredParameterElement {
                     if (stringBuilder.charAt(stringBuilder.length() - 1) == ',') {
                         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                     }
-                    return stringBuilder.toString();
                 }
+                return stringBuilder.toString();
 
             case LABEL:
                 if (explode) {
@@ -256,7 +254,6 @@ public class ParameterObject extends StructuredParameterElement {
                         stringBuilder.append("=");
                         stringBuilder.append(p.getValueAsFormattedString(ParameterStyle.SIMPLE));
                     });
-                    return stringBuilder.toString();
                 } else {
                     // .R.100.G.200.B.150
                     properties.forEach(p -> {
@@ -265,8 +262,8 @@ public class ParameterObject extends StructuredParameterElement {
                         stringBuilder.append(".");
                         stringBuilder.append(p.getValueAsFormattedString(ParameterStyle.SIMPLE));
                     });
-                    return stringBuilder.toString();
                 }
+                return stringBuilder.toString();
 
             case FORM:
                 if (explode) {
@@ -280,7 +277,6 @@ public class ParameterObject extends StructuredParameterElement {
                     if (stringBuilder.charAt(stringBuilder.length() - 1) == '&') {
                         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                     }
-                    return stringBuilder.toString();
                 } else {
                     // color=R,100,G,200,B,150
                     stringBuilder.append(this.getName().toString());
@@ -294,8 +290,8 @@ public class ParameterObject extends StructuredParameterElement {
                     if (stringBuilder.charAt(stringBuilder.length() - 1) == ',') {
                         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                     }
-                    return stringBuilder.toString();
                 }
+                return stringBuilder.toString();
 
             case SIMPLE:
                 if (explode) {
@@ -306,10 +302,6 @@ public class ParameterObject extends StructuredParameterElement {
                         stringBuilder.append(p.getValueAsFormattedString(ParameterStyle.SIMPLE));
                         stringBuilder.append(",");
                     });
-                    if (stringBuilder.charAt(stringBuilder.length() - 1) == ',') {
-                        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                    }
-                    return stringBuilder.toString();
                 } else {
                     // R,100,G,200,B,150
                     properties.forEach(p -> {
@@ -318,11 +310,11 @@ public class ParameterObject extends StructuredParameterElement {
                         stringBuilder.append(p.getValueAsFormattedString(ParameterStyle.SIMPLE));
                         stringBuilder.append(",");
                     });
-                    if (stringBuilder.charAt(stringBuilder.length() - 1) == ',') {
-                        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                    }
-                    return stringBuilder.toString();
                 }
+                if (stringBuilder.charAt(stringBuilder.length() - 1) == ',') {
+                    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                }
+                return stringBuilder.toString();
 
             case SPACE_DELIMITED:
                 // R%20100%20G%20200%20B%20150

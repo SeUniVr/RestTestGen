@@ -1,6 +1,6 @@
 package io.resttestgen.core.testing;
 
-public interface ResponseProcessor {
+public abstract class ResponseProcessor {
 
-    public void process(TestInteraction testInteraction);
+    public abstract void process(TestInteraction testInteraction);
 }

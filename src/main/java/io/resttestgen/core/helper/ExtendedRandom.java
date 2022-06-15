@@ -250,7 +250,7 @@ public class ExtendedRandom extends Random {
      * @return the random binary string
      */
     public String nextBinaryString() {
-        return nextBinaryString(nextIntBetween(1, 256));
+        return nextBinaryString(nextInt(1, 256));
     }
 
     /**
@@ -277,7 +277,7 @@ public class ExtendedRandom extends Random {
      * @return the random string in base64.
      */
     public String nextBase64() {
-        byte[] randomBytes = new byte[nextIntBetween(1, 100)];
+        byte[] randomBytes = new byte[nextInt(1, 100)];
         nextBytes(randomBytes);
         return Base64.getUrlEncoder().encodeToString(randomBytes);
     }
@@ -392,8 +392,27 @@ public class ExtendedRandom extends Random {
     }
 
     public Double nextDouble(Double min, Double max) {
+        min = min != null ? min : -Double.MAX_VALUE;
+        max = max != null ? max : Double.MAX_VALUE;
         if (min <= max) {
-            return min + nextDouble() * (max - min);
+            if (min >= 0 || max <= 0) {
+                return min + nextDouble() * (max - min);
+            } else {
+                return min + nextDouble() * Math.abs(min) + nextDouble() * Math.abs(max);
+            }
+        }
+        return null;
+    }
+
+    public Float nextFloat(Float min, Float max) {
+        min = min != null ? min : -Float.MAX_VALUE;
+        max = max != null ? max : Float.MAX_VALUE;
+        if (min <= max) {
+            if (min >= 0 || max <= 0) {
+                return min + nextFloat() * (max - min);
+            } else {
+                return min + nextFloat() * Math.abs(min) + nextFloat() * Math.abs(max);
+            }
         }
         return null;
     }
@@ -442,7 +461,7 @@ public class ExtendedRandom extends Random {
         StringBuilder s = new StringBuilder();
         while (s.length() < length)
         {
-            s.append(base.charAt(nextIntBetween(0, base.length())));
+            s.append(base.charAt(nextInt(0, base.length())));
         }
         return s.toString();
     }
@@ -508,7 +527,7 @@ public class ExtendedRandom extends Random {
             email = nextDomain(true);
         }
 
-        return nextLetterString(nextIntBetween(1, 10)) + "@" + email;
+        return nextLetterString(nextInt(1, 10)) + "@" + email;
     }
 
     public String nextURI() {
@@ -547,7 +566,7 @@ public class ExtendedRandom extends Random {
 
         for (int i = 0; i < randAddress.length; i++) {
             for(int j = 0; j < 4; j++){
-                randAddress[i] = randAddress[i] + scope[nextIntBetween(0, 15 + 1)];
+                randAddress[i] = randAddress[i] + scope[nextInt(0, 15 + 1)];
             }
         }
 
@@ -557,7 +576,7 @@ public class ExtendedRandom extends Random {
     public String nextDomain(boolean topDomain) {
         String[] topDomainString = {"com", "it", "info", "ch", "de", "gov", "co.uk", "io", "me"};
 
-        StringBuilder s = new StringBuilder(nextLetterString(nextIntBetween(1, 10)));
+        StringBuilder s = new StringBuilder(nextLetterString(nextInt(1, 10)));
         for (int i = 0; i < nextInt(2); i++) {
             s.append(".").append(nextLetterString(nextIntBetweenInclusive(1, 10)));
         }
@@ -574,13 +593,20 @@ public class ExtendedRandom extends Random {
     }
 
     /**
-     * Returns a random integer between start (inclusive) and end (exclusive)
-     * @param start from (inclusive)
-     * @param end to (exclusive)
-     * @return the random integer
+     * Returns a random integer between min and max.
+     * @param min minimum.
+     * @param max maximum.
+     * @return the random integer.
      */
-    public int nextIntBetween(int start, int end) {
-        return start + (int)Math.round(Math.random() * (end - start - 1));
+    public Integer nextInt(Integer min, Integer max) {
+        if (min <= max) {
+            if (min >= 0 || max <= 0) {
+                return min + (int) (nextDouble() * (max - min));
+            } else {
+                return min + (int) (nextDouble() * Math.abs(min)) + (int) (nextDouble() * Math.abs(max));
+            }
+        }
+        return null;
     }
 
     /**
@@ -590,17 +616,24 @@ public class ExtendedRandom extends Random {
      * @return the random integer
      */
     public int nextIntBetweenInclusive(int start, int end) {
-        return nextIntBetween(start, end + 1);
+        return nextInt(start, end + 1);
     }
 
     /**
-     * Returns a random long between start (inclusive) and end (exclusive)
-     * @param start from (inclusive)
-     * @param end to (exclusive)
+     * Returns a random long between min and max (inclusive).
+     * @param min minimum value.
+     * @param max maximum value.
      * @return the random long
      */
-    public long nextLong(long start, long end) {
-        return start + ((long) (nextDouble() * (end - start - 1)));
+    public Long nextLong(Long min, Long max) {
+        if (min <= max) {
+            if (min >= 0 || max <= 0) {
+                return min + (long) (nextDouble() * (max - min));
+            } else {
+                return min + (long) (nextDouble() * Math.abs(min)) + (long) (nextDouble() * Math.abs(max));
+            }
+        }
+        return null;
     }
 
     /**

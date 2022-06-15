@@ -2,7 +2,7 @@ package io.resttestgen.core.helper;
 
 import io.resttestgen.core.AuthenticationInfo;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.HTTPMethod;
+import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.openapi.Operation;
 import okhttp3.*;
@@ -24,6 +24,8 @@ public class RequestManager {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private static final Logger logger = LogManager.getLogger(RequestManager.class);
+
+    private AuthenticationInfo authenticationInfo = Environment.getInstance().getAuthenticationInfo(0);
 
     public RequestManager(Operation operation) {
         this.client = new OkHttpClient();
@@ -123,9 +125,9 @@ public class RequestManager {
         // TODO: add cookie parameters support
 
         RequestBody requestBody;
-        if (operation.getMethod().equals(HTTPMethod.POST) ||
-                operation.getMethod().equals(HTTPMethod.PUT) ||
-                operation.getMethod().equals(HTTPMethod.PATCH)
+        if (operation.getMethod().equals(HttpMethod.POST) ||
+                operation.getMethod().equals(HttpMethod.PUT) ||
+                operation.getMethod().equals(HttpMethod.PATCH)
         ) {
             if (operation.getRequestBody() != null) {
                 requestBody = RequestBody.create(operation.getRequestBody().getJSONString(), JSON);
@@ -145,34 +147,33 @@ public class RequestManager {
         );
 
         // Apply authorization
-        AuthenticationInfo auth = Environment.getInstance().getAuth();
-        if (auth != null) {
+        if (authenticationInfo != null) {
 
             if (!asFuzzed) {
 
                 if (dropAuth) {
-                    switch (auth.getIn()) {
+                    switch (authenticationInfo.getIn()) {
                         case HEADER:
-                            requestBuilder.removeHeader(auth.getName().toString());
+                            requestBuilder.removeHeader(authenticationInfo.getName().toString());
                             break;
                         case QUERY:
-                            queryParametersMap.remove(auth.getName());
+                            queryParametersMap.remove(authenticationInfo.getName().toString());
                             break;
                         case COOKIE:
                             logger.warn("Cookie parameters are not already supported.");
                             break;
                     }
                 } else {
-                    String authToken = auth.getValue();
+                    String authToken = authenticationInfo.getValue();
                     if (token != null) {
                         authToken = token;
                     }
-                    switch (auth.getIn()) {
+                    switch (authenticationInfo.getIn()) {
                         case HEADER:
-                            requestBuilder.header(auth.getName().toString(), authToken);
+                            requestBuilder.header(authenticationInfo.getName().toString(), authToken);
                             break;
                         case QUERY:
-                            queryParametersMap.put(auth.getName().toString(), authToken);
+                            queryParametersMap.put(authenticationInfo.getName().toString(), authenticationInfo.getName().toString() + "=" + authToken);
                             break;
                         case COOKIE:
                             logger.warn("Cookie parameters are not already supported.");
@@ -354,9 +355,9 @@ public class RequestManager {
         }
 
         if (source.getRequestBody() != null) {
-            Set<ParameterElement> leavesRequired =
-                    source.getRequestBody().getLeaves().stream().filter(ParameterElement::isRequired)
-                            .collect(Collectors.toSet());
+            Set<ParameterLeaf> leavesRequired = source.getRequestBody().getLeaves().stream()
+                    .filter(ParameterElement::isRequired)
+                    .collect(Collectors.toSet());
             return (leavesRequired.size() <= 0 || operation.getRequestBody() != null) &&
                     operation.getRequestBody().getLeaves().containsAll(leavesRequired);
         }
@@ -364,7 +365,7 @@ public class RequestManager {
         return true;
     }
 
-    private static void setMethod(Request.Builder builder, HTTPMethod method, RequestBody body) {
+    private static void setMethod(Request.Builder builder, HttpMethod method, RequestBody body) {
         switch (method) {
             case GET:
                 builder.get();
@@ -410,4 +411,7 @@ public class RequestManager {
         return newElements;
     }
 
+    public void setAuthenticationInfo(AuthenticationInfo authenticationInfo) {
+        this.authenticationInfo = authenticationInfo;
+    }
 }

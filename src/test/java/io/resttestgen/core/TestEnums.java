@@ -1,6 +1,6 @@
 package io.resttestgen.core;
 
-import io.resttestgen.core.datatype.HTTPMethod;
+import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.parameter.ParameterStyle;
 import io.resttestgen.core.datatype.parameter.ParameterType;
 import io.resttestgen.core.datatype.parameter.ParameterTypeFormat;
@@ -18,16 +18,16 @@ public class TestEnums {
     public void testHTTPMethod() {
         logger.info("Test values from getMethod function in HTTPMethod enum");
 
-        assertEquals(HTTPMethod.GET, HTTPMethod.getMethod("Get"));
-        assertEquals(HTTPMethod.POST, HTTPMethod.getMethod("POST"));
-        assertEquals(HTTPMethod.PUT, HTTPMethod.getMethod("put"));
-        assertEquals(HTTPMethod.PATCH, HTTPMethod.getMethod("pAtch"));
-        assertEquals(HTTPMethod.DELETE, HTTPMethod.getMethod("Delete"));
-        assertEquals(HTTPMethod.HEAD, HTTPMethod.getMethod("heaD"));
-        assertEquals(HTTPMethod.OPTIONS, HTTPMethod.getMethod("options"));
-        assertEquals(HTTPMethod.TRACE, HTTPMethod.getMethod("trace"));
-        assertThrows(IllegalArgumentException.class, () -> HTTPMethod.getMethod("Custom"));
-        assertThrows(IllegalArgumentException.class, () -> HTTPMethod.getMethod(null));
+        assertEquals(HttpMethod.GET, HttpMethod.getMethod("Get"));
+        assertEquals(HttpMethod.POST, HttpMethod.getMethod("POST"));
+        assertEquals(HttpMethod.PUT, HttpMethod.getMethod("put"));
+        assertEquals(HttpMethod.PATCH, HttpMethod.getMethod("pAtch"));
+        assertEquals(HttpMethod.DELETE, HttpMethod.getMethod("Delete"));
+        assertEquals(HttpMethod.HEAD, HttpMethod.getMethod("heaD"));
+        assertEquals(HttpMethod.OPTIONS, HttpMethod.getMethod("options"));
+        assertEquals(HttpMethod.TRACE, HttpMethod.getMethod("trace"));
+        assertThrows(IllegalArgumentException.class, () -> HttpMethod.getMethod("Custom"));
+        assertThrows(IllegalArgumentException.class, () -> HttpMethod.getMethod(null));
     }
 
     @Test

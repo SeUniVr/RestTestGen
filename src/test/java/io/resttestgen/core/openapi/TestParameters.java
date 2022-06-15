@@ -1,7 +1,7 @@
 package io.resttestgen.core.openapi;
 
 import io.resttestgen.core.TestingOperationGenerator;
-import io.resttestgen.core.datatype.HTTPMethod;
+import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
 import org.apache.logging.log4j.LogManager;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,7 +57,7 @@ public class TestParameters {
     public void testPetJSONParameterEquals() throws InvalidOpenAPIException, IOException {
         logger.info("Test equals/hashCode functions on petstore JSON parameters");
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.GET;
+        HttpMethod method = HttpMethod.GET;
 
         Operation op1 = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/getPets.json"));
         Operation op2 = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/getPets.json"));
@@ -110,7 +109,7 @@ public class TestParameters {
     public void testPetParameterEquals() throws IOException, InvalidOpenAPIException {
         logger.info("Test equals/hashCode functions on petstore simple parameters");
         String endpoint = "/pet/{petId}";
-        HTTPMethod method = HTTPMethod.DELETE;
+        HttpMethod method = HttpMethod.DELETE;
 
         Operation op1 = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/deletePetId.json"));
         Operation op2 = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/deletePetId.json"));
@@ -121,27 +120,27 @@ public class TestParameters {
         Map<String, Object> modOperation = getJSONMap("build/resources/test/operations/deletePetId.json");
 
         // Same object
-        assertEquals(op1.getInputParametersSet(), op1.getInputParametersSet());
-        assertEquals(op1.getInputParametersSet().hashCode(), op1.getInputParametersSet().hashCode());
+        assertEquals(op1.getReferenceLeaves(), op1.getReferenceLeaves());
+        assertEquals(op1.getReferenceLeaves().hashCode(), op1.getReferenceLeaves().hashCode());
 
         // Different parsings
-        assertEquals(op1.getInputParametersSet(), op2.getInputParametersSet());
-        assertEquals(op1.getInputParametersSet().hashCode(), op2.getInputParametersSet().hashCode());
+        assertEquals(op1.getReferenceLeaves(), op2.getReferenceLeaves());
+        assertEquals(op1.getReferenceLeaves().hashCode(), op2.getReferenceLeaves().hashCode());
 
         // Unordered
-        assertEquals(op1.getInputParametersSet(), op3.getInputParametersSet());
-        assertEquals(op1.getInputParametersSet().hashCode(), op3.getInputParametersSet().hashCode());
+        assertEquals(op1.getReferenceLeaves(), op3.getReferenceLeaves());
+        assertEquals(op1.getReferenceLeaves().hashCode(), op3.getReferenceLeaves().hashCode());
 
         // Equals transitivity
-        assertEquals(op2.getInputParametersSet(), op3.getInputParametersSet());
-        assertEquals(op2.getInputParametersSet().hashCode(), op3.getInputParametersSet().hashCode());
+        assertEquals(op2.getReferenceLeaves(), op3.getReferenceLeaves());
+        assertEquals(op2.getReferenceLeaves().hashCode(), op3.getReferenceLeaves().hashCode());
 
         // Parameters must be in the same place
         Map<String, Object> name = (Map<String, Object>) ((List) modOperation.get("parameters")).get(0);
         name.put("in", "query");
         op4 = new Operation(endpoint, method, modOperation);
 
-        assertNotEquals(op1.getInputParametersSet(), op4.getInputParametersSet());
+        assertNotEquals(op1.getReferenceLeaves(), op4.getReferenceLeaves());
 
         name.put("in", "path");
 
@@ -152,7 +151,7 @@ public class TestParameters {
         ((List) modOperation.get("parameters")).add(newParam);
         op4 = new Operation(endpoint, method, modOperation);
 
-        assertNotEquals(op1.getInputParametersSet(), op4.getInputParametersSet());
+        assertNotEquals(op1.getReferenceLeaves(), op4.getReferenceLeaves());
 
         ((List) modOperation.get("parameters")).remove(newParam);
 
@@ -169,7 +168,7 @@ public class TestParameters {
         logger.info("Test parameter examples parsing");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.POST;
+        HttpMethod method = HttpMethod.POST;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/postPets_examples.json"));
 
         Set<Object> examples;
@@ -180,7 +179,7 @@ public class TestParameters {
         Set<ParameterElement> headerParameters = o.getHeaderParameters();
         examples = getParameterByName("api_key", headerParameters).getExamples();
         assertTrue(examples.contains("this_is_a_key_example"));
-        assertTrue(examples.size() == 1);
+        assertEquals(1, examples.size());
 
         // Query parameters
         Set<ParameterElement> queryParameters = o.getQueryParameters();
@@ -188,7 +187,7 @@ public class TestParameters {
         assertTrue(examples.contains(1.0));
         assertTrue(examples.contains(2.0));
         assertTrue(examples.contains(3.0));
-        assertTrue(examples.size() == 3);
+        assertEquals(3, examples.size());
 
         // Request body
         ParameterObject body = (ParameterObject) o.getRequestBody();
@@ -203,7 +202,7 @@ public class TestParameters {
                 ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
         objectExampleValue.put("name", "firstLevelName");
-        objectExampleValue.put("photoUrls", new LinkedList<>(Arrays.asList("root_url")));
+        objectExampleValue.put("photoUrls", new LinkedList<>(List.of("root_url")));
         objectExampleValue.put("tags", new LinkedList<>());
         Map<String, Object> firstTag = new HashMap<>(
                 Stream.of(
@@ -226,7 +225,7 @@ public class TestParameters {
         examples = getParameterByName("id", body.getProperties()).getExamples();
         assertTrue(examples.contains(5.0));
         assertTrue(examples.contains(123123.0));
-        assertTrue(examples.size() == 2);
+        assertEquals(2, examples.size());
 
         // Root level category object
         ParameterObject category = (ParameterObject) getParameterByName("category", body.getProperties());
@@ -239,33 +238,33 @@ public class TestParameters {
         // 2nd level, category -> id
         examples = getParameterByName("id", category.getProperties()).getExamples();
         assertTrue(examples.contains(234234.0));
-        assertTrue(examples.size() == 1);
+        assertEquals(1, examples.size());
 
         // 2nd level, category -> name
         examples = getParameterByName("name", category.getProperties()).getExamples();
         assertTrue(examples.contains("categoryName!"));
         assertTrue(examples.contains("category_name"));
-        assertTrue(examples.size() == 2);
+        assertEquals(2, examples.size());
 
         // Root level name string
         examples = getParameterByName("name", body.getProperties()).getExamples();
         assertTrue(examples.contains("firstLevelName"));
         assertTrue(examples.contains("doggie"));
-        assertTrue(examples.size() == 2);
+        assertEquals(2, examples.size());
 
         // Root level photoUrls array
         ParameterArray photoUrls = (ParameterArray) getParameterByName("photoUrls", body.getProperties());
         examples = photoUrls.getExamples();
-        assertTrue(examples.contains(new LinkedList<>(Arrays.asList("root_url"))));
+        assertTrue(examples.contains(new LinkedList<>(List.of("root_url"))));
         assertTrue(examples.contains(new LinkedList<>(Arrays.asList("url_1", "url_2"))));
-        assertTrue(examples.size() == 2);
+        assertEquals(2, examples.size());
 
         // 2nd level, photoUrls -> photoUrl (reference element for photoUrls array)
         examples = photoUrls.getReferenceElement().getExamples();
         assertTrue(examples.contains("root_url"));
         assertTrue(examples.contains("url_1"));
         assertTrue(examples.contains("url_2"));
-        assertTrue(examples.size() == 3);
+        assertEquals(3, examples.size());
 
         // Root level tags array
         ParameterArray tags = (ParameterArray) getParameterByName("tags", body.getProperties());
@@ -283,7 +282,7 @@ public class TestParameters {
         listExampleValue.add(bigTag);
         assertTrue(examples.contains(listExampleValue));
         listExampleValue.clear();
-        assertTrue(examples.size() == 2);
+        assertEquals(2, examples.size());
 
         // 2nd level, tags -> tag (reference element for tags array)
         ParameterObject tag = (ParameterObject) tags.getReferenceElement();
@@ -291,7 +290,7 @@ public class TestParameters {
         assertTrue(examples.contains(firstTag));
         assertTrue(examples.contains(secondTag));
         assertTrue(examples.contains(bigTag));
-        assertTrue(examples.size() == 3);
+        assertEquals(3, examples.size());
 
         // 3rd level, tags -> tag -> id
         examples = getParameterByName("id", tag.getProperties()).getExamples();
@@ -299,14 +298,14 @@ public class TestParameters {
         assertTrue(examples.contains(2.0));
         assertTrue(examples.contains(999.0));
         assertTrue(examples.contains(333.0));
-        assertTrue(examples.size() == 4);
+        assertEquals(4, examples.size());
 
         // 3rd level, tags -> tag -> name
         examples = getParameterByName("name", tag.getProperties()).getExamples();
         assertTrue(examples.contains("firstTag"));
         assertTrue(examples.contains("secondTag"));
         assertTrue(examples.contains("bigTag"));
-        assertTrue(examples.size() == 3);
+        assertEquals(3, examples.size());
 
         // Root level status string
         examples = getParameterByName("status", body.getProperties()).getExamples();
@@ -318,7 +317,7 @@ public class TestParameters {
         logger.info("Test parameter enums (at root level) parsing");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.POST;
+        HttpMethod method = HttpMethod.POST;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/postPets_enums.json"));
 
         Set<Object> enums;
@@ -329,7 +328,7 @@ public class TestParameters {
         enums = getParameterByName("api_key", headerParameters).getEnumValues();
         assertTrue(enums.contains("devKey"));
         assertTrue(enums.contains("prodKey"));
-        assertTrue(enums.size() == 2);
+        assertEquals(2, enums.size());
 
         // Query parameters
         Set<ParameterElement> queryParameters = o.getQueryParameters();
@@ -337,7 +336,7 @@ public class TestParameters {
         assertTrue(enums.contains(1.0));
         assertTrue(enums.contains(2.0));
         assertTrue(enums.contains(3.0));
-        assertTrue(enums.size() == 3);
+        assertEquals(3, enums.size());
 
         // Request body
         ParameterObject body = (ParameterObject) o.getRequestBody();
@@ -375,7 +374,7 @@ public class TestParameters {
         ((List) objectEnumValue.get("tags")).add(cTag);
         ((List) objectEnumValue.get("tags")).remove(bTag);
         assertTrue(enums.contains(objectEnumValue));
-        assertTrue(enums.size() == 2);
+        assertEquals(2, enums.size());
 
         // Check empty enums for underlying fields
         enums = getParameterByName("id", body.getProperties()).getEnumValues();
@@ -404,7 +403,7 @@ public class TestParameters {
         logger.info("Test parameter enums (at leaf level) parsing");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.PUT;
+        HttpMethod method = HttpMethod.PUT;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/putPets_enums.json"));
 
         Set<Object> enums;
@@ -420,7 +419,7 @@ public class TestParameters {
         enums = getParameterByName("paramNumber", queryParameters).getEnumValues();
         assertTrue(enums.contains(12.0));
         assertTrue(enums.contains(21.0));
-        assertTrue(enums.size() == 2);
+        assertEquals(2, enums.size());
 
         // Request body
         ParameterObject body = (ParameterObject) o.getRequestBody();
@@ -434,7 +433,7 @@ public class TestParameters {
         assertTrue(enums.contains(1.0));
         assertTrue(enums.contains(2.0));
         assertTrue(enums.contains(3.0));
-        assertTrue(enums.size() == 3);
+        assertEquals(3, enums.size());
 
         // Root level category object
         ParameterObject category = (ParameterObject) getParameterByName("category", body.getProperties());
@@ -446,14 +445,14 @@ public class TestParameters {
         assertTrue(enums.contains(4.0));
         assertTrue(enums.contains(5.0));
         assertTrue(enums.contains(6.0));
-        assertTrue(enums.size() == 3);
+        assertEquals(3, enums.size());
 
         // 2nd level, category -> name
         enums = getParameterByName("name", category.getProperties()).getEnumValues();
         assertTrue(enums.contains("cat_1"));
         assertTrue(enums.contains("cat_2"));
         assertTrue(enums.contains("cat_3"));
-        assertTrue(enums.size() == 3);
+        assertEquals(3, enums.size());
 
         // Root level tags array
         ParameterArray tags = (ParameterArray) getParameterByName("tags", body.getProperties());
@@ -470,14 +469,14 @@ public class TestParameters {
         assertTrue(enums.contains(7.0));
         assertTrue(enums.contains(8.0));
         assertTrue(enums.contains(9.0));
-        assertTrue(enums.size() == 3);
+        assertEquals(3, enums.size());
 
         // 3rd level, tags -> tag -> name
         enums = getParameterByName("name", tag.getProperties()).getEnumValues();
         assertTrue(enums.contains("aTag"));
         assertTrue(enums.contains("bTag"));
         assertTrue(enums.contains("cTag"));
-        assertTrue(enums.size() == 3);
+        assertEquals(3, enums.size());
     }
 
     @Test
@@ -485,7 +484,7 @@ public class TestParameters {
         logger.info("Test parameter default parsing");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.POST;
+        HttpMethod method = HttpMethod.POST;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/postPets_defaults.json"));
 
         Object def;
@@ -494,12 +493,12 @@ public class TestParameters {
         // Header parameters
         Set<ParameterElement> headerParameters = o.getHeaderParameters();
         def = getParameterByName("api_key", headerParameters).getDefaultValue();
-        assertTrue(def.equals("default_api_key"));
+        assertEquals("default_api_key", def);
 
         // Query parameters
         Set<ParameterElement> queryParameters = o.getQueryParameters();
         def = getParameterByName("paramNumber", queryParameters).getDefaultValue();
-        assertTrue(def.equals(909.0));
+        assertEquals(909.0, def);
 
         // Request body
         ParameterObject body = (ParameterObject) o.getRequestBody();
@@ -531,11 +530,11 @@ public class TestParameters {
         );
         ((List) ((Map) defaultValue).get("tags")).add(tag1);
         ((List) ((Map) defaultValue).get("tags")).add(tag2);
-        assertTrue(def.equals(defaultValue));
+        assertEquals(def, defaultValue);
 
         // Root level id
         def = getParameterByName("id", body.getProperties()).getDefaultValue();
-        assertTrue(def.equals(5.0));
+        assertEquals(5.0, def);
 
         // Root level category object
         ParameterObject category = (ParameterObject) getParameterByName("category", body.getProperties());
@@ -543,28 +542,28 @@ public class TestParameters {
         defaultValue = new HashMap<String, Object>();
         ((Map) defaultValue).put("id", 3434.0);
         ((Map) defaultValue).put("name", "cat_def");
-        assertTrue(def.equals(defaultValue));
+        assertEquals(def, defaultValue);
 
         // 2nd level, category -> id
         def = getParameterByName("id", category.getProperties()).getDefaultValue();
-        assertTrue(def.equals(33.0));
+        assertEquals(33.0, def);
 
         // 2nd level, category -> name
         def = getParameterByName("name", category.getProperties()).getDefaultValue();
-        assertTrue(def.equals("category_name"));
+        assertEquals("category_name", def);
 
         // Root level name string
         def = getParameterByName("name", body.getProperties()).getDefaultValue();
-        assertTrue(def.equals("doggie"));
+        assertEquals("doggie", def);
 
         // Root level photoUrls array
         ParameterArray photoUrls = (ParameterArray) getParameterByName("photoUrls", body.getProperties());
         def = photoUrls.getDefaultValue();
-        assertTrue(def.equals(new LinkedList<>(Arrays.asList("url_a", "url_b"))));
+        assertEquals(def, new LinkedList<>(Arrays.asList("url_a", "url_b")));
 
         // 2nd level, photoUrls -> photoUrl (reference element for photoUrls array)
         def = photoUrls.getReferenceElement().getDefaultValue();
-        assertTrue(def == null);
+        assertNull(def);
 
         // Root level tags array
         ParameterArray tags = (ParameterArray) getParameterByName("tags", body.getProperties());
@@ -578,24 +577,24 @@ public class TestParameters {
                         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
                 )
         );
-        assertTrue(def.equals(defaultValue));
+        assertEquals(def, defaultValue);
 
         // 2nd level, tags -> tag (reference element for tags array)
         ParameterObject tag = (ParameterObject) tags.getReferenceElement();
         def = tag.getDefaultValue();
-        assertTrue(def == null);
+        assertNull(def);
 
         // 3rd level, tags -> tag -> id
         def = getParameterByName("id", tag.getProperties()).getDefaultValue();
-        assertTrue(def.equals(333.0));
+        assertEquals(333.0, def);
 
         // 3rd level, tags -> tag -> name
         def = getParameterByName("name", tag.getProperties()).getDefaultValue();
-        assertTrue(def.equals("aTag"));
+        assertEquals("aTag", def);
 
         // Root level status string
         def = getParameterByName("status", body.getProperties()).getDefaultValue();
-        assertTrue(def == null);
+        assertNull(def);
     }
 
     @Test
@@ -603,7 +602,7 @@ public class TestParameters {
         logger.info("Test parameter deepClone function");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.POST;
+        HttpMethod method = HttpMethod.POST;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/postPets_full.json"));
 
         Object default1, default2;
@@ -833,7 +832,7 @@ public class TestParameters {
         logger.info("Test NullParameter creation and manipulation");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.POST;
+        HttpMethod method = HttpMethod.POST;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/postPets_full.json"));
 
         // Header parameters
@@ -861,7 +860,7 @@ public class TestParameters {
         OpenAPI openapi = openAPIParser.parse();
 
         Operation operation = openapi.getOperations().stream()
-                .filter(o -> o.getEndpoint().equals("/pet") && o.getMethod().equals(HTTPMethod.POST))
+                .filter(o -> o.getEndpoint().equals("/pet") && o.getMethod().equals(HttpMethod.POST))
                 .findFirst().get();
 
         ParameterObject body = (ParameterObject) operation.getRequestBody();
@@ -890,7 +889,7 @@ public class TestParameters {
     }
 
     @Test
-    public void testTypeCompliant() throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvalidOpenAPIException {
+    public void testTypeCompliant() throws IOException, InvalidOpenAPIException {
         logger.info("Test Parameters functions 'isObjectTypeCompliant' and 'castToParameterValueType'");
 
         Object defaultValue;
@@ -911,7 +910,7 @@ public class TestParameters {
         assertTrue(enumValues.contains(1.0));
         assertTrue(enumValues.contains(2.0));
         assertTrue(enumValues.contains(3.0));
-        assertTrue(enumValues.size() == 3);
+        assertEquals(3, enumValues.size());
 
         map = getJSONMap("build/resources/test/parameters/string_not_valid.json");
         ParameterElement stringParameter = new StringParameter(null, map, o, "stringParameter");
@@ -926,7 +925,7 @@ public class TestParameters {
         assertTrue(enumValues.contains("1.0"));
         assertTrue(enumValues.contains("2.5"));
         assertTrue(enumValues.contains("a"));
-        assertTrue(enumValues.size() == 3);
+        assertEquals(3, enumValues.size());
 
         map = getJSONMap("build/resources/test/parameters/boolean_not_valid.json");
         ParameterElement booleanParameter = new BooleanParameter(null, map, o, "booleanParameter");
@@ -936,13 +935,13 @@ public class TestParameters {
         defaultValue = booleanParameter.getDefaultValue();
         enumValues = booleanParameter.getEnumValues();
         exampleValues = booleanParameter.getExamples();
-        assertEquals(null, defaultValue);
+        assertNull(defaultValue);
         assertTrue(exampleValues.contains(true));
         assertTrue(exampleValues.contains(false));
-        assertTrue(exampleValues.size() == 2);
+        assertEquals(2, exampleValues.size());
         assertTrue(enumValues.contains(true));
         assertTrue(enumValues.contains(false));
-        assertTrue(enumValues.size() == 2);
+        assertEquals(2, enumValues.size());
 
         map = getJSONMap("build/resources/test/parameters/object_not_valid.json");
         ParameterObject objectParameter = new ParameterObject(null, map, o, "objectParameter");
@@ -953,8 +952,8 @@ public class TestParameters {
         defaultValue = objectParameter.getDefaultValue();
         enumValues = objectParameter.getEnumValues();
         exampleValues = objectParameter.getExamples();
-        assertEquals(null, defaultValue);
-        assertTrue(exampleValues.size() == 1);
+        assertNull(defaultValue);
+        assertEquals(1, exampleValues.size());
         assertTrue(enumValues.isEmpty());
 
         map = getJSONMap("build/resources/test/parameters/array_not_valid.json");
@@ -966,9 +965,9 @@ public class TestParameters {
         defaultValue = arrayParameter.getDefaultValue();
         enumValues = arrayParameter.getEnumValues();
         exampleValues = arrayParameter.getExamples();
-        assertEquals(null, defaultValue);
+        assertNull(defaultValue);
         assertTrue(exampleValues.contains(new LinkedList<>(Arrays.asList(1.0, 2.0))));
-        assertTrue(exampleValues.size() == 1);
+        assertEquals(1, exampleValues.size());
         assertTrue(enumValues.isEmpty());
     }
 
@@ -981,7 +980,7 @@ public class TestParameters {
         OpenAPI openapi = openAPIParser.parse();
 
         Operation operation = openapi.getOperations().stream()
-                .filter(o -> o.getEndpoint().equals("/pet/{petId}/{anotherId}") && o.getMethod().equals(HTTPMethod.GET))
+                .filter(o -> o.getEndpoint().equals("/pet/{petId}/{anotherId}") && o.getMethod().equals(HttpMethod.GET))
                 .findFirst().get();
         operation = operation.deepClone();
 

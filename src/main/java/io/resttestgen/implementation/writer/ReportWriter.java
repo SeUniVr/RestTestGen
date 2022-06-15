@@ -27,8 +27,7 @@ public class ReportWriter extends Writer {
 
         file.mkdirs();
 
-        FileWriter writer = new FileWriter(getOutputPath() +
-                testSequence.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".json");
+        FileWriter writer = new FileWriter(getOutputPath() + getSuggestedFileName(".json"));
 
         // Convert map to JSON File
         new GsonBuilder().setPrettyPrinting().create().toJson(testSequence, writer);

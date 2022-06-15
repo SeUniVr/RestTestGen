@@ -1,12 +1,8 @@
 package io.resttestgen.implementation.fuzzer;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.testing.Fuzzer;
-import io.resttestgen.core.testing.TestInteraction;
-import io.resttestgen.core.testing.TestRunner;
-import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.*;
 import io.resttestgen.implementation.mutator.ConstraintViolationMutator;
 import io.resttestgen.implementation.mutator.MissingRequiredMutator;
 import io.resttestgen.implementation.mutator.WrongTypeMutator;
@@ -17,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.jgrapht.alg.util.Pair;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ErrorFuzzer extends Fuzzer {
@@ -52,9 +47,12 @@ public class ErrorFuzzer extends Fuzzer {
                 // Get last interaction in the sequence
                 TestInteraction mutableInteraction = currentTestSequence.getLast();
 
-                SimpleDateFormat dformat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-                currentTestSequence.setName(mutableInteraction.getOperation().getOperationId() + "_" +
-                        dformat.format(currentTestSequence.getGeneratedAt()));
+                String sequenceName = mutableInteraction.getOperation().getOperationId().length() > 0 ?
+                        mutableInteraction.getOperation().getOperationId() :
+                        mutableInteraction.getOperation().getMethod().toString() + "-" +
+                                mutableInteraction.getOperation().getEndpoint();
+                currentTestSequence.setName(sequenceName);
+                currentTestSequence.appendGeneratedAtTimestampToSequenceName();
 
                 // Get set of applicable mutations to this operation
                 Set<Pair<ParameterLeaf, Mutator>> mutableParameters = new HashSet<>();

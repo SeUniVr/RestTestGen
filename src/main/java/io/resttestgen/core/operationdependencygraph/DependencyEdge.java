@@ -17,6 +17,7 @@ public class DependencyEdge extends DefaultEdge {
             this.normalizedName = producedParameter.getNormalizedName();
             this.producedParameter = producedParameter;
             this.consumedParameter = consumedParameter;
+            this.satisfied = false;
         }
     }
 

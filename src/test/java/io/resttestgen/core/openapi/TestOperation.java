@@ -1,6 +1,6 @@
 package io.resttestgen.core.openapi;
 
-import io.resttestgen.core.datatype.HTTPMethod;
+import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
 import org.apache.logging.log4j.LogManager;
@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class TestOperation {
         logger.info("Test parsing read-only properties of Operation and its associated Parameters");
 
         String endpoint = "/pets";
-        HTTPMethod method = HTTPMethod.POST;
+        HttpMethod method = HttpMethod.POST;
         Operation o = new Operation(endpoint, method, getJSONMap("build/resources/test/operations/postPets_full.json"));
 
         // test read-only on operation
@@ -50,11 +49,11 @@ public class TestOperation {
         assertThrows(UnsupportedOperationException.class, () -> o.getOutputParameters().put("", null));
         // Not read-only: do not affect Operation instance state
         assertDoesNotThrow(() -> o.getOutputParametersSet().add(null));
-        assertDoesNotThrow(() -> o.getInputParametersSet().add(null));
+        assertDoesNotThrow(() -> o.getReferenceLeaves().add(null));
 
         // clone has read-only true by default
         Operation oClone = o.deepClone();
-        assertTrue(oClone.isReadOnly() == false);
+        assertFalse(oClone.isReadOnly());
 
         // Test read-only on operation parameters
         Set<ParameterElement> headerParameters = o.getHeaderParameters();
@@ -83,7 +82,7 @@ public class TestOperation {
 
         ParameterObject body = (ParameterObject) o.getRequestBody();
         assertThrows(EditReadOnlyOperationException.class, () -> body.addExample(new Object()));
-        assertThrows(EditReadOnlyOperationException.class, () -> body.removeUninitializedParameters());
+        assertThrows(EditReadOnlyOperationException.class, body::removeUninitializedParameters);
         assertThrows(EditReadOnlyOperationException.class, () -> body.setKeepIfEmpty(true));
         assertThrows(UnsupportedOperationException.class, () -> body.getProperties().add(null));
         assertThrows(UnsupportedOperationException.class, () -> body.getExamples().add(null));
@@ -93,7 +92,7 @@ public class TestOperation {
         // Test not read-only clone
         ParameterObject cloneBody = (ParameterObject) oClone.getRequestBody();
         assertDoesNotThrow(() -> cloneBody.addExample(new HashMap<>()));
-        assertDoesNotThrow(() -> cloneBody.removeUninitializedParameters());
+        assertDoesNotThrow(cloneBody::removeUninitializedParameters);
         assertDoesNotThrow(() -> cloneBody.setKeepIfEmpty(true));
         assertDoesNotThrow(() -> cloneBody.getProperties().add(null));
         assertDoesNotThrow(() -> cloneBody.getExamples().add(null));
@@ -103,9 +102,9 @@ public class TestOperation {
                 .filter(p -> p.getName().equals(new ParameterName("photoUrls")))
                 .findAny().get();
         assertThrows(EditReadOnlyOperationException.class, () -> photoUrls.addExample(new Object()));
-        assertThrows(EditReadOnlyOperationException.class, () -> photoUrls.removeUninitializedParameters());
+        assertThrows(EditReadOnlyOperationException.class, photoUrls::removeUninitializedParameters);
         assertThrows(EditReadOnlyOperationException.class, () -> photoUrls.setKeepIfEmpty(true));
-        assertThrows(EditReadOnlyOperationException.class, () -> photoUrls.clearElements());
+        assertThrows(EditReadOnlyOperationException.class, photoUrls::clearElements);
         assertThrows(EditReadOnlyOperationException.class, () -> photoUrls.addElement(null));
         assertThrows(UnsupportedOperationException.class, () -> photoUrls.getElements().add(null));
         assertThrows(UnsupportedOperationException.class, () -> photoUrls.getExamples().add(null));
@@ -118,9 +117,9 @@ public class TestOperation {
                 .filter(p -> p.getName().equals(new ParameterName("photoUrls")))
                 .findAny().get();
         assertDoesNotThrow(() -> clonePhotoUrls.addExample(new LinkedList<>()));
-        assertDoesNotThrow(() -> clonePhotoUrls.removeUninitializedParameters());
+        assertDoesNotThrow(clonePhotoUrls::removeUninitializedParameters);
         assertDoesNotThrow(() -> clonePhotoUrls.setKeepIfEmpty(true));
-        assertDoesNotThrow(() -> clonePhotoUrls.clearElements());
+        assertDoesNotThrow(clonePhotoUrls::clearElements);
         // TODO Check what is wrong
         //assertDoesNotThrow(() -> clonePhotoUrls.addElement(null));
         assertDoesNotThrow(() -> clonePhotoUrls.getElements().add(null));

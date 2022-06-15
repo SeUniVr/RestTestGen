@@ -52,13 +52,18 @@ public abstract class ParameterLeaf extends ParameterElement {
             return "";
         }
 
-        Object renderedValue = value;
+        String encodedValue = getConcreteValue().toString();
 
-        if (renderedValue instanceof ParameterLeaf) {
-            renderedValue = ((ParameterLeaf) renderedValue).getValue();
+        // Encode only path parameters
+        if (this.getLocation() == ParameterLocation.PATH) {
+            encodedValue = URLEncoder.encode(encodedValue, StandardCharsets.UTF_8);
         }
 
-        String encodedValue = URLEncoder.encode(renderedValue.toString(), StandardCharsets.UTF_8);
+        // If numeric value (double) is integer (not decimal), convert it to long to prevent the printing of .0
+        if (getConcreteValue() instanceof Double && ((Double) getConcreteValue()) % 1 == 0) {
+            encodedValue = Long.toString(((Double) getConcreteValue()).longValue());
+        }
+
         switch (style) {
             case MATRIX:
                 return ";" + getName().toString() + "=" + encodedValue;

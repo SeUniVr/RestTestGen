@@ -1,6 +1,6 @@
 package io.resttestgen.core.datatype;
 
-public enum HTTPMethod {
+public enum HttpMethod {
     GET,
     POST,
     PUT,
@@ -10,8 +10,8 @@ public enum HTTPMethod {
     OPTIONS,
     TRACE;
 
-    public static HTTPMethod getMethod(String stringMethod) {
-        for (HTTPMethod method : HTTPMethod.values()) {
+    public static HttpMethod getMethod(String stringMethod) {
+        for (HttpMethod method : HttpMethod.values()) {
             if (method.name().equalsIgnoreCase(stringMethod)) {
                 return method;
             }

@@ -121,16 +121,32 @@ public class NumberParameter extends ParameterLeaf {
         return minimum != null;
     }
 
+    public void setMaximum(Double maximum) {
+        this.maximum = maximum;
+    }
+
     public Double getMaximum() {
         return maximum;
+    }
+
+    public void setMinimum(Double minimum) {
+        this.minimum = minimum;
     }
 
     public Double getMinimum() {
         return minimum;
     }
 
+    public void setExclusiveMaximum(boolean exclusiveMaximum) {
+        this.exclusiveMaximum = exclusiveMaximum;
+    }
+
     public boolean isExclusiveMaximum() {
         return exclusiveMaximum;
+    }
+
+    public void setExclusiveMinimum(boolean exclusiveMinimum) {
+        this.exclusiveMinimum = exclusiveMinimum;
     }
 
     public boolean isExclusiveMinimum() {
@@ -165,14 +181,14 @@ public class NumberParameter extends ParameterLeaf {
                     generatedValue = random.nextLength(0, 120);
                     break;
                 }
-                generatedValue = random.nextIntBetween(-128, 127);
+                generatedValue = random.nextInt(-128, 127);
                 break;
             case INT16:
                 if (halfProb) {
                     generatedValue = random.nextLength(0, 120);
                     break;
                 }
-                generatedValue = random.nextIntBetween(-32768, 32767);
+                generatedValue = random.nextInt(-32768, 32767);
                 break;
             case INT32:
                 if (halfProb) {
@@ -193,28 +209,28 @@ public class NumberParameter extends ParameterLeaf {
                     generatedValue = random.nextLength(0, 120);
                     break;
                 }
-                generatedValue = random.nextIntBetween(0, 255);
+                generatedValue = random.nextInt(0, 255);
                 break;
             case UINT16:
                 if (halfProb) {
                     generatedValue = random.nextLength(0, 120);
                     break;
                 }
-                generatedValue = random.nextIntBetween(0, 65535);
+                generatedValue = random.nextInt(0, 65535);
                 break;
             case UINT32:
                 if (halfProb) {
                     generatedValue = Long.valueOf(random.nextLength(0, 120));
                     break;
                 }
-                generatedValue = random.nextLong(0, 4294967295L);
+                generatedValue = random.nextLong(0L, 4294967295L);
                 break;
             case UINT64:
                 if (halfProb) {
                     generatedValue = Long.valueOf(random.nextLength(0, 120));
                     break;
                 }
-                generatedValue = random.nextLong(0, 9223372036854775807L);
+                generatedValue = random.nextLong(0L, 9223372036854775807L);
                 break;
             case FLOAT:
                 generatedValue = random.nextFloat();
@@ -233,7 +249,7 @@ public class NumberParameter extends ParameterLeaf {
      * Infers a format from format, type, and name of the parameter.
      * @return the inferred format.
      */
-    private ParameterTypeFormat inferFormat() {
+    public ParameterTypeFormat inferFormat() {
 
         ExtendedRandom random = Environment.getInstance().getRandom();
 
@@ -270,7 +286,7 @@ public class NumberParameter extends ParameterLeaf {
                 if (type == ParameterType.INTEGER) {
                     return ParameterTypeFormat.INT32;
                 } else {
-                    switch (random.nextIntBetween(0, 3)) {
+                    switch (random.nextInt(0, 3)) {
                         case 0:
                             return ParameterTypeFormat.INT32;
                         case 1:
@@ -307,10 +323,14 @@ public class NumberParameter extends ParameterLeaf {
 
     @Override
     public String getJSONString() {
-        /*if (getConcreteValue() instanceof Integer) {
-            return getJSONHeading() + getConcreteValue();
-        }*/
-        return getJSONHeading() + getConcreteValue().toString();
+        String stringValue = getConcreteValue().toString();
+
+        // If the numeric value is integer (mathematical meaning, i.e., no decimal digits), print it without the .0
+        if (getConcreteValue() instanceof Double && ((Double) getConcreteValue()) % 1 == 0) {
+            stringValue = Long.toString(((Double) getConcreteValue()).longValue());
+        }
+
+        return getJSONHeading() + stringValue;
     }
 
 }

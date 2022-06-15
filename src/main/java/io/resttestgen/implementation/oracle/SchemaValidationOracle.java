@@ -4,6 +4,7 @@ import io.resttestgen.core.testing.Oracle;
 import io.resttestgen.core.testing.TestResult;
 import io.resttestgen.core.testing.TestSequence;
 
+@SuppressWarnings("unused")
 public class SchemaValidationOracle extends Oracle {
 
     @Override

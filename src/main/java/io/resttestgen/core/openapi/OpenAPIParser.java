@@ -2,7 +2,7 @@ package io.resttestgen.core.openapi;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import io.resttestgen.core.datatype.HTTPMethod;
+import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.parameter.ParameterType;
 import io.resttestgen.core.helper.ObjectHelper;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +51,7 @@ public class OpenAPIParser {
      * each resolved field and normalizes parameters defined at path level adding them to every path item.
      * As a result, an OpenAPI object is instantiated.
      * @return An OpenAPI object that contains the parsed structure of the parser OpenAPI specification.
-     * @throws InvalidOpenAPIException
+     * @throws InvalidOpenAPIException if the provided specification is invalid.
      */
     public OpenAPI parse() throws InvalidOpenAPIException {
 
@@ -109,7 +109,7 @@ public class OpenAPIParser {
                 }
 
                 Operation o = new Operation(path.getKey(),
-                        HTTPMethod.getMethod(operation.getKey()),
+                        HttpMethod.getMethod(operation.getKey()),
                         (Map<String, Object>) operation.getValue());
                 o.setReadOnly();
                 openAPI.addOperation(o);
@@ -169,8 +169,8 @@ public class OpenAPIParser {
 
     /**
      * Function that recursively search for missing 'type' field in parameters schema. When a missing one is found,
-     * if the parameter is compatible with an object or an array, the type is added to the parameter schema
-     * @param parameter
+     * if the parameter is compatible with an object or an array, the type is added to the parameter schema.
+     * @param parameter the parameter for which the type should be inferred.
      */
     private void recursiveTypeInference(Map<String, Object> parameter) {
         // distinction between standard parameters and request/response body parameters
@@ -218,7 +218,7 @@ public class OpenAPIParser {
         switch (ParameterType.getTypeFromString((String) targetMap.get("type"))) {
             case OBJECT:
                 Map<String, Map<String, Object>> properties = safeGet(targetMap, "properties", LinkedTreeMap.class);
-                properties.values().forEach(p -> recursiveTypeInference(p));
+                properties.values().forEach(this::recursiveTypeInference);
             case ARRAY:
                 Map<String, Object> items = safeGet(targetMap, "items", LinkedTreeMap.class);
                 recursiveTypeInference(items);
@@ -347,11 +347,11 @@ public class OpenAPIParser {
 
         // Induction step 2: if the parameter contains combined schemas, check for unsolved required
         List<Map<String, Object>> allOf = OpenAPIParser.safeGet(map, "allOf", ArrayList.class);
-        allOf.forEach(s -> recursiveUnfoldRequired(s));
+        allOf.forEach(this::recursiveUnfoldRequired);
         List<Map<String, Object>> anyOf = OpenAPIParser.safeGet(map, "anyOf", ArrayList.class);
-        anyOf.forEach(s -> recursiveUnfoldRequired(s));
+        anyOf.forEach(this::recursiveUnfoldRequired);
         List<Map<String, Object>> oneOf = OpenAPIParser.safeGet(map, "oneOf", ArrayList.class);
-        oneOf.forEach(s -> recursiveUnfoldRequired(s));
+        oneOf.forEach(this::recursiveUnfoldRequired);
 
         // Base step: simple parameter, so required can only be a boolean field
 
@@ -389,7 +389,7 @@ public class OpenAPIParser {
             for (Map.Entry<String, Object> operationMap : pathItem.entrySet()) {
                 // Parse iff the key is a supported HTTP method
                 try {
-                    HTTPMethod.getMethod(operationMap.getKey());
+                    HttpMethod.getMethod(operationMap.getKey());
                 } catch (IllegalArgumentException e) {
                     continue;
                 }
@@ -437,7 +437,7 @@ public class OpenAPIParser {
             resolveSchemaRef(schemas);
 
             // Once resolved parameters schema refs, resolve schema items refs
-            schemas.values().forEach(schema -> resolvePropertyItemRef((Map<String, Object>) schema));
+            schemas.values().forEach(this::resolvePropertyItemRef);
 
             // Parse responses
             logger.info("Solving components/responses refs..");
