@@ -2,6 +2,7 @@ package io.resttestgen.core.testing;
 
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
+import io.resttestgen.core.helper.Taggable;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,7 +12,7 @@ import java.sql.Timestamp;
 /**
  * Represents a single HTTP test interaction (including a request and a response).
  */
-public class TestInteraction {
+public class TestInteraction extends Taggable {
 
     private static final Logger logger = LogManager.getLogger(TestInteraction.class);
 
@@ -183,5 +184,10 @@ public class TestInteraction {
 
     public TestInteraction deepClone() {
         return new TestInteraction(operation.deepClone());
+    }
+
+    @Override
+    public String toString() {
+        return operation.toString();
     }
 }

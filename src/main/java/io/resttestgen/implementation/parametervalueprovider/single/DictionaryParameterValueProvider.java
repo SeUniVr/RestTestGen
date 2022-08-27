@@ -8,22 +8,33 @@ import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class DictionaryParameterValueProvider implements CountableParameterValueProvider {
+public class DictionaryParameterValueProvider extends CountableParameterValueProvider {
 
     // Get values from global dictionary by default
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
 
     @Override
     public int countAvailableValuesFor(ParameterLeaf parameterLeaf) {
-        return parameterLeaf.countValuesInDictionary(dictionary);
+        if (strict) {
+            return dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType()).size();
+        } else {
+            return (int) dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType())
+                    .stream().filter(e -> parameterLeaf.isValueCompliant(e.getValue())).count();
+        }
     }
 
     @Override
     public Object provideValueFor(ParameterLeaf parameterLeaf) {
         ExtendedRandom random = Environment.getInstance().getRandom();
-        Optional<DictionaryEntry> entry = random.nextElement(
-                dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType()));
+        Optional<DictionaryEntry> entry;
+        if (!strict) {
+            entry = random.nextElement(dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType()));
+        } else {
+            entry = random.nextElement(dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType())
+                    .stream().filter(e -> parameterLeaf.isValueCompliant(e.getValue())).collect(Collectors.toSet()));
+        }
         return entry.map(DictionaryEntry::getSource).orElse(null);
     }
 

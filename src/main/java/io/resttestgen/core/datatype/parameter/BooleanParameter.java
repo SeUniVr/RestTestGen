@@ -4,6 +4,7 @@ import com.google.gson.JsonPrimitive;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
+import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,6 +67,20 @@ public class BooleanParameter extends ParameterLeaf {
             return true;
         }
         return Boolean.class.isAssignableFrom(o.getClass());
+    }
+
+    @Override
+    public boolean isValueCompliant(Object value) {
+        if (value instanceof ParameterLeaf) {
+            value = ((ParameterLeaf) value).getConcreteValue();
+        }
+        try {
+            boolean booleanValue = ObjectHelper.castToBoolean(value);
+            if (getEnumValues().size() == 0 || getEnumValues().contains(booleanValue)) {
+                return true;
+            }
+        } catch (ClassCastException ignored) {}
+        return false;
     }
 
     @Override

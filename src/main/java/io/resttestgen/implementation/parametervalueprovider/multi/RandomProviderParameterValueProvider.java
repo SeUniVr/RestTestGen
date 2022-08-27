@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RandomProviderParameterValueProvider implements ParameterValueProvider {
+public class RandomProviderParameterValueProvider extends ParameterValueProvider {
 
     @Override
     public Object provideValueFor(ParameterLeaf parameterLeaf) {
@@ -31,6 +31,8 @@ public class RandomProviderParameterValueProvider implements ParameterValueProvi
         candidateProviders.add(new ExamplesParameterValueProvider());
         candidateProviders.add(new NormalizedDictionaryParameterValueProvider());
         candidateProviders.add(new DictionaryParameterValueProvider());
+
+        candidateProviders.forEach(p -> p.setStrict(this.strict));
 
         providers.addAll(candidateProviders.stream().filter(p -> p.countAvailableValuesFor(parameterLeaf) > 0)
                 .collect(Collectors.toSet()));

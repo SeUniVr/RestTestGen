@@ -4,6 +4,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.helper.ObjectHelper;
+import io.resttestgen.core.helper.Taggable;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
 import io.resttestgen.core.openapi.OpenAPIParser;
 import io.resttestgen.core.openapi.Operation;
@@ -19,7 +20,7 @@ import java.util.*;
  * OpenAPI specification. In fact, every operation (and consequently its parameters) parsed from the specification is
  * set as read-only. In order to be able to perform any modification, the operation must be cloned.
  */
-public abstract class ParameterElement {
+public abstract class ParameterElement extends Taggable {
 
     protected ParameterName name;
     protected NormalizedParameterName normalizedName;
@@ -35,10 +36,10 @@ public abstract class ParameterElement {
     protected Set<Object> enumValues;
     protected Set<Object> examples;
 
+    private final String description;
+
     private Operation operation; // Operation to which the parameter is associated
     private ParameterElement parent; // Reference to the parent Parameter if any; else null
-
-    private String tag; // Custom tag that can be added by strategies
 
     private static final String castedWarn = "' was not compliant to parameter type, but it has been " +
             "cast to fit the right type.";
@@ -89,6 +90,9 @@ public abstract class ParameterElement {
 
         this.type = ParameterType.getTypeFromString((String) sourceMap.get("type"));
         this.format = ParameterTypeFormat.getFormatFromString((String) sourceMap.get("format"));
+
+        this.description = OpenAPIParser.safeGet(parameterMap, "description", String.class);
+
         Object defaultValue = sourceMap.get("default");
         if (defaultValue != null) {
             if (isObjectTypeCompliant(defaultValue)) {
@@ -179,6 +183,8 @@ public abstract class ParameterElement {
         style = other.style;
         explode = other.explode;
 
+        description = other.description;
+
         defaultValue = ObjectHelper.deepCloneObject(other.defaultValue);
         enumValues = new HashSet<>(ObjectHelper.deepCloneObject(other.enumValues));
         examples = new HashSet<>(ObjectHelper.deepCloneObject(other.examples));
@@ -186,7 +192,7 @@ public abstract class ParameterElement {
         operation = other.operation;
         parent = other.parent;
 
-        tag = other.tag;
+        tags.addAll(other.tags);
     }
 
     protected ParameterElement(ParameterElement other, Operation operation, ParameterElement parent) {
@@ -195,7 +201,7 @@ public abstract class ParameterElement {
         this.operation = operation;
         this.parent = parent;
 
-        this.tag = other.tag;
+        tags.addAll(other.tags);
     }
 
     protected ParameterElement(Operation operation, ParameterElement parent) {
@@ -203,11 +209,17 @@ public abstract class ParameterElement {
         this.parent = parent;
         this.location = ParameterLocation.RESPONSE_BODY;
         this.explode = false;
+        this.description = "";
         this.enumValues = new HashSet<>();
         this.examples = new HashSet<>();
     }
 
     public abstract ParameterElement merge(ParameterElement other);
+
+    /**
+     * To remove the parameter from the parent element (or operation).
+     */
+    public abstract boolean remove();
 
     /**
      * Function to check whether the object passed as parameter is compliant to the Parameter type.
@@ -231,6 +243,14 @@ public abstract class ParameterElement {
      * @return the JSON string.
      */
     public abstract String getJSONString();
+
+    /**
+     * Returns the JSON path for the element, e.g., owner.name
+     * @return the JSON path for the element, e.g., owner.name
+     */
+    public abstract String getJsonPath();
+
+    public abstract ParameterElement getParameterFromJsonPath(String jsonPath);
 
     /**
      * Function to retrieve the value of a Parameter as a string accordingly to given style and explode
@@ -283,6 +303,10 @@ public abstract class ParameterElement {
         return enumValues;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public NormalizedParameterName getNormalizedName() {
         return this.normalizedName;
     }
@@ -301,14 +325,6 @@ public abstract class ParameterElement {
 
     public void setRequired(boolean required) {
         this.required = required;
-    }
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
     }
 
     public boolean addExample(Object o) {
@@ -388,6 +404,18 @@ public abstract class ParameterElement {
         return Objects.hash(name, type, location, operation);
     }
 
+    /**
+     * Returns the root element of a structured parameter. If a parameter is not structured, then the root element is
+     * itself.
+     * @return the root element of a structured parameter.
+     */
+    public ParameterElement getRoot() {
+        if (getParent() == null) {
+            return this;
+        } else {
+            return getParent().getRoot();
+        }
+    }
 
     public ParameterElement getParent() {
         return parent;
@@ -436,6 +464,12 @@ public abstract class ParameterElement {
      * @return the collection of objects in the parameter.
      */
     public abstract Collection<ParameterObject> getReferenceObjects();
+
+    /**
+     * Returns all parameters elements of this element.
+     * @return all parameters elements of this element.
+     */
+    public abstract Collection<ParameterElement> getAllParameters();
 
     /**
      * Returns a collection containing the leaves in the parameter element and underlying elements.

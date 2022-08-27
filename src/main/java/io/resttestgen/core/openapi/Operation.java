@@ -15,6 +15,8 @@ public class Operation {
     private final HttpMethod method;
     private final String operationId;
 
+    private final String description;
+
     private Set<ParameterElement> headerParameters;
     private Set<ParameterElement> pathParameters;
     private Set<ParameterElement> queryParameters;
@@ -42,6 +44,8 @@ public class Operation {
         logger.debug("Fetching operation " + method + " " + endpoint);
 
         operationId = OpenAPIParser.safeGet(operationMap, "operationId", String.class);
+
+        description = OpenAPIParser.safeGet(operationMap, "description", String.class);
 
         // Check for header/path/query parameters
         List<Map<String, Object>> parameters = OpenAPIParser.safeGet(operationMap, "parameters", ArrayList.class);
@@ -158,6 +162,7 @@ public class Operation {
         endpoint = other.endpoint;
         method = HttpMethod.getMethod(other.method.toString());
         operationId = other.operationId;
+        description = other.description;
 
         headerParameters = new HashSet<>();
         other.headerParameters.forEach(p -> headerParameters.add(p.deepClone(this, null)));
@@ -191,6 +196,40 @@ public class Operation {
 
     public String getOperationId() {
         return operationId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Return all the parameter elements in the request
+     * @return
+     */
+    public Collection<ParameterElement> getAllRequestParameters() {
+        Set<ParameterElement> parameters = new HashSet<>();
+
+        for (ParameterElement element : headerParameters) {
+            parameters.addAll(element.getAllParameters());
+        }
+
+        for (ParameterElement element : pathParameters) {
+            parameters.addAll(element.getAllParameters());
+        }
+
+        for (ParameterElement element : queryParameters) {
+            parameters.addAll(element.getAllParameters());
+        }
+
+        for (ParameterElement element : cookieParameters) {
+            parameters.addAll(element.getAllParameters());
+        }
+
+        if (requestBody != null) {
+            parameters.addAll(requestBody.getAllParameters());
+        }
+
+        return parameters;
     }
 
     public Set<ParameterElement> getHeaderParameters() {

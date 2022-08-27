@@ -2,6 +2,7 @@ package io.resttestgen.implementation.writer;
 
 import com.google.gson.GsonBuilder;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.TestSequenceSerializer;
 import io.resttestgen.core.testing.Writer;
 
 import java.io.File;
@@ -28,9 +29,9 @@ public class ReportWriter extends Writer {
         file.mkdirs();
 
         FileWriter writer = new FileWriter(getOutputPath() + getSuggestedFileName(".json"));
-
         // Convert map to JSON File
-        new GsonBuilder().setPrettyPrinting().create().toJson(testSequence, writer);
+        //new GsonBuilder().setPrettyPrinting().create().toJson(testSequence, writer);
+        new GsonBuilder().registerTypeAdapter(TestSequence.class, new TestSequenceSerializer()).setPrettyPrinting().create().toJson(testSequence,writer);
 
         // Close the writer
         writer.close();

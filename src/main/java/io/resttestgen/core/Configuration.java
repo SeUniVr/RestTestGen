@@ -28,6 +28,8 @@ public class Configuration {
     private String strategyName;
     private List<String> qualifiableNames;
     private String odgFileName;
+    private String projectDirectoryRoot;
+    private String packageName;
 
     /**
      * Initializes the default configuration
@@ -49,6 +51,9 @@ public class Configuration {
         qualifiableNames = new ArrayList<>();
         qualifiableNames.add("id");
         qualifiableNames.add("name");
+
+        projectDirectoryRoot = outputPath;
+        packageName = null;
     }
 
     public Configuration(Boolean loadFromFile) {
@@ -61,16 +66,36 @@ public class Configuration {
                 Configuration tempConfiguration = gson.fromJson(reader, Configuration.class);
 
                 this.logVerbosity = tempConfiguration.logVerbosity;
-                this.testingSessionName = tempConfiguration.testingSessionName;
                 this.outputPath = tempConfiguration.outputPath;
                 this.specificationFileName = tempConfiguration.specificationFileName;
+                this.testingSessionName = computeTestingSessionName();
                 this.authCommand = tempConfiguration.authCommand;
                 this.strategyName = tempConfiguration.strategyName;
                 this.qualifiableNames = tempConfiguration.qualifiableNames;
                 this.odgFileName = tempConfiguration.odgFileName;
+                this.projectDirectoryRoot = tempConfiguration.projectDirectoryRoot;
+                this.packageName = tempConfiguration.packageName;
             } catch (IOException e) {
                 logger.warn("Could not read configuration from file. Using default configuration.");
             }
+        }
+    }
+
+    private String computeTestingSessionName() {
+        try {
+            // Apply new name only if no custom name is provided
+            if (testingSessionName.startsWith("testing-session-")) {
+                String[] specificationSplit = specificationFileName.split("/");
+                String specFileNameWithoutExtension = specificationSplit[specificationSplit.length - 1].split(".json")[0];
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+                LocalDateTime now = LocalDateTime.now();
+                return specFileNameWithoutExtension + "-" + dtf.format(now);
+            } else {
+                return testingSessionName;
+            }
+        } catch (Exception e) {
+            // If any exception occurs, just return the initial name
+            return testingSessionName;
         }
     }
 
@@ -130,5 +155,13 @@ public class Configuration {
 
     public void setOdgFileName(String odgFileName) {
         this.odgFileName = odgFileName;
+    }
+
+    public String getProjectDirectoryRoot() {
+        return projectDirectoryRoot;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 }

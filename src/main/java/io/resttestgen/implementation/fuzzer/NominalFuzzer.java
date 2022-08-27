@@ -26,6 +26,7 @@ public class NominalFuzzer extends Fuzzer {
 
     private final Operation operation;
     private ParameterValueProvider parameterValueProvider = new EnumAndExamplePriorityParameterValueProvider();
+    private boolean strict = false;
     
     public NominalFuzzer(Operation operation) {
         this.operation = operation;
@@ -105,5 +106,15 @@ public class NominalFuzzer extends Fuzzer {
 
     public void setParameterValueProvider(ParameterValueProvider parameterValueProvider) {
         this.parameterValueProvider = parameterValueProvider;
+        this.parameterValueProvider.setStrict(this.strict);
+    }
+
+    public boolean isStrict() {
+        return strict;
+    }
+
+    public void setStrict(boolean strict) {
+        this.strict = strict;
+        this.parameterValueProvider.setStrict(strict);
     }
 }

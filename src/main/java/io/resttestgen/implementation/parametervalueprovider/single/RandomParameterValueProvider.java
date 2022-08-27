@@ -8,7 +8,7 @@ import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider
 /**
  * Generates a random value for the given parameter.
  */
-public class RandomParameterValueProvider implements ParameterValueProvider {
+public class RandomParameterValueProvider extends ParameterValueProvider {
 
     private static final ExtendedRandom random = Environment.getInstance().getRandom();
 

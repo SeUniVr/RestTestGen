@@ -5,6 +5,7 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.helper.ExtendedRandom;
+import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -154,11 +155,34 @@ public class NumberParameter extends ParameterLeaf {
     }
 
     @Override
+    public boolean isValueCompliant(Object value) {
+        if (value instanceof ParameterLeaf) {
+            value = ((ParameterLeaf) value).getConcreteValue();
+        }
+        try {
+            double doubleValue = ObjectHelper.castToNumber(value).doubleValue();
+
+            // TODO: check format
+
+            // Check if value is in enum set, if set is defined
+            if (getEnumValues().size() == 0 || getEnumValues().contains(doubleValue)) {
+
+                // Check if minimum and maximum constraints are met
+                if (((maximum == null || doubleValue <= maximum) && (maximum == null || !exclusiveMaximum || doubleValue < maximum)) &&
+                        ((minimum == null || doubleValue >= minimum) && (minimum == null || !exclusiveMinimum || doubleValue > minimum))) {
+                    return true;
+                }
+            }
+        } catch (ClassCastException ignored) {}
+        return false;
+    }
+
+    @Override
     public boolean isObjectTypeCompliant(Object o) {
         if (o == null) {
             return false;
         }
-        if (o instanceof  NumberParameter) {
+        if (o instanceof NumberParameter) {
             return true;
         }
         return Number.class.isAssignableFrom(o.getClass());

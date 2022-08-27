@@ -8,14 +8,17 @@ import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValu
 
 import java.util.List;
 
-public class LastNormalizedDictionaryParameterValueProvider implements CountableParameterValueProvider {
+// TODO: add support for strict mode
+
+public class LastNormalizedDictionaryParameterValueProvider extends CountableParameterValueProvider {
 
     // Get values from global dictionary by default
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
 
     @Override
     public int countAvailableValuesFor(ParameterLeaf parameterLeaf) {
-        return parameterLeaf.countValuesInNormalizedDictionary(dictionary);
+        return dictionary
+                .getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(), parameterLeaf.getType()).size();
     }
 
     @Override

@@ -150,6 +150,10 @@ public class ParameterArray extends StructuredParameterElement {
         this.uniqueItems = uniqueItems;
     }
 
+    public int indexOf(ParameterElement element) {
+        return elements.indexOf(element);
+    }
+
     @Override
     public boolean isObjectTypeCompliant(Object o) {
         if (o == null) {
@@ -186,6 +190,32 @@ public class ParameterArray extends StructuredParameterElement {
     public boolean isEmpty() {
         return this.elements.isEmpty();
     }
+
+    // TODO: remove
+    /*@Override
+    public ParameterElement getElementByJsonPath(String jsonPath) {
+
+        String path = jsonPath.substring(jsonPath.indexOf("[")+1,jsonPath.indexOf("]"));
+        String remaining = jsonPath.substring(jsonPath.indexOf("]")+1);
+        ParameterElement parameter = this.elements.get(Integer.parseInt(path));
+        if(remaining.equals("")){
+            return parameter;
+        }else{
+            if(parameter instanceof ParameterLeaf){
+                return parameter;
+            }
+            if(parameter instanceof ParameterObject){
+                return ((ParameterObject) parameter).getElementByJsonPath(remaining);
+            }
+            if(parameter instanceof ParameterArray){
+                return ((ParameterArray) parameter).getElementByJsonPath(remaining);
+            }
+        }
+        return null;
+
+    }
+    */
+
 
     /**
      * This function only operates on elements in the instance element list. The reference item is only used as a
@@ -478,6 +508,15 @@ public class ParameterArray extends StructuredParameterElement {
     }
 
     @Override
+    public Collection<ParameterElement> getAllParameters() {
+        HashSet<ParameterElement> parameters = new HashSet<>();
+        parameters.add(this);
+        parameters.addAll(referenceElement.getAllParameters());
+        elements.forEach(e -> parameters.addAll(e.getAllParameters()));
+        return parameters;
+    }
+
+    @Override
     public Collection<CombinedSchemaParameter> getCombinedSchemas() {
         Collection<CombinedSchemaParameter> combinedSchemas = new LinkedList<>();
 
@@ -486,5 +525,60 @@ public class ParameterArray extends StructuredParameterElement {
         }
 
         return combinedSchemas;
+    }
+
+
+
+    /*@Override
+    public String getJsonPath() {
+        if (getParent() != null){
+            if (getParent() instanceof ParameterArray) {
+                return getParent().getJsonPath() +"[" +((ParameterArray) getParent()).indexOf(this)+ "]" ;
+            } else {
+                return this.getName().toString().isEmpty()? getParent().getJsonPath() : getParent().getJsonPath() +  "['" +getName().toString()+ "']";
+            }
+        } else {
+            return this.getName().toString().isEmpty()? "" :"['" +getName().toString()+ "']";
+        }
+    }*/
+
+    /**
+     * Return a parameter element according to its JSON path.
+     * @param jsonPath the JSON path of the parameter we want to get.
+     * @return the parameter matching the JSON path.
+     */
+    @Override
+    public ParameterElement getParameterFromJsonPath(String jsonPath) {
+
+        // If the JSON path starts with $, then start the search from the root element
+        ParameterElement rootElement = getRoot();
+        if (this != rootElement && jsonPath.startsWith("$")) {
+            return rootElement.getParameterFromJsonPath(jsonPath);
+        }
+
+        // If the JSON path starts with $, remove it
+        if (jsonPath.startsWith("$")) {
+            jsonPath = jsonPath.substring(1);
+        }
+
+        int start = jsonPath.indexOf("[");
+        int end = jsonPath.indexOf("]");
+
+        if (start >= 0 && end >= 0) {
+            int elementIndex = Integer.parseInt(jsonPath.substring(start + 1, end));
+            // Index -1 stands for reference element
+            if (elementIndex == -1) {
+                return referenceElement.getParameterFromJsonPath(jsonPath.substring(end + 1));
+            } else if (elementIndex >= 0 && elementIndex < elements.size()) {
+                return elements.get(elementIndex).getParameterFromJsonPath(jsonPath.substring(end + 1));
+            } else {
+                // Index is invalid
+                return null;
+            }
+        } else {
+            // Missing parenthesis
+            return null;
+        }
+
     }
 }

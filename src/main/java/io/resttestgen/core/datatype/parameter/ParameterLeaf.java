@@ -1,6 +1,5 @@
 package io.resttestgen.core.datatype.parameter;
 
-import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
 import io.resttestgen.core.openapi.Operation;
@@ -9,10 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class ParameterLeaf extends ParameterElement {
 
@@ -45,6 +41,8 @@ public abstract class ParameterLeaf extends ParameterElement {
     public ParameterLeaf(Operation operation, ParameterElement parent) {
         super(operation, parent);
     }
+
+    public abstract boolean isValueCompliant(Object value);
 
     public String getValueAsFormattedString(ParameterStyle style, boolean explode) {
         if (value == null) {
@@ -121,14 +119,6 @@ public abstract class ParameterLeaf extends ParameterElement {
         this.value = null;
     }
 
-    public int countValuesInNormalizedDictionary(Dictionary dictionary) {
-        return dictionary.getEntriesByNormalizedParameterName(normalizedName, type).size();
-    }
-
-    public int countValuesInDictionary(Dictionary dictionary) {
-        return dictionary.getEntriesByParameterName(name, type).size();
-    }
-
     public abstract Object generateCompliantValue();
 
     /**
@@ -179,12 +169,54 @@ public abstract class ParameterLeaf extends ParameterElement {
         return false;
     }
 
+    public String getJsonPath() {
+
+        String thisJsonPath = "['" + this.getName() + "']";
+
+        if (getParent() == null) {
+            return "$" + thisJsonPath;
+        } else if (getParent() instanceof ParameterArray) {
+
+            // If this is the referenceElement of the array, return index = -1
+            if (this == ((ParameterArray) getParent()).getReferenceElement()) {
+                return getParent().getJsonPath() + "[-1]";
+            }
+
+            // If this is an element of the array, return its index
+            else if (((ParameterArray) getParent()).getElements().contains(this)) {
+                return getParent().getJsonPath() + "[" + ((ParameterArray) getParent()).getElements().indexOf(this) + "]";
+            }
+
+            // If this is not contained in the array, return null
+            else {
+                return null;
+            }
+        } else {
+            return getParent().getJsonPath() + thisJsonPath;
+        }
+
+        // TODO: remove
+        /*if (getParent() instanceof ParameterArray) {
+            return getParent().getJsonPath() + "[" + ((ParameterArray) getParent()).indexOf(this) + "]." + getName().toString();
+        } else {
+            return getParent() != null ? getParent().getJsonPath() + "['" +getName().toString()+ "']" :  "['" +getName().toString()+ "']";
+        }*/
+    }
+
+
     @Override
     public boolean hasValue() {
         if (value == null) {
             logger.warn("Parameter " + getName() + " has an invalid value.");
         }
         return value != null;
+    }
+
+    @Override
+    public Set<ParameterElement> getAllParameters() {
+        HashSet<ParameterElement> parameters = new HashSet<>();
+        parameters.add(this);
+        return parameters;
     }
 
     @Override
@@ -212,5 +244,86 @@ public abstract class ParameterLeaf extends ParameterElement {
     @Override
     public Collection<CombinedSchemaParameter> getCombinedSchemas() {
         return new LinkedList<>();
+    }
+
+    //TODO: remove for parametersCoverage (why?)
+    @Override
+    public boolean remove() {
+
+        // If the leaf has no parent (it is a root), then remove it from the operation
+        if (getParent() == null) {
+            switch (getLocation()) {
+                case QUERY:
+                    return getOperation().getQueryParameters().remove(this);
+                case PATH:
+                    return getOperation().getPathParameters().remove(this);
+                case HEADER:
+                    return getOperation().getHeaderParameters().remove(this);
+                case COOKIE:
+                    return getOperation().getCookieParameters().remove(this);
+            }
+        }
+
+        // If the leaf is contained in a parent element (array or object), remove it from the parent
+        else {
+            if (getParent() instanceof ParameterArray) {
+                return ((ParameterArray) getParent()).getElements().remove(this);
+            } else if (getParent() instanceof ParameterObject) {
+                return ((ParameterObject) getParent()).getProperties().remove(this);
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Return a parameter element according to its JSON path.
+     * @param jsonPath the JSON path of the parameter we want to get.
+     * @return the parameter matching the JSON path.
+     */
+    @Override
+    public ParameterElement getParameterFromJsonPath(String jsonPath) {
+
+        // If the JSON path starts with $, then start the search from the root element
+        ParameterElement rootElement = getRoot();
+        if (this != rootElement && jsonPath.startsWith("$")) {
+            return rootElement.getParameterFromJsonPath(jsonPath);
+        }
+
+        // If the JSON path starts with $, remove it
+        if (jsonPath.startsWith("$")) {
+            jsonPath = jsonPath.substring(1);
+        }
+
+        int start = jsonPath.indexOf("[");
+        int end = jsonPath.indexOf("]");
+
+        if (start >= 0 && end >= 0) {
+            if ((jsonPath.charAt(start + 1) == '\'' || jsonPath.charAt(start + 1) == '"') &&
+                    (jsonPath.charAt(end - 1) == '\'' || jsonPath.charAt(end - 1) == '"')) {
+                String leafName = jsonPath.substring(start + 2, end - 1);
+                if (getName().toString().equals(leafName)) {
+                    return this;
+                }
+                return null;
+            } else {
+                // Missing quotes or double quotes
+                return null;
+            }
+        } else {
+            // Missing parenthesis
+            return null;
+        }
     }
 }

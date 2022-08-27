@@ -8,6 +8,7 @@ import io.resttestgen.implementation.mutator.MissingRequiredMutator;
 import io.resttestgen.implementation.mutator.WrongTypeMutator;
 import io.resttestgen.implementation.oracle.ErrorStatusCodeOracle;
 import io.resttestgen.implementation.writer.ReportWriter;
+import io.resttestgen.implementation.writer.RestAssuredWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jgrapht.alg.util.Pair;
@@ -46,6 +47,7 @@ public class ErrorFuzzer extends Fuzzer {
 
                 // Get last interaction in the sequence
                 TestInteraction mutableInteraction = currentTestSequence.getLast();
+                mutableInteraction.addTag("mutated");
 
                 String sequenceName = mutableInteraction.getOperation().getOperationId().length() > 0 ?
                         mutableInteraction.getOperation().getOperationId() :
@@ -69,6 +71,7 @@ public class ErrorFuzzer extends Fuzzer {
 
                     // Apply mutation
                     ParameterLeaf mutated = mutable.get().getSecond().mutate(mutable.get().getFirst());
+                    mutated.addTag("mutated");
 
                     // Replace original parameter with mutated one
                     if (mutable.get().getFirst().replace(mutated)) {
@@ -89,6 +92,9 @@ public class ErrorFuzzer extends Fuzzer {
                     try {
                         ReportWriter reportWriter = new ReportWriter(currentTestSequence);
                         reportWriter.write();
+                        RestAssuredWriter restAssuredWriter = new RestAssuredWriter(currentTestSequence);
+                        restAssuredWriter.setNumSequence(i+j);
+                        restAssuredWriter.write();
                     } catch (IOException e) {
                         logger.warn("Could not write report to file.");
                     }

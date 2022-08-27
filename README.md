@@ -26,6 +26,8 @@ A framework for automated black-box testing of RESTful APIs.
 - Java 11
 - Ubuntu, or other Linux distributions (RestTestGen was not tested on Windows)
 
+For further information see REQUIREMENTS.md file 
+
 ## Configuration
 RestTestGen comes with a built-in default configuration suitable for most REST APIs, defined in the `io.resttestgen.core.Configuration` class. The default configuration can be overridden by means of the `rtg_config.json` file. The file must be located in the current working directory.
 
@@ -78,6 +80,8 @@ To build and run RestTestGen with Gradle use the command: `./gradlew run`
 
 Alternatively, you can open the RestTestGen Gradle project with IntelliJ IDEA. To run RestTestGen, click the play icon alongside the `main` method of the class `io.resttestgen.core.cli.App`.
 
+> Warning: make sure that your gradlew file is executable. Moreover, some test cases only work with the default OpenAPI specification, so in the case the execution fails due to failed test cases, we recommend to skip tests adding `-x test` to Gradle commands.
+
 ## <a id="core-features"></a> Features
 The core of the RestTestGen framework provides the following features:
 - custom parser for OpenAPI specifications v3 in JSON format (we dropped Swagger Codegen that caused instability)
@@ -103,10 +107,13 @@ The core of the RestTestGen framework provides the following features:
 - writers to output test cases and test results to file
   - JSON report writer
   - JUnit + OkHttp test case writer (wip)
-  - JUnit + REST Assured test case writer (wip)
+  - JUnit + REST Assured test case writer
 - coverage measurements
-  - operations coverage (wip)
-  - status code coverage (wip)
+  - path coverage 
+  - operations coverage
+  - status code coverage
+  - parameter coverage
+  - parameter value coverage
 
 
 ## Contributing

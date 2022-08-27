@@ -1,25 +1,25 @@
 package io.resttestgen.core.testing;
 
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.helper.ExtendedRandom;
+import io.resttestgen.core.helper.Taggable;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Represents an ordered sequence of test interactions. Although the current implementations of fuzzers do not require
  * ordered sequences, the order is anyway managed by this class in order to support further extensions.
  */
-public class TestSequence {
+public class TestSequence extends Taggable implements List<TestInteraction> {
 
     private String generator = "UserInstantiated";
     private String name = generateRandomTestSequenceName();
-    private String tag;
     private List<TestInteraction> testInteractions = new LinkedList<>();
 
     // Time information
@@ -45,11 +45,7 @@ public class TestSequence {
         this.testInteractions = testInteractions;
     }
 
-    public List<TestInteraction> getTestInteractions() {
-        return testInteractions;
-    }
-
-    public void setTestInteractions(List<TestInteraction> testInteractions) {
+    protected void setTestInteractions(List<TestInteraction> testInteractions) {
         this.testInteractions = testInteractions;
     }
 
@@ -61,6 +57,74 @@ public class TestSequence {
         return testInteractions.size();
     }
 
+    @Override
+    public boolean isEmpty() {
+        return testInteractions.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return testInteractions.contains(o);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<TestInteraction> iterator() {
+        return testInteractions.iterator();
+    }
+
+    @NotNull
+    @Override
+    public Object[] toArray() {
+        return testInteractions.toArray();
+    }
+
+    @NotNull
+    @Override
+    public <T> T[] toArray(@NotNull T[] ts) {
+        return testInteractions.toArray(ts);
+    }
+
+    @Override
+    public boolean add(TestInteraction testInteraction) {
+        return testInteractions.add(testInteraction);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return testInteractions.remove(o);
+    }
+
+    @Override
+    public boolean containsAll(@NotNull Collection<?> collection) {
+        return testInteractions.containsAll(collection);
+    }
+
+    @Override
+    public boolean addAll(@NotNull Collection<? extends TestInteraction> collection) {
+        return testInteractions.addAll(collection);
+    }
+
+    @Override
+    public boolean addAll(int i, @NotNull Collection<? extends TestInteraction> collection) {
+        return testInteractions.addAll(i, collection);
+    }
+
+    @Override
+    public boolean removeAll(@NotNull Collection<?> collection) {
+        return testInteractions.removeAll(collection);
+    }
+
+    @Override
+    public boolean retainAll(@NotNull Collection<?> collection) {
+        return testInteractions.retainAll(collection);
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
     public TestInteraction getFirst() {
         return testInteractions.get(0);
     }
@@ -70,6 +134,49 @@ public class TestSequence {
             throw new IndexOutOfBoundsException();
         }
         return testInteractions.get(index);
+    }
+
+    @Override
+    public TestInteraction set(int i, TestInteraction testInteraction) {
+        return testInteractions.set(i, testInteraction);
+    }
+
+    @Override
+    public void add(int i, TestInteraction testInteraction) {
+        testInteractions.add(i, testInteraction);
+    }
+
+    @Override
+    public TestInteraction remove(int i) {
+        return testInteractions.remove(i);
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return testInteractions.indexOf(o);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return testInteractions.lastIndexOf(o);
+    }
+
+    @NotNull
+    @Override
+    public ListIterator<TestInteraction> listIterator() {
+        return testInteractions.listIterator();
+    }
+
+    @NotNull
+    @Override
+    public ListIterator<TestInteraction> listIterator(int i) {
+        return testInteractions.listIterator(i);
+    }
+
+    @NotNull
+    @Override
+    public List<TestInteraction> subList(int i, int i1) {
+        return testInteractions.subList(i, i1);
     }
 
     public TestInteraction getLast() {
@@ -90,7 +197,7 @@ public class TestSequence {
         } else if (!this.generator.endsWith(testSequence.generator)){
             this.generator = this.generator + "+" + testSequence.generator;
         }
-        testInteractions.addAll(testSequence.getTestInteractions());
+        testInteractions.addAll(testSequence);
     }
 
     /**
@@ -106,7 +213,8 @@ public class TestSequence {
      */
     public void filterBySuccessfulStatusCode() {
         testInteractions = testInteractions.stream()
-                .filter(testInteraction -> testInteraction.getResponseStatusCode().isSuccessful())
+                .filter(testInteraction -> testInteraction.getTestStatus() == TestStatus.EXECUTED &&
+                        testInteraction.getResponseStatusCode().isSuccessful())
                 .collect(Collectors.toList());
     }
 
@@ -139,14 +247,6 @@ public class TestSequence {
         return generatedAt;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
     public void addTestResult(Oracle oracle, TestResult testResult) {
         testResults.put(oracle, testResult);
     }
@@ -162,6 +262,35 @@ public class TestSequence {
             }
         }
         return true;
+    }
+
+    /**
+     * Replaces concrete values in interactions with a pointer to an output value, in case previous interactions have
+     * returned a value used later on as input in the sequence.
+     */
+    public void inferVariablesFromConcreteValues() {
+        for (int i = testInteractions.size() - 1; i > 0; i--) {
+            for (ParameterLeaf responseLeaf : testInteractions.get(i).getOperation().getLeaves()) {
+
+                boolean found = false;
+
+                for (int j = i - 1; j >= 0 && !found; j--) {
+
+                    ParameterElement responseBody = testInteractions.get(j).getOperation().getResponseBody();
+                    if (responseBody != null) {
+                        for (ParameterLeaf requestLeaf : responseBody.getLeaves()) {
+
+                            if (requestLeaf.getName().equals(responseLeaf.getName()) &&
+                                    requestLeaf.getValue().toString().equals(responseLeaf.getValue().toString())) {
+                                requestLeaf.setValue(responseLeaf);
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void reset() {
@@ -183,5 +312,14 @@ public class TestSequence {
     public void appendGeneratedAtTimestampToSequenceName() {
         SimpleDateFormat dformat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         this.name = this.name + "-" + dformat.format(getGeneratedAt());
+    }
+
+    public Map<Oracle, TestResult> getTestResults() {
+        return testResults;
+    }
+
+    @Override
+    public String toString() {
+        return testInteractions.toString();
     }
 }

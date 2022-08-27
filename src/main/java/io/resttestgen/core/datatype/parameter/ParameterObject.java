@@ -408,6 +408,35 @@ public class ParameterObject extends StructuredParameterElement {
         return properties.isEmpty();
     }
 
+    // TODO: remove
+    /*@Override
+    public ParameterElement getElementByJsonPath(String jsonPath) {
+        String path = jsonPath.substring(jsonPath.indexOf("[")+2,jsonPath.indexOf("]")-1);
+        String remaining = jsonPath.substring(jsonPath.indexOf("]")+1);
+        if(remaining.equals("")){
+            for(ParameterElement property :this.properties){
+                    if(property.getName().toString().equalsIgnoreCase(path)){
+                        return property;
+                    }
+                }
+        }else{
+            for(ParameterElement property :this.properties){
+                if(property.getName().toString().equalsIgnoreCase(path)){
+                    if(property instanceof ParameterLeaf){
+                        return property;
+                    }
+                    if(property instanceof ParameterObject){
+                        return ((ParameterObject) property).getElementByJsonPath(remaining);
+                    }
+                    if(property instanceof ParameterArray){
+                        return ((ParameterArray) property).getElementByJsonPath(remaining);
+                    }
+                }
+            }
+        }
+        return null;
+    }*/
+
     @Override
     public void removeUninitializedParameters() {
         if (getOperation().isReadOnly()) {
@@ -500,7 +529,6 @@ public class ParameterObject extends StructuredParameterElement {
         for (ParameterElement property : properties) {
             arrays.addAll(property.getArrays());
         }
-
         return arrays;
     }
 
@@ -521,6 +549,14 @@ public class ParameterObject extends StructuredParameterElement {
     }
 
     @Override
+    public Collection<ParameterElement> getAllParameters() {
+        HashSet<ParameterElement> parameters = new HashSet<>();
+        parameters.add(this);
+        properties.forEach(p -> parameters.addAll(p.getAllParameters()));
+        return parameters;
+    }
+
+    @Override
     public Collection<CombinedSchemaParameter> getCombinedSchemas() {
         Collection<CombinedSchemaParameter> combinedSchemas = new LinkedList<>();
 
@@ -530,4 +566,80 @@ public class ParameterObject extends StructuredParameterElement {
 
         return combinedSchemas;
     }
+
+    private int getIndexOfParameterObject(){
+        List<ParameterElement> elements = ((ParameterArray) getParent()).getElements();
+        int elementPosition=0;
+        for(ParameterElement element : elements){
+            if(this.getLeaves().equals(element.getLeaves())){
+                return elementPosition;
+            }
+            elementPosition++;
+        }
+        return elementPosition;
+    }
+
+    // TODO: remove
+    /*@Override
+    public String getJsonPath() {
+        if (getParent() != null) {
+            if (getParent() instanceof ParameterArray) {
+                return getParent().getJsonPath() + "[" +((ParameterArray) getParent()).indexOf(this)+ "]";
+            } else {
+                return this.getName().toString().isEmpty() ?
+                        getParent().getJsonPath() :
+                        getParent().getJsonPath() +  "['" +getName().toString()+ "']";
+            }
+        } else {
+            return this.getName().toString().isEmpty()? "" :"['" +getName().toString()+ "']";
+        }
+
+    }*/
+
+    /**
+     * Return a parameter element according to its JSON path.
+     * @param jsonPath the JSON path of the parameter we want to get.
+     * @return the parameter matching the JSON path.
+     */
+    @Override
+    public ParameterElement getParameterFromJsonPath(String jsonPath) {
+
+        // If the JSON path starts with $, then start the search from the root element
+        ParameterElement rootElement = getRoot();
+        if (this != rootElement && jsonPath.startsWith("$")) {
+            return rootElement.getParameterFromJsonPath(jsonPath);
+        }
+
+        // If the JSON path starts with $, remove it
+        if (jsonPath.startsWith("$")) {
+            jsonPath = jsonPath.substring(1);
+        }
+
+        int start = jsonPath.indexOf("[");
+        int end = jsonPath.indexOf("]");
+
+        if (start >= 0 && end >= 0) {
+            if ((jsonPath.charAt(start + 1) == '\'' || jsonPath.charAt(start + 1) == '"') &&
+                    (jsonPath.charAt(end - 1) == '\'' || jsonPath.charAt(end - 1) == '"')) {
+                String propertyName = jsonPath.substring(start + 2, end - 1);
+                for (ParameterElement property : properties) {
+                    if (property.getName().toString().equals(propertyName)) {
+                        if (property instanceof ParameterArray) {
+                            return property.getParameterFromJsonPath(jsonPath.substring(end + 1));
+                        } else {
+                            return property.getParameterFromJsonPath(jsonPath);
+                        }
+                    }
+                }
+                return null;
+            } else {
+                // Missing quotes or double quotes
+                return null;
+            }
+        } else {
+            // Missing parenthesis
+            return null;
+        }
+    }
+
 }

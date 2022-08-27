@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EnumAndExamplePriorityParameterValueProvider implements ParameterValueProvider {
+public class EnumAndExamplePriorityParameterValueProvider extends ParameterValueProvider {
 
     final ExtendedRandom random = Environment.getInstance().getRandom();
 
@@ -21,11 +21,13 @@ public class EnumAndExamplePriorityParameterValueProvider implements ParameterVa
 
         // If the leaf is an enum, return a random enum value
         EnumParameterValueProvider enumParameterValueProvider = new EnumParameterValueProvider();
+        enumParameterValueProvider.setStrict(this.strict);
         if (enumParameterValueProvider.countAvailableValuesFor(parameterLeaf) > 0 && random.nextInt(1, 10) <= 9) {
             return enumParameterValueProvider.provideValueFor(parameterLeaf);
         }
 
         ExamplesParameterValueProvider examplesParameterValueProvider = new ExamplesParameterValueProvider();
+        examplesParameterValueProvider.setStrict(this.strict);
         if (examplesParameterValueProvider.countAvailableValuesFor(parameterLeaf) > 0 && random.nextInt(1, 10) <= 7) {
             return examplesParameterValueProvider.provideValueFor(parameterLeaf);
         }
@@ -42,6 +44,8 @@ public class EnumAndExamplePriorityParameterValueProvider implements ParameterVa
         candidateProviders.add(new DefaultParameterValueProvider());
         candidateProviders.add(new NormalizedDictionaryParameterValueProvider());
         candidateProviders.add(new DictionaryParameterValueProvider());
+
+        candidateProviders.forEach(p -> p.setStrict(this.strict));
 
         providers.addAll(candidateProviders.stream().filter(p -> p.countAvailableValuesFor(parameterLeaf) > 0)
                 .collect(Collectors.toSet()));

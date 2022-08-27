@@ -20,7 +20,7 @@ public class StatusCodeOracle extends Oracle {
             return testResult.setError("One or more interaction in the sequence have not been executed.");
         }
 
-        for (TestInteraction testInteraction : testSequence.getTestInteractions()) {
+        for (TestInteraction testInteraction : testSequence) {
             if (testInteraction.getResponseStatusCode().isSuccessful()) {
                 testResult.setPass("The test sequence was executed successfully.");
             } else if (testInteraction.getResponseStatusCode().isServerError()) {

@@ -4,8 +4,8 @@ import com.google.gson.JsonPrimitive;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.helper.ExtendedRandom;
+import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -124,6 +124,26 @@ public class StringParameter extends ParameterLeaf {
     }
 
     @Override
+    public boolean isValueCompliant(Object value) {
+        if (value instanceof ParameterLeaf) {
+            value = ((ParameterLeaf) value).getConcreteValue();
+        }
+        try {
+            String stringValue = ObjectHelper.castToString(value);
+
+            // Check if value is in enum set, if enum values are available
+            if (getEnumValues().size() == 0 || getEnumValues().contains(stringValue)) {
+
+                // Check if length is compliant with maxLength and minLength, if defined
+                if ((maxLength == null || stringValue.length() <= maxLength) && (minLength == null || stringValue.length() >= minLength)) {
+                    return true;
+                }
+            }
+        } catch (ClassCastException ignored) {}
+        return false;
+    }
+
+    @Override
     public boolean isObjectTypeCompliant(Object o) {
         if (o == null) {
             return false;
@@ -132,16 +152,6 @@ public class StringParameter extends ParameterLeaf {
             return true;
         }
         return String.class.isAssignableFrom(o.getClass());
-    }
-
-    @Override
-    public int countValuesInNormalizedDictionary(Dictionary dictionary) {
-        return dictionary.getEntriesByNormalizedParameterName(normalizedName, type).size();
-    }
-
-    @Override
-    public int countValuesInDictionary(Dictionary dictionary) {
-        return dictionary.getEntriesByParameterName(name, type).size();
     }
 
     @Override

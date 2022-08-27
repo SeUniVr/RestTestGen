@@ -2,11 +2,13 @@ package io.resttestgen.core.datatype.parameter;
 
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
 import io.resttestgen.core.openapi.Operation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
 public abstract class StructuredParameterElement extends ParameterElement {
-
+    private static final Logger logger = LogManager.getLogger(StructuredParameterElement.class);
     // By default, remove a structured parameter instead keeping it empty when representing it
     private boolean keepIfEmpty = false;
 
@@ -63,9 +65,83 @@ public abstract class StructuredParameterElement extends ParameterElement {
         this.keepIfEmpty = keepIfEmpty;
     }
 
+    @Override
+    public String getJsonPath() {
+        if (getParent() == null) {
+            return "$";
+        }
+
+        else if (getParent() instanceof ParameterArray) {
+
+            // If this is the referenceElement of the array, return index = -1
+            if (this == ((ParameterArray) getParent()).getReferenceElement()) {
+                return getParent().getJsonPath() + "[-1]";
+            }
+
+            // If this is an element of the array, return its index
+            else if (((ParameterArray) getParent()).getElements().contains(this)) {
+                return getParent().getJsonPath() + "[" + ((ParameterArray) getParent()).getElements().indexOf(this) + "]";
+            }
+
+            // If this is not contained in the array, return null
+            else {
+                return null;
+            }
+        }
+
+        else {
+            return getParent().getJsonPath() + "['" + this.getName() + "']";
+        }
+    }
+
+    // TODO: remove
+    //public abstract ParameterElement getElementByJsonPath(String jsonPath);
+
+    @Override
+    public boolean remove() {
+
+        // If the leaf has no parent (it is a root), then remove it from the operation
+        if (getParent() == null) {
+            switch (getLocation()) {
+                case REQUEST_BODY:
+                    if (this == getOperation().getRequestBody()) {
+                        getOperation().setRequestBody(null);
+                        return true;
+                    }
+                    break;
+                case RESPONSE_BODY:
+                    if (this == getOperation().getResponseBody()) {
+                        getOperation().setResponseBody(null);
+                        return true;
+                    }
+                    break;
+                case QUERY:
+                    return getOperation().getQueryParameters().remove(this);
+                case PATH:
+                    return getOperation().getPathParameters().remove(this);
+                case HEADER:
+                    return getOperation().getHeaderParameters().remove(this);
+                case COOKIE:
+                    return getOperation().getCookieParameters().remove(this);
+            }
+        }
+
+        // If the leaf is contained in a parent element (array or object), remove it from the parent
+        else {
+            if (getParent() instanceof ParameterArray) {
+                return ((ParameterArray) getParent()).getElements().remove(this);
+            } else if (getParent() instanceof ParameterObject) {
+                return ((ParameterObject) getParent()).getProperties().remove(this);
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Helper function used to remove null-valued (for Leaves) and empty (for structured) children Parameters
      * in order to have a valid representation of the structured parameter.
      */
     public abstract void removeUninitializedParameters();
+
 }

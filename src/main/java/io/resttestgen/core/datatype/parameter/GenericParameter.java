@@ -39,6 +39,10 @@ public class GenericParameter extends ParameterLeaf {
         return this;
     }
 
+    @Override
+    public boolean isValueCompliant(Object value) {
+        return true;
+    }
 
     @Override
     public boolean isObjectTypeCompliant(Object o) {

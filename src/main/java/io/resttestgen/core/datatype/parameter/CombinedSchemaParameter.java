@@ -128,6 +128,11 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
         return "";
     }
 
+    public String getJsonPath() {
+        // FIXME: implement when supporting combined parameters
+        return "";
+    }
+
     @Override
     public String getValueAsFormattedString(ParameterStyle style, boolean explode) {
         if (outputParameterSchema != null) {
@@ -179,6 +184,11 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
 
 
         return leaves;
+    }
+
+    @Override
+    public boolean remove() {
+        return false;
     }
 
     @Override
@@ -267,6 +277,11 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
     }
 
     @Override
+    public Collection<ParameterElement> getAllParameters() {
+        return new HashSet<>();
+    }
+
+    @Override
     public Collection<CombinedSchemaParameter> getCombinedSchemas() {
         Collection<CombinedSchemaParameter> combinedSchemas = new LinkedList<>();
 
@@ -283,5 +298,10 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
         }
 
         return combinedSchemas;
+    }
+
+    @Override
+    public ParameterElement getParameterFromJsonPath(String jsonPath) {
+        return null;
     }
 }

@@ -6,9 +6,17 @@ import io.resttestgen.core.datatype.parameter.ParameterLeaf;
  * Given a parameter, the parameter value provider provides a value for that parameter. Example of parameter value
  * providers are random generators, examples, default values, dictionaries
  */
-public interface ParameterValueProvider {
+public abstract class ParameterValueProvider {
 
-    //public int countAvailableValuesFor(ParameterLeaf parameterLeaf);
+    protected boolean strict = false;
 
-    Object provideValueFor(ParameterLeaf parameterLeaf);
+    public abstract Object provideValueFor(ParameterLeaf parameterLeaf);
+
+    public boolean isStrict() {
+        return strict;
+    }
+
+    public void setStrict(boolean strict) {
+        this.strict = strict;
+    }
 }

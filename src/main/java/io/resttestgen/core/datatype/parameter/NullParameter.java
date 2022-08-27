@@ -54,6 +54,11 @@ public class NullParameter extends ParameterLeaf {
     }
 
     @Override
+    public boolean isValueCompliant(Object value) {
+        return value == null || value.toString().equals("null") || value instanceof NullParameter;
+    }
+
+    @Override
     public Object generateCompliantValue() {
         return "null";
     }

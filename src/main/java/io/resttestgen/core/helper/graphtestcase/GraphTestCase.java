@@ -27,7 +27,7 @@ public class GraphTestCase {
 
         graph.addVertex(staticSourceNode);
 
-        for (TestInteraction interaction : testSequence.getTestInteractions()) {
+        for (TestInteraction interaction : testSequence) {
 
             String targetNode = getNodeFromInteraction(testSequence, interaction);
             graph.addVertex(targetNode);
@@ -47,7 +47,7 @@ public class GraphTestCase {
 
         String previousNode = staticSourceNode;
 
-        for (TestInteraction interaction : testSequence.getTestInteractions()) {
+        for (TestInteraction interaction : testSequence) {
             String currentNode = getNodeFromInteraction(testSequence, interaction);
             graph.addEdge(previousNode, currentNode, new ParameterEdge());
             previousNode = currentNode;
@@ -62,14 +62,14 @@ public class GraphTestCase {
 
     private static String getNodeFromInteraction(TestSequence sequence, TestInteraction interaction) {
         if (sequence != null && interaction != null) {
-            int number = sequence.getTestInteractions().indexOf(interaction) + 1;
+            int number = sequence.indexOf(interaction) + 1;
             return number + ": " + interaction.getOperation().toString();
         }
         return "Error";
     }
 
     private static TestInteraction getInteractionFromOperation(TestSequence sequence, Operation operation) {
-        for (TestInteraction interaction : sequence.getTestInteractions()) {
+        for (TestInteraction interaction : sequence) {
             if (interaction.getOperation() == operation) {
                 return interaction;
             }

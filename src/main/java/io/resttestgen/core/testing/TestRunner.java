@@ -5,6 +5,7 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
 import io.resttestgen.core.helper.RequestManager;
+import io.resttestgen.core.testing.coverage.CoverageManager;
 import io.resttestgen.implementation.responseprocessor.DictionaryResponseProcessor;
 import io.resttestgen.implementation.responseprocessor.GraphResponseProcessor;
 import io.resttestgen.implementation.responseprocessor.JsonParserResponseProcessor;
@@ -39,6 +40,8 @@ public class TestRunner {
     private static final int MAX_ATTEMPTS = 10;
     private AuthenticationInfo authenticationInfo = Environment.getInstance().getAuthenticationInfo(0);
 
+    private CoverageManager coverage = new CoverageManager();
+
     /**
      * Constructor in which response processors are initialized and invalid status codes are defined. An invalid status
      * code is a status code that suggests a replay of the test interaction is required. Method is private to prevent
@@ -67,7 +70,7 @@ public class TestRunner {
      * @param testSequence test sequence to run.
      */
     public void run(TestSequence testSequence) {
-        testSequence.getTestInteractions().forEach(this::tryTestInteractionExecution);
+        testSequence.forEach(this::tryTestInteractionExecution);
     }
 
     /**
@@ -173,11 +176,13 @@ public class TestRunner {
                     new Timestamp(response.sentRequestAtMillis()),
                     new Timestamp(response.receivedResponseAtMillis()));
             testInteraction.setTestStatus(TestStatus.EXECUTED);
+            coverage.updateCoverage(testInteraction);
         } catch (IOException e) {
             logger.warn("Request execution failed: connectivity problem or timeout.");
             call.cancel();
             testInteraction.setTestStatus(TestStatus.ERROR);
         }
+
     }
 
     /**
@@ -206,5 +211,9 @@ public class TestRunner {
 
     public void setAuthenticationInfo(AuthenticationInfo authenticationInfo) {
         this.authenticationInfo = authenticationInfo;
+    }
+
+    public CoverageManager getCoverage(){
+        return this.coverage;
     }
 }

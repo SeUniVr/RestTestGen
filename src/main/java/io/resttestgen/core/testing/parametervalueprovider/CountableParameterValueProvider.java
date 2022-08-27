@@ -5,7 +5,7 @@ import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 /**
  * Parameter value providers that pick values from a deterministic source with a countable number of values.
  */
-public interface CountableParameterValueProvider extends ParameterValueProvider {
+public abstract class CountableParameterValueProvider extends ParameterValueProvider {
 
-    int countAvailableValuesFor(ParameterLeaf parameterLeaf);
+    public abstract int countAvailableValuesFor(ParameterLeaf parameterLeaf);
 }
