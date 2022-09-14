@@ -12,50 +12,59 @@ import java.util.Set;
 
 public class PathCoverage extends Coverage {
 
-    private Set<String> testedPaths = new HashSet<>();
-    private Set<String> pathsToBeTested= new HashSet<>();
+    private Set<String> pathsToTest= new HashSet<>();
+    private Set<String> pathsDocumentedTested= new HashSet<>();
+    private Set<String> pathsNotDocumentedTested = new HashSet<>();
 
     public PathCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
-            pathsToBeTested.add(operation.getEndpoint());
+            pathsToTest.add(operation.getEndpoint());
         }
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        testedPaths.add(testInteraction.getOperation().getEndpoint());
+        if(pathsToTest.contains(testInteraction.getOperation().getEndpoint())){
+            pathsDocumentedTested.add(testInteraction.getOperation().getEndpoint());
+        }else{
+            pathsNotDocumentedTested.add(testInteraction.getOperation().getEndpoint());
+        }
     }
-
-    public double computeCoverage(){
-        return ((double)getTested()/(double)getToTest());
+    @Override
+    public int getNumOfTestedDocumented(){
+        return pathsDocumentedTested.size();
     }
-
 
     @Override
-    public int getTested() {
-        return testedPaths.size();
+    public int getNumOfTestedNotDocumented(){
+        return pathsNotDocumentedTested.size();
     }
 
     @Override
     public int getToTest() {
-        return pathsToBeTested.size();
+        return pathsToTest.size();
     }
 
     @Override
     public JsonObject getReportAsJsonObject() {
         JsonObject report = new JsonObject();
         JsonArray documented = new JsonArray(getToTest());
-        JsonArray tested = new JsonArray(getTested());
-        JsonArray notTested = new JsonArray(getToTest()-getTested());
-        for(String path : pathsToBeTested){
+        JsonArray testedDocumented = new JsonArray(getNumOfTestedDocumented());
+        JsonArray testedNotDocumented = new JsonArray(getNumOfTestedNotDocumented());
+        JsonArray notTested = new JsonArray(getToTest()-getNumOfTestedDocumented());
+        for(String path : pathsToTest){
             documented.add(path);
-            if(testedPaths.contains(path)){
-                tested.add(path);
+            if(pathsDocumentedTested.contains(path)){
+                testedDocumented.add(path);
             }else{
                 notTested.add(path);
             }
         }
+        for(String path : pathsNotDocumentedTested){
+            testedNotDocumented.add(path);
+        }
         report.add("documented",documented);
-        report.add("tested", tested);
+        report.add("documentedTested", testedDocumented);
+        report.add("notDocumentedTested", testedNotDocumented);
         report.add("notTested", notTested);
         return report;
     }

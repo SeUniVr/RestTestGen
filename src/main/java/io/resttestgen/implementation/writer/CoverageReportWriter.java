@@ -42,9 +42,10 @@ public class CoverageReportWriter{
             JsonObject simpleCoverageReport = new JsonObject();
             JsonObject raw = new JsonObject();
             raw.addProperty("documented", coverage.getToTest());
-            raw.addProperty("tested", coverage.getTested());
+            raw.addProperty("documentedTested", coverage.getNumOfTestedDocumented());
+            raw.addProperty("notDocumentedTested", coverage.getNumOfTestedNotDocumented());
             simpleCoverageReport.add("raw",raw);
-            simpleCoverageReport.addProperty("rate", coverage.getCoverage());
+            simpleCoverageReport.addProperty("rate", coverage.getCoverage().toString());
             jsonRoot.add(coverage.getClass().getSimpleName(), simpleCoverageReport);
 
         }

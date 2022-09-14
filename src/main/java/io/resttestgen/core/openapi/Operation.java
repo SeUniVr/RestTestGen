@@ -3,6 +3,7 @@ package io.resttestgen.core.openapi;
 import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +27,10 @@ public class Operation {
     private final Map<String, StructuredParameterElement> outputParameters;
     private StructuredParameterElement responseBody;
 
+    // Inter-parameter dependencies
+    private Set<ParameterName> allOrNone;
+    private Set<ParameterName> onlyOne;
+
     private boolean isReadOnly; // Field to avoid changes to template operation parsed from specification
 
     private static final Logger logger = LogManager.getLogger(Operation.class);
@@ -40,6 +45,9 @@ public class Operation {
         cookieParameters = new HashSet<>();
 
         this.outputParameters = new HashMap<>();
+
+        allOrNone = new HashSet<>();
+        onlyOne = new HashSet<>();
 
         logger.debug("Fetching operation " + method + " " + endpoint);
 
@@ -183,6 +191,9 @@ public class Operation {
         other.outputParameters.forEach((key, value) ->
                 outputParameters.put(key, value.deepClone(this, null)));
 
+        allOrNone = new HashSet<>(other.allOrNone);
+        onlyOne = new HashSet<>(other.onlyOne);
+
         isReadOnly = false;
     }
 
@@ -230,6 +241,15 @@ public class Operation {
         }
 
         return parameters;
+    }
+
+    public StructuredParameterElement getSuccessfulOutputParameters() {
+        for (String key : outputParameters.keySet()) {
+            if (key.startsWith("2")) {
+                return outputParameters.get(key);
+            }
+        }
+        return null;
     }
 
     public Set<ParameterElement> getHeaderParameters() {

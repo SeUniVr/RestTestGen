@@ -33,7 +33,7 @@ public class ErrorFuzzer extends Fuzzer {
 
     public List<TestSequence> generateTestSequences(int numberOfSequences) {
         List<TestSequence> testSequences = new LinkedList<>();
-
+        int numSequence=0;
         // Build up all the subsequences
         for (int i = 1; i <= testSequenceToMutate.size(); i++) {
 
@@ -93,7 +93,7 @@ public class ErrorFuzzer extends Fuzzer {
                         ReportWriter reportWriter = new ReportWriter(currentTestSequence);
                         reportWriter.write();
                         RestAssuredWriter restAssuredWriter = new RestAssuredWriter(currentTestSequence);
-                        restAssuredWriter.setNumSequence(i+j);
+                        restAssuredWriter.setNumSequence(numSequence++);
                         restAssuredWriter.write();
                     } catch (IOException e) {
                         logger.warn("Could not write report to file.");

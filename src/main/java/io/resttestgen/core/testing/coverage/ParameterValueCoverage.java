@@ -16,111 +16,90 @@ import java.util.Set;
 
 public class ParameterValueCoverage extends Coverage {
 
-    private HashMap<Operation, HashMap<ParameterElement, Set<Object>>> valuesToBeTested = new HashMap<>();
-    private HashMap<Operation, HashMap<ParameterElement, Set<Object>>> testedValues= new HashMap<>();
+    private HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> valuesToTest = new HashMap<>();
+    private HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> valuesDocumentedTested= new HashMap<>();
+    private HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> valuesNotDocumentedTested= new HashMap<>();
 
     public ParameterValueCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
-            HashMap<ParameterElement,Set<Object>> newMapParameter = new HashMap<>();
+            HashMap<ParameterElementWrapper,Set<Object>> newMapParameters = new HashMap<>();
             for(ParameterElement parameter : operation.getLeaves()){
+                ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
                 Set<Object> values = new HashSet<>();
-                if(parameter.getType()== ParameterType.BOOLEAN){
-                    values.add("True");
-                    values.add("False");
+                if(parameter.getType() == ParameterType.BOOLEAN){
+                    values.add(true);
+                    values.add(false);
                 }
-                if(!parameter.getEnumValues().isEmpty()){
+                if(parameter.isEnum()){
                     values.add(parameter.getEnumValues());
                 }
-                if(parameter.isRequired()){
-                    values.add("null");
-                    values.add("value");
-                }
                 if(!values.isEmpty()){
-                    newMapParameter.put(parameter,values);
-                    valuesToBeTested.put(operation,newMapParameter);
+                    newMapParameters.put(parameterWrapper,values);
+                    valuesToTest.put(operation,newMapParameters);
                 }
             }
         }
-        System.out.println(valuesToBeTested);
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
         Operation operation = testInteraction.getOperation();
-        if(testedValues.containsKey(operation)){
-            for(ParameterElement parameter : operation.getLeaves()) {
-                if(testedValues.get(operation).containsKey(parameter)){
-                    if(parameter.getType()== ParameterType.BOOLEAN || !parameter.getEnumValues().isEmpty()){
-                        testedValues.get(operation).get(parameter).add(parameter.getValue());
-                    }
-                    if(parameter.isRequired()) {
-                        if (parameter.hasValue()) {
-                            testedValues.get(operation).get(parameter).add("value");
-                        } else {
-                            testedValues.get(operation).get(parameter).add("null");
+        boolean containsOperation = valuesToTest.containsKey(operation);
+        for(ParameterElement parameter : operation.getLeaves()) {
+            ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
+            if(parameter.getType()== ParameterType.BOOLEAN || parameter.isEnum()){
+                if(containsOperation){
+                    if(valuesToTest.get(operation).containsKey(parameterWrapper)){
+                        if(valuesToTest.get(operation).get(parameterWrapper).contains(parameterWrapper.getParameterElement().getValue())) {
+                            insertParameterValueToSet(valuesDocumentedTested, operation, parameterWrapper, parameter.getValue());
+                        }else{
+                            insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, parameterWrapper.getParameterElement().getValue());
                         }
+                    }else{
+                        insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, parameter.getValue());
                     }
-                }else {
-                    if(parameter.getType()== ParameterType.BOOLEAN || !parameter.getEnumValues().isEmpty()){
-                        Set<Object> newSet = new HashSet<>();
-                        newSet.add(parameter.getValue());
-                        testedValues.get(operation).put(parameter,newSet);
-                    }
-                    if(parameter.isRequired()) {
-                        if (parameter.hasValue()) {
-                            Set<Object> newSet = new HashSet<>();
-                            newSet.add("value");
-                            testedValues.get(operation).put(parameter,newSet);
-                        } else {
-                            Set<Object> newSet = new HashSet<>();
-                            newSet.add("null");
-                            testedValues.get(operation).put(parameter,newSet);
-                        }
-                    }
+                }else{
+                    insertParameterValueToSet(valuesNotDocumentedTested, operation, parameterWrapper, parameter.getValue());
                 }
             }
-        }else {
-            HashMap<ParameterElement, Set<Object>> newMap = new HashMap<>();
-            for(ParameterElement parameter : operation.getLeaves()) {
-                if(newMap.containsKey(parameter)){
-                    if(parameter.getType()== ParameterType.BOOLEAN || !parameter.getEnumValues().isEmpty()){
-                        newMap.get(parameter).add(parameter.getValue());
-                    }
-                    if(parameter.isRequired()) {
-                        if (parameter.hasValue()) {
-                            newMap.get(parameter).add("value");
-                        } else {
-                            newMap.get(parameter).add("null");
-                        }
-                    }
-                }else {
-                    if(parameter.getType()== ParameterType.BOOLEAN || !parameter.getEnumValues().isEmpty()){
-                        Set<Object> newSet = new HashSet<>();
-                        newSet.add(parameter.getValue());
-                        newMap.put(parameter,newSet);
-                    }
-                    if(parameter.isRequired()) {
-                        if (parameter.hasValue()) {
-                            Set<Object> newSet = new HashSet<>();
-                            newSet.add("value");
-                            newMap.put(parameter,newSet);
-                        } else {
-                            Set<Object> newSet = new HashSet<>();
-                            newSet.add("null");
-                            newMap.put(parameter,newSet);
-                        }
-                    }
-                }
+
+        }
+    }
+
+    public void insertParameterValueToSet(HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> operationMap,Operation operation, ParameterElementWrapper parameter, Object value){
+        if(operationMap.containsKey(operation)){
+            if(operationMap.get(operation).containsKey(parameter)){
+                operationMap.get(operation).get(parameter).add(value);
+            }else{
+                Set<Object> values = new HashSet<>();
+                values.add(value);
+                operationMap.get(operation).put(parameter,values);
             }
-            testedValues.put(operation,newMap);
+        }else{
+            HashMap<ParameterElementWrapper, Set<Object>> parametersMap = new HashMap<>();
+            Set<Object> values = new HashSet<>();
+            values.add(value);
+            parametersMap.put(parameter, values);
+            operationMap.put(operation, parametersMap);
         }
     }
 
     @Override
-    public int getTested() {
+    public int getNumOfTestedDocumented(){
         int sum = 0;
-        for(Operation key: testedValues.keySet()){
-            for(ParameterElement subKey: testedValues.get(key).keySet()){
-                sum += testedValues.get(key).get(subKey).size();
+        for(Operation key: valuesDocumentedTested.keySet()){
+            for(ParameterElementWrapper subKey: valuesDocumentedTested.get(key).keySet()){
+                sum += valuesDocumentedTested.get(key).get(subKey).size();
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public int getNumOfTestedNotDocumented(){
+        int sum = 0;
+        for(Operation key: valuesNotDocumentedTested.keySet()){
+            for(ParameterElementWrapper subKey: valuesNotDocumentedTested.get(key).keySet()){
+                sum += valuesNotDocumentedTested.get(key).get(subKey).size();
             }
         }
         return sum;
@@ -129,9 +108,9 @@ public class ParameterValueCoverage extends Coverage {
     @Override
     public int getToTest() {
         int sum = 0;
-        for(Operation key: valuesToBeTested.keySet()){
-            for(ParameterElement subKey: valuesToBeTested.get(key).keySet()){
-                sum += valuesToBeTested.get(key).get(subKey).size();
+        for(Operation key: valuesToTest.keySet()){
+            for(ParameterElementWrapper subKey: valuesToTest.get(key).keySet()){
+                sum += valuesToTest.get(key).get(subKey).size();
             }
         }
         return sum;
@@ -140,37 +119,51 @@ public class ParameterValueCoverage extends Coverage {
     @Override
     public JsonObject getReportAsJsonObject() {
         JsonObject report = new JsonObject();
-        JsonObject documented = new JsonObject();
-        JsonObject tested = new JsonObject();
-        JsonObject notTested = new JsonObject();
-        for(Operation operation: valuesToBeTested.keySet()){
-            JsonObject jsonOperationDocumented = new JsonObject();
-            JsonObject jsonOperationTested = new JsonObject();
-            JsonObject jsonOperationNotTested = new JsonObject();
-            for(ParameterElement parameter: valuesToBeTested.get(operation).keySet()){
-                JsonArray jsonArrayValuesDocumented = new JsonArray();
-                JsonArray jsonArrayValuesTested = new JsonArray();
-                JsonArray jsonArrayValuesNotTested = new JsonArray();
-                for(Object value: valuesToBeTested.get(operation).get(parameter)){
-                   jsonArrayValuesDocumented.add(value.toString());
-                   if(testedValues.get(operation).get(parameter).contains(value)){
-                       jsonArrayValuesTested.add(value.toString());
-                   }else{
-                       jsonArrayValuesNotTested.add(value.toString());
-                   }
-                }
-                jsonOperationDocumented.add(parameter.toString(),jsonArrayValuesDocumented);
-                jsonOperationTested.add(parameter.toString(),jsonArrayValuesTested);
-                jsonOperationNotTested.add(parameter.toString(),jsonArrayValuesNotTested);
-            }
-            documented.add(operation.toString(),jsonOperationDocumented);
-            tested.add(operation.toString(),jsonOperationTested);
-            notTested.add(operation.toString(),jsonOperationNotTested);
-        }
-        report.add("documented",documented);
-        report.add("tested", tested);
-        report.add("notTested", notTested);
+        report.add("documented", createJsonObject(valuesToTest));
+        report.add("documentedTested", createJsonObject(valuesDocumentedTested));
+        report.add("notDocumentedTested", createJsonObject(valuesNotDocumentedTested));
+        report.add("notTested", createJsonObject(createNotTested()));
         return report;
+    }
+
+    private JsonObject createJsonObject(HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> operationsMap){
+        JsonObject jsonObject = new JsonObject();
+        for(Operation op : operationsMap.keySet()) {
+            JsonObject jsonObjectOperation = new JsonObject();
+            for(ParameterElementWrapper parameter : operationsMap.get(op).keySet()){
+                JsonArray values = new JsonArray();
+                for(Object value : operationsMap.get(op).get(parameter)){
+                    values.add(value.toString());
+                }
+                jsonObjectOperation.add(parameter.toString(),values);
+            }
+            jsonObject.add(op.toString(),jsonObjectOperation);
+        }
+        return jsonObject;
+    }
+
+    private HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> createNotTested(){
+        HashMap<Operation, HashMap<ParameterElementWrapper, Set<Object>>> notTested = new HashMap<>();
+        boolean containsOperation;
+        boolean containsParameter = false;
+        for(Operation op : valuesToTest.keySet()){
+            containsOperation = valuesDocumentedTested.containsKey(op);
+            for(ParameterElementWrapper parameter : valuesToTest.get(op).keySet()){
+                if(containsOperation){
+                    containsParameter = valuesDocumentedTested.get(op).containsKey(parameter);
+                }
+                for(Object value : valuesToTest.get(op).get(parameter)){
+                    if(containsOperation && containsParameter){
+                        if(!valuesDocumentedTested.get(op).get(parameter).contains(value)){
+                            insertParameterValueToSet(notTested,op,parameter,value);
+                        }
+                    }else{
+                        insertParameterValueToSet(notTested,op,parameter,value);
+                    }
+                }
+            }
+        }
+        return notTested;
     }
 
 }

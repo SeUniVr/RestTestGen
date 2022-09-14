@@ -6,11 +6,16 @@ public abstract class Coverage {
 
     public abstract void updateCoverage(TestInteraction testInteraction);
 
-    public double getCoverage(){
-        return (double)this.getTested()*100/this.getToTest();
+    public Double getCoverage(){
+        if(this.getToTest() == 0){
+            return 0.00;
+        }
+        return (double)this.getNumOfTestedDocumented()*100/this.getToTest();
     }
 
-    public abstract int getTested();
+    public abstract int getNumOfTestedDocumented();
+
+    public abstract int getNumOfTestedNotDocumented();
 
     public abstract int getToTest();
 

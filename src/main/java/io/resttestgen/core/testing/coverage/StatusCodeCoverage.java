@@ -15,44 +15,67 @@ import java.util.Set;
 
 public class StatusCodeCoverage  extends Coverage {
 
-    private HashMap<Operation, Set<HttpStatusCode>> responseCodeToBeTested = new HashMap<>();
-    private HashMap<Operation, Set<HttpStatusCode>> testedResponseCode= new HashMap<>();
+    private HashMap<Operation, Set<HttpStatusCode>> statusCodeToTest = new HashMap<>();
+    private HashMap<Operation, Set<HttpStatusCode>> statusCodeDocumentedTested = new HashMap<>();
+    private HashMap<Operation, Set<HttpStatusCode>> statusCodeNotDocumentedTested = new HashMap<>();
 
     public StatusCodeCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
-            Set<HttpStatusCode> paths = new HashSet<>();
-            for(String responseCode : operation.getOutputParameters().keySet()){
-                paths.add(new HttpStatusCode(Integer.parseInt(responseCode)));
+            Set<HttpStatusCode> codes = new HashSet<>();
+            for(String code : operation.getOutputParameters().keySet()){
+                codes.add(new HttpStatusCode(Integer.parseInt(code)));
             }
-            responseCodeToBeTested.put(operation,paths);
-        }
-    }
-    @Override
-    public void updateCoverage(TestInteraction testInteraction) {
-        Operation operation = testInteraction.getOperation();
-        if(testedResponseCode.containsKey(operation)){
-            testedResponseCode.get(operation).add(testInteraction.getResponseStatusCode());
-        }else{
-            Set<HttpStatusCode> newSet = new HashSet<>();
-            newSet.add(testInteraction.getResponseStatusCode());
-            testedResponseCode.put(operation,newSet);
+            statusCodeToTest.put(operation,codes);
         }
     }
 
     @Override
-    public int getTested() {
-        int sum = 0;
-        for(Operation key: testedResponseCode.keySet()){
-            sum += testedResponseCode.get(key).size();
+    public void updateCoverage(TestInteraction testInteraction) {
+        Operation op = testInteraction.getOperation();
+        if(statusCodeToTest.containsKey(op)){
+            if(statusCodeToTest.get(op).contains(testInteraction.getResponseStatusCode())){
+                insertStatusCodeToSet(statusCodeDocumentedTested,op,testInteraction.getResponseStatusCode());
+            }else{
+                insertStatusCodeToSet(statusCodeNotDocumentedTested,op,testInteraction.getResponseStatusCode());
+            }
+        }else{
+            insertStatusCodeToSet(statusCodeNotDocumentedTested,op,testInteraction.getResponseStatusCode());
         }
-        return sum;
+    }
+
+    private void insertStatusCodeToSet(HashMap<Operation, Set<HttpStatusCode>> operationsMap, Operation operation, HttpStatusCode code){
+        if(operationsMap.containsKey(operation)){
+            operationsMap.get(operation).add(code);
+        }else{
+            Set<HttpStatusCode> codes = new HashSet<>();
+            codes.add(code);
+            operationsMap.put(operation, codes);
+        }
     }
 
     @Override
     public int getToTest() {
         int sum = 0;
-        for(Operation key: responseCodeToBeTested.keySet()){
-            sum += responseCodeToBeTested.get(key).size();
+        for(Operation key: statusCodeToTest.keySet()){
+            sum += statusCodeToTest.get(key).size();
+        }
+        return sum;
+    }
+
+    @Override
+    public int getNumOfTestedDocumented(){
+        int sum = 0;
+        for(Operation key: statusCodeDocumentedTested.keySet()){
+            sum += statusCodeDocumentedTested.get(key).size();
+        }
+        return sum;
+    }
+
+    @Override
+    public int getNumOfTestedNotDocumented(){
+        int sum = 0;
+        for(Operation key: statusCodeNotDocumentedTested.keySet()){
+            sum += statusCodeNotDocumentedTested.get(key).size();
         }
         return sum;
     }
@@ -60,30 +83,39 @@ public class StatusCodeCoverage  extends Coverage {
     @Override
     public JsonObject getReportAsJsonObject() {
         JsonObject report = new JsonObject();
-        JsonObject documented = new JsonObject();
-        JsonObject tested = new JsonObject();
-        JsonObject notTested = new JsonObject();
-        for(Operation op : responseCodeToBeTested.keySet()){
+        report.add("documented", createJsonObject(statusCodeToTest));
+        report.add("documentedTested", createJsonObject(statusCodeDocumentedTested));
+        report.add("notDocumentedTested", createJsonObject(statusCodeNotDocumentedTested));
+        report.add("notTested", createJsonObject(createNotTested()));
+        return report;
+    }
 
-            JsonArray operationDocumented = new JsonArray();
-            JsonArray operationTested = new JsonArray();
-            JsonArray operationNotTested = new JsonArray();
-            for(HttpStatusCode responseCode: responseCodeToBeTested.get(op)){
-                operationDocumented.add(responseCode.toString());
-                if(testedResponseCode.get(op).contains(responseCode)){
-                    operationTested.add(responseCode.toString());
+    private JsonObject createJsonObject(HashMap<Operation, Set<HttpStatusCode>> operationMap){
+        JsonObject jsonObject = new JsonObject();
+        for(Operation op : operationMap.keySet()) {
+            JsonArray codes = new JsonArray();
+            for (HttpStatusCode code : operationMap.get(op)) {
+                codes.add(code.toString());
+            }
+            jsonObject.add(op.toString(),codes);
+        }
+        return jsonObject;
+    }
+
+    private HashMap<Operation, Set<HttpStatusCode>> createNotTested(){
+        HashMap<Operation, Set<HttpStatusCode>> notTested = new HashMap<>();
+        for(Operation op : statusCodeToTest.keySet()){
+            boolean containsOperation = statusCodeDocumentedTested.containsKey(op);
+            for(HttpStatusCode code : statusCodeToTest.get(op)){
+                if(containsOperation){
+                    if(!statusCodeDocumentedTested.get(op).contains(code)){
+                        insertStatusCodeToSet(notTested,op,code);
+                    }
                 }else{
-                    operationNotTested.add(responseCode.toString());
+                    insertStatusCodeToSet(notTested,op,code);
                 }
             }
-            documented.add(op.toString(),operationDocumented);
-            tested.add(op.toString(),operationTested);
-            notTested.add(op.toString(),operationNotTested);
-
         }
-        report.add("documented",documented);
-        report.add("tested", tested);
-        report.add("notTested", notTested);
-        return report;
+        return notTested;
     }
 }

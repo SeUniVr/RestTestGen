@@ -360,6 +360,11 @@ public abstract class ParameterElement extends Taggable {
         return format;
     }
 
+    public void setFormat(ParameterTypeFormat format) {
+        // FIXME: move set format to leaves to check that type matches the format
+        this.format = format;
+    }
+
     public Operation getOperation() {
         return operation;
     }

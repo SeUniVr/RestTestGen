@@ -63,13 +63,7 @@ public class NominalAndErrorStrategy extends Strategy {
             sorter.removeFirst();
         }
 
-        try {
-            CoverageReportWriter coverageReportWriter = new CoverageReportWriter(TestRunner.getInstance().getCoverage());
-            coverageReportWriter.write();
-        } catch (IOException e) {
-            logger.warn("Could not write Coverage report to file.");
-            e.printStackTrace();
-        }
+
 
 
         // Keep only successful test interactions in the sequence
@@ -79,5 +73,13 @@ public class NominalAndErrorStrategy extends Strategy {
 
         ErrorFuzzer errorFuzzer = new ErrorFuzzer(globalNominalTestSequence);
         errorFuzzer.generateTestSequences(5);
+
+        try {
+            CoverageReportWriter coverageReportWriter = new CoverageReportWriter(TestRunner.getInstance().getCoverage());
+            coverageReportWriter.write();
+        } catch (IOException e) {
+            logger.warn("Could not write Coverage report to file.");
+            e.printStackTrace();
+        }
     }
 }
