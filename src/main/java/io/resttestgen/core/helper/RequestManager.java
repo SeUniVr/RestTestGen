@@ -22,6 +22,7 @@ public class RequestManager {
     private final Operation operation;
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static final MediaType FORM = MediaType.parse("application/x-www-form-urlencoded");
 
     private static final Logger logger = LogManager.getLogger(RequestManager.class);
 
@@ -130,7 +131,18 @@ public class RequestManager {
                 operation.getMethod().equals(HttpMethod.PATCH)
         ) {
             if (operation.getRequestBody() != null) {
-                requestBody = RequestBody.create(operation.getRequestBody().getJSONString(), JSON);
+                if (operation.getRequestContentType().contains("application/x-www-form-urlencoded") &&
+                        operation.getRequestBody() instanceof ParameterObject) {
+                    Map<String, String> formParametersMap = new HashMap<>();
+                    ((ParameterObject) operation.getRequestBody()).getProperties().forEach(
+                            p -> formParametersMap.put(p.getName().toString(), p.getValueAsFormattedString())
+                    );
+                    StringJoiner formUrlEncoded = new StringJoiner("&");
+                    formParametersMap.values().forEach(formUrlEncoded::add);
+                    requestBody = RequestBody.create(formUrlEncoded.toString(), FORM);
+                } else {
+                    requestBody = RequestBody.create(operation.getRequestBody().getJSONString(), JSON);
+                }
             } else {
                 requestBody = RequestBody.create(new byte[0], null);
             }
@@ -187,12 +199,8 @@ public class RequestManager {
 
         // Add query parameters
         if (queryParametersMap.size() > 0) {
-            StringBuilder queryString = new StringBuilder();
-            String prefix = "";
-            for (String renderedParameter : queryParametersMap.values()) {
-                queryString.append(prefix).append(renderedParameter);
-                prefix = "&";
-            }
+            StringJoiner queryString = new StringJoiner("&");
+            queryParametersMap.values().forEach(queryString::add);
             httpBuilder.query(queryString.toString());
         }
 

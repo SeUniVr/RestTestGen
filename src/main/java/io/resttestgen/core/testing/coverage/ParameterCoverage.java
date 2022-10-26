@@ -20,8 +20,10 @@ public class ParameterCoverage extends Coverage {
     public ParameterCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
             Set<ParameterElementWrapper> parameters = new HashSet<>();
-            for(ParameterElement parameter: operation.getLeaves()){
-                parameters.add(new ParameterElementWrapper(parameter));
+            for(ParameterElement parameter: operation.getAllRequestParameters()){
+                if(parameter instanceof ParameterLeaf){
+                    parameters.add(new ParameterElementWrapper(parameter));
+                }
             }
             parametersToTest.put(operation, parameters);
         }
@@ -29,16 +31,16 @@ public class ParameterCoverage extends Coverage {
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
         Operation operation = testInteraction.getOperation();
-        for(ParameterLeaf parameter : operation.getLeaves()){
-            ParameterElementWrapper elementWrapper = new ParameterElementWrapper(parameter);
-            if (parameter.getConcreteValue() != null){
-                if(parametersToTest.containsKey(operation)){
-                    if(parametersToTest.get(operation).contains(elementWrapper)){
+        for (ParameterElement parameter : operation.getAllRequestParameters()) {
+            if (parameter instanceof ParameterLeaf) {
+                ParameterElementWrapper elementWrapper = new ParameterElementWrapper(parameter);
+                if (parametersToTest.containsKey(operation)) {
+                    if (parametersToTest.get(operation).contains(elementWrapper)) {
                         insertParameterToSet(parametersDocumentedTested, elementWrapper, operation);
-                    }else{
+                    } else {
                         insertParameterToSet(parametersNotDocumentedTested, elementWrapper, operation);
                     }
-                }else{
+                } else {
                     insertParameterToSet(parametersNotDocumentedTested, elementWrapper, operation);
                 }
             }

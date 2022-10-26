@@ -6,6 +6,8 @@ import io.resttestgen.core.datatype.parameter.NumberParameter;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.datatype.parameter.StringParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
+import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,6 +18,7 @@ import java.util.Optional;
 public class ConstraintViolationMutator extends Mutator {
 
     private static final Logger logger = LogManager.getLogger(ConstraintViolationMutator.class);
+    private static final ParameterValueProvider valueProvider = new RandomParameterValueProvider();
 
     @Override
     public boolean isParameterMutable(ParameterLeaf parameter) {
@@ -65,7 +68,10 @@ public class ConstraintViolationMutator extends Mutator {
     private void mutateEnum(ParameterLeaf parameter) {
         // Set a random value to the parameter (it is very unlikely that the generated value belongs to the enum values
         // FIXME: check that the generated value does not belong to the enum values
-        parameter.setValue(parameter.generateCompliantValue());
+        parameter.setValue(valueProvider.provideValueFor(parameter));
+
+        //TODO: remove: it is replaced by RandomValueProvider
+        //parameter.setValue(parameter.generateCompliantValue());
     }
 
     /**

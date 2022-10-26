@@ -52,7 +52,7 @@ public class Configuration {
         qualifiableNames.add("id");
         qualifiableNames.add("name");
 
-        projectDirectoryRoot = outputPath;
+        projectDirectoryRoot = null;
         packageName = null;
     }
 

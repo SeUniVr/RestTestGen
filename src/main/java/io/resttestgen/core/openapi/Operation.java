@@ -5,10 +5,13 @@ import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
+import kotlin.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Operation {
 
@@ -22,14 +25,19 @@ public class Operation {
     private Set<ParameterElement> pathParameters;
     private Set<ParameterElement> queryParameters;
     private Set<ParameterElement> cookieParameters;
+    private String requestContentType;
     private StructuredParameterElement requestBody;
 
     private final Map<String, StructuredParameterElement> outputParameters;
     private StructuredParameterElement responseBody;
 
     // Inter-parameter dependencies
-    private Set<ParameterName> allOrNone;
-    private Set<ParameterName> onlyOne;
+    private final List<Pair<String, String>> requires;
+    private final List<Set<ParameterName>> or;
+    private final List<Set<ParameterName>> onlyOne;
+    private final List<Set<ParameterName>> allOrNone;
+    private final List<Set<ParameterName>> zeroOrOne;
+    // TODO: support arithmetic/relational IPDs
 
     private boolean isReadOnly; // Field to avoid changes to template operation parsed from specification
 
@@ -46,8 +54,46 @@ public class Operation {
 
         this.outputParameters = new HashMap<>();
 
-        allOrNone = new HashSet<>();
-        onlyOne = new HashSet<>();
+        requires = new LinkedList<>();
+        or = new LinkedList<>();
+        onlyOne = new LinkedList<>();
+        allOrNone = new LinkedList<>();
+        zeroOrOne = new LinkedList<>();
+
+        ArrayList<String> interParameterDependencies = OpenAPIParser.safeGet(operationMap, "x-dependencies", ArrayList.class);
+        HashMap<String, List<Set<ParameterName>>> ipdTokenSetMapping = new HashMap<>();
+        ipdTokenSetMapping.put("Or", or);
+        ipdTokenSetMapping.put("OnlyOne", onlyOne);
+        ipdTokenSetMapping.put("AllOrNone", allOrNone);
+        ipdTokenSetMapping.put("ZeroOrOne", zeroOrOne);
+
+        // Parsing of IPDs
+        for (String dependency : interParameterDependencies) {
+            dependency = dependency.trim();
+            System.out.println(dependency);
+
+            // Requires IPDs
+            Pattern pattern = Pattern.compile("IF (.*) THEN (.*);");
+            Matcher matcher = pattern.matcher(dependency);
+            if (matcher.find()) {
+                requires.add(new Pair<>(matcher.group(1), matcher.group(2)));
+                continue;
+            }
+
+            // Set IPDs
+            for (String idpToken : ipdTokenSetMapping.keySet()) {
+                if (dependency.startsWith(idpToken + "(") && dependency.endsWith(");")) {
+                    dependency = dependency.substring(idpToken.length() + 1, dependency.length() - 2);
+                    List<Set<ParameterName>> currentIdp = ipdTokenSetMapping.get(idpToken);
+                    Set<ParameterName> currentIdpSet = new HashSet<>();
+                    String[] params = dependency.split(",");
+                    for (String param : params) {
+                        currentIdpSet.add(new ParameterName(param.trim()));
+                    }
+                    currentIdp.add(currentIdpSet);
+                }
+            }
+        }
 
         logger.debug("Fetching operation " + method + " " + endpoint);
 
@@ -91,6 +137,14 @@ public class Operation {
         Map<String, Object> requestBody = OpenAPIParser.safeGet(operationMap, "requestBody", LinkedTreeMap.class);
         Map<String, Object> content = OpenAPIParser.safeGet(requestBody, "content", LinkedTreeMap.class);
         Map<String, Object> jsonContent = OpenAPIParser.safeGet(content, "application/json", LinkedTreeMap.class);
+        if (!jsonContent.isEmpty()) {
+            this.requestContentType = "application/json";
+        } else {
+            jsonContent = OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+            if (!jsonContent.isEmpty()) {
+                this.requestContentType = "application/x-www-form-urlencoded";
+            }
+        }
         Map<String, Object> schema = OpenAPIParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
         if (!schema.isEmpty()) {
@@ -115,6 +169,9 @@ public class Operation {
             Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
             content = OpenAPIParser.safeGet(response, "content", LinkedTreeMap.class);
             jsonContent = OpenAPIParser.safeGet(content, "application/json", LinkedTreeMap.class);
+            if (jsonContent.isEmpty()) {
+                OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+            }
             schema = OpenAPIParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
             if (!schema.isEmpty()) {
@@ -184,6 +241,7 @@ public class Operation {
         cookieParameters = new HashSet<>();
         other.cookieParameters.forEach(p -> cookieParameters.add(p.deepClone(this, null)));
 
+        requestContentType = other.requestContentType;
         requestBody = other.requestBody != null ? other.requestBody.deepClone(this, null) : null;
         responseBody = other.responseBody != null ? other.responseBody.deepClone(this, null) : null;
 
@@ -191,8 +249,12 @@ public class Operation {
         other.outputParameters.forEach((key, value) ->
                 outputParameters.put(key, value.deepClone(this, null)));
 
-        allOrNone = new HashSet<>(other.allOrNone);
-        onlyOne = new HashSet<>(other.onlyOne);
+        requires = other.requires;
+        // FIXME: do sets have to be cloned element by element?
+        or = new LinkedList<>(other.or);
+        onlyOne = new LinkedList<>(other.onlyOne);
+        allOrNone = new LinkedList<>(other.allOrNone);
+        zeroOrOne = new LinkedList<>(other.zeroOrOne);
 
         isReadOnly = false;
     }
@@ -214,8 +276,8 @@ public class Operation {
     }
 
     /**
-     * Return all the parameter elements in the request
-     * @return
+     * Return all the parameter elements in the request.
+     * @return all the parameter elements in the request.
      */
     public Collection<ParameterElement> getAllRequestParameters() {
         Set<ParameterElement> parameters = new HashSet<>();
@@ -286,6 +348,26 @@ public class Operation {
 
     public StructuredParameterElement getResponseBody() {
         return responseBody;
+    }
+
+    public List<Pair<String, String>> getRequires() {
+        return requires;
+    }
+
+    public List<Set<ParameterName>> getOr() {
+        return or;
+    }
+
+    public List<Set<ParameterName>> getOnlyOne() {
+        return onlyOne;
+    }
+
+    public List<Set<ParameterName>> getAllOrNone() {
+        return allOrNone;
+    }
+
+    public List<Set<ParameterName>> getZeroOrOne() {
+        return zeroOrOne;
     }
 
     public Collection<ParameterLeaf> getLeaves() {
@@ -549,6 +631,14 @@ public class Operation {
 
     public void setReadOnly() {
         this.isReadOnly = true;
+    }
+
+    public String getRequestContentType() {
+        return requestContentType;
+    }
+
+    public void setRequestContentType(String requestContentType) {
+        this.requestContentType = requestContentType;
     }
 
     @Override

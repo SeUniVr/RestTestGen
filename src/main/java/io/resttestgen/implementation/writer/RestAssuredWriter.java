@@ -1,5 +1,6 @@
 package io.resttestgen.implementation.writer;
 
+import io.resttestgen.core.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
@@ -17,6 +18,7 @@ public class RestAssuredWriter extends Writer {
 
     private final List<Operation> allOperation = new LinkedList<>();
     private int num;
+    private final Environment environment = Environment.getInstance();
     private int numSequence;
     public RestAssuredWriter(TestSequence testSequence) {
         super(testSequence);
@@ -33,7 +35,7 @@ public class RestAssuredWriter extends Writer {
     public void write() throws IOException {
 
         String path;
-        if(Objects.equals(configuration.getProjectDirectoryRoot(), configuration.getOutputPath())){
+        if(configuration.getProjectDirectoryRoot()==null){
             path = getOutputPath();
         }else{
             path = configuration.getProjectDirectoryRoot();
@@ -46,7 +48,7 @@ public class RestAssuredWriter extends Writer {
         File file = new File(path);
         file.mkdirs();
 
-        FileWriter writer = new FileWriter(path + getSuggestedFileName("java"));
+        FileWriter writer = new FileWriter(path + getSuggestedFileName("java").replaceAll("-","_"));
 
 
         String content = "";
@@ -106,16 +108,19 @@ public class RestAssuredWriter extends Writer {
 
     private String generateMainTestMethod(){
         StringBuilder content = new StringBuilder();
-        Environment environment = Environment.getInstance();
 
         //set baseURL from OpenAPI
         content.append("String baseURL =\"").append(environment.getOpenAPI().getServers().get(0)).append("\";\n\n");
 
+
+        //TODO: only on the last testInteraction or on all testInteractions ?
+
         // for all Test interaction generate method
-        for (TestInteraction testInteraction : testSequence) {
+        TestInteraction testInteraction = testSequence.getLast();
+        //for (TestInteraction testInteraction : testSequence) {
             content.append(generateTestMethod(testInteraction));
             this.num++;
-        }
+        //}
 
         //write main class Test
         content.append("\t@Test\n");
@@ -147,72 +152,96 @@ public class RestAssuredWriter extends Writer {
         writeOperation(content);
         content.append("\t\t//OPERATION 0\n");
         parametersInitialization(operation,content,0);
-        content.append("\t\tAssertions.assertFalse(response0.getStatusCode()>=500,\"The test sequence was not executed successfully.\");\n");
+        if(Objects.equals(testSequence.getGenerator(), "ErrorFuzzer")){
+            content.append("\t\tAssertions.assertFalse(response0.getStatusCode()<=299,\"StatusCode 2xx: The test sequence was not executed successfully.\");\n");
+        }
+        content.append("\t\tAssertions.assertFalse(response0.getStatusCode()>=500,\"StatusCode 5xx: The test sequence was not executed successfully.\");\n");
         //content.append("result0.getStatusCode().assertThat().statusCode(").append(operation.getOutputParameters().get("code")).append(");");
         content.append("\t}\n");
         return content.toString();
     }
 
 
-
-    private void parametersInitialization(Operation operation, StringBuilder content, int numOperation){
-
-        //take all leaves
-        Collection<ParameterLeaf> allParameters = operation.getLeaves();
-        if (allParameters.size() > 0) {
-            content.append("\t\t//Parameter initialization\n");
-        }
-        for(ParameterLeaf parameterLeaf: allParameters) {
-            if(parameterLeaf.getValue() instanceof ParameterLeaf) {
-                ParameterLeaf parameterLeafParent = (ParameterLeaf) parameterLeaf.getValue();
-                content.append("\t\tString ");
-                if(parameterLeaf.getLocation()==ParameterLocation.REQUEST_BODY || parameterLeaf.getLocation()==ParameterLocation.RESPONSE_BODY){
-                    content.append(buildVariableName("request",numOperation,"body",parameterLeaf.getName()));
-                }else{
-                    content.append(buildVariableName("request",numOperation,parameterLeaf.getLocation().toString(),parameterLeaf.getName()));
-                }
-                content.append(" = ");
-
-                //check if location of parameterLeaf is not RESPONSE_BODY
-                if(parameterLeafParent.getLocation()!=ParameterLocation.RESPONSE_BODY){
-                    if(parameterLeafParent.getLocation()!=ParameterLocation.REQUEST_BODY){
-                        content.append(buildVariableName("request",allOperation.indexOf(parameterLeafParent.getOperation()) + 1,parameterLeafParent.getLocation().toString(),parameterLeafParent.getName()));
-                    }else{
-                        content.append(buildVariableName("request",allOperation.indexOf(parameterLeafParent.getOperation()) + 1,"body",parameterLeafParent.getName()));
+    private void structuredParameterInitialization(StringBuilder content,ParameterElement parameter, String parentName){
+        if(parameter instanceof ParameterArray){
+            content.append("\t\tJSONArray ");
+            content.append(parentName).append(" = new JSONArray();\n");
+            int count = 0;
+            List<ParameterElement> childrenParameters = ((ParameterArray) parameter).getElements();
+            for(ParameterElement childParameter : childrenParameters) {
+                if (childParameter.getParent() == parameter) {
+                    String childName = parentName + "_" + childParameter.getName() + count;
+                    if (childParameter instanceof StructuredParameterElement) {
+                        structuredParameterInitialization(content, childParameter, childName);
                     }
+                    if (childParameter instanceof ParameterLeaf) {
+                        parameterLeafInitialization(content, childParameter, childName);
+                    }
+                    content.append("\t\t").append(parentName).append(".put(").append(childName).append(");\n");
+                    count++;
                 }
-                else{
-                    content.append("JsonPath.read(");
-                    content.append(buildVariableName("response",allOperation.indexOf(parameterLeafParent.getOperation()) + 1,"body",null));
-                    content.append(" , \"");
-                    content.append(parameterLeafParent.getJsonPath());
-                    content.append("\").toString()");
-                }
-                content.append(";\n");
-            }else {
-                content.append("\t\tString ");
-                if(parameterLeaf.getLocation()==ParameterLocation.REQUEST_BODY || parameterLeaf.getLocation()==ParameterLocation.RESPONSE_BODY){
-                    content.append(buildVariableName("request",numOperation,"body",parameterLeaf.getName()));
-                }else{
-                    content.append(buildVariableName("request",numOperation,parameterLeaf.getLocation().toString(),parameterLeaf.getName()));
-                }
-                content.append(" = \"").append(parameterLeaf.getValueAsFormattedString(ParameterStyle.SIMPLE)).append("\";\n");
             }
         }
-
-        //if request needs body
-        if(operation.getRequestBody()!=null && !operation.getRequestBody().isEmpty()){
-            content.append("\t\t//build bodyRequest\n");
+        if(parameter instanceof ParameterObject){
             content.append("\t\tJSONObject ");
-            content.append(buildVariableName("request",numOperation,"body",null));
-            content.append(" = new JSONObject();\n ");
-            for(ParameterLeaf parameterLeaf: allParameters){
-                if(parameterLeaf.getLocation()==ParameterLocation.REQUEST_BODY){
-                    content.append("\t\t");
-                    content.append(buildVariableName("request",numOperation,"body",null));
-                    content.append(".put(\"").append(parameterLeaf.getName()).append("\" , ");
-                    content.append(buildVariableName("request",numOperation,"body",parameterLeaf.getName()));
-                    content.append(");\n");
+            content.append(parentName).append(" = new JSONObject();\n");
+            List<ParameterElement> childrenParameters =((ParameterObject) parameter).getProperties();
+            for(ParameterElement childParameter : childrenParameters){
+                String childName =parentName+"_"+childParameter.getName();
+                    if(childParameter instanceof StructuredParameterElement){
+                        structuredParameterInitialization(content, childParameter, childName);
+                    }
+                    if(childParameter instanceof ParameterLeaf){
+                        parameterLeafInitialization(content,childParameter, childName);
+                    }
+                    content.append("\t\t").append(parentName).append(".put(\"").append(childParameter.getName()).append("\" , ").append(childName).append(");\n");
+            }
+        }
+    }
+
+    private void parameterLeafInitialization(StringBuilder content,ParameterElement parameter, String parentName){
+
+        content.append("\t\tObject ").append(parentName).append(" = ");
+        if(parameter.getValue() instanceof ParameterLeaf && !parameter.getTags().contains("mutated")) {
+            ParameterLeaf parameterRef= (ParameterLeaf) parameter.getValue();
+            //check if location of parameterLeaf is not RESPONSE_BODY
+            if(parameterRef.getLocation()!=ParameterLocation.RESPONSE_BODY){
+                content.append(buildVariableName("request",allOperation.indexOf(parameterRef.getOperation()) + 1,parameterRef.getLocation().toString(),parameterRef.getName()));
+            }
+            else{
+                content.append("JsonPath.read(");
+                content.append(buildVariableName("response",allOperation.indexOf(parameterRef.getOperation()) + 1,parameterRef.getLocation().toString(),null));
+                content.append(" , \"");
+                content.append(parameterRef.getJsonPath());
+                content.append("\")");
+            }
+            content.append(";\n");
+        }else {
+            if(parameter.getValue()!=null){
+                if(parameter.getValue() instanceof String){
+                    content.append("\"").append(parameter.getValueAsFormattedString(ParameterStyle.SIMPLE)).append("\";\n");
+                }else{
+                    content.append(parameter.getValueAsFormattedString(ParameterStyle.SIMPLE)).append(";\n");
+                }
+            }else{
+                content.append("null").append(";\n");
+            }
+        }
+    }
+
+    private void parametersInitialization(Operation operation, StringBuilder content, int numOperation){
+        Set<ParameterElement> parameters = (Set<ParameterElement>) operation.getAllRequestParameters();
+
+        if (parameters.size() > 0) {
+            content.append("\t\t//Parameter initialization\n");
+        }
+        for(ParameterElement parameter : parameters){
+            if(parameter.getParent()==null){
+                if(parameter instanceof StructuredParameterElement){
+                    structuredParameterInitialization(content,parameter,buildVariableName("request",numOperation,parameter.getLocation().toString(),parameter.getName()));
+                }
+                if(parameter instanceof ParameterLeaf){
+                    parameterLeafInitialization(content,parameter, buildVariableName("request",numOperation,parameter.getLocation().toString(),parameter.getName()));
                 }
             }
         }
@@ -225,7 +254,12 @@ public class RestAssuredWriter extends Writer {
 
     private void buildRequest(StringBuilder content,Operation operation,int numOperation ){
         content.append("\t\t//Build request\n ");
-        content.append("\t\tRequestSpecification ").append(buildVariableName("request",numOperation,null,null)).append(" = RestAssured.given();\n");
+        content.append("\t\tRequestSpecification ").append(buildVariableName("request",numOperation,null,null)).append(" = RestAssured.given()");
+        AuthenticationInfo authInfo = environment.getAuthenticationInfo(0);
+        if(authInfo != null){
+            content.append(".header(\"Authorization\",\"").append(authInfo.getValue()).append("\")");
+        }
+        content.append(";\n");
         for(ParameterElement parameter: operation.getLeaves()){
             if(parameter.getLocation()!= ParameterLocation.REQUEST_BODY){
                 content.append("\t\t").append(buildVariableName("request",numOperation,null,null));
@@ -246,7 +280,7 @@ public class RestAssuredWriter extends Writer {
             }
         }
         if(operation.getRequestBody()!=null && !operation.getRequestBody().isEmpty()){
-            content.append("\t\t").append(buildVariableName("request",numOperation,null,null)).append(".contentType(ContentType.JSON).body(").append(buildVariableName("request",numOperation,"body",null)).append(".toString());\n");
+            content.append("\t\t").append(buildVariableName("request",numOperation,null,null)).append(".contentType(ContentType.JSON).body(").append(buildVariableName("request",numOperation,"request_body",null)).append(".toString());\n");
         }
         content.append("\t\t//Build Response\n");
         content.append("\t\tResponse ").append(buildVariableName("response",numOperation,null,null)).append(" = ").append(buildVariableName("request",numOperation,null,null));
@@ -255,7 +289,7 @@ public class RestAssuredWriter extends Writer {
         //extract body as String
         if(operation.getResponseBody()!=null && !operation.getResponseBody().isEmpty()){
             content.append("\t\tString ");
-            content.append(buildVariableName("response",numOperation,"body",null));
+            content.append(buildVariableName("response",numOperation,"response_body",null));
             content.append(" = ");
             content.append(buildVariableName("response",numOperation,null,null)).append(".getBody().asString();\n\n");
         }
@@ -281,13 +315,18 @@ public class RestAssuredWriter extends Writer {
         for(int count = allOperation.size();count>0;count--){
             content.append("\t\t//OPERATION ").append(count).append("\n");
             parametersInitialization(allOperation.get(count-1),content,count);
+            content.append("\t\tAssertions.assertTrue(response").append(count).append(".getStatusCode()<=299,\"StatusCode not 2xx for previous operation.\");\n");
         }
     }
 
     private String buildVariableName(String operation, int numOperation, String location, ParameterName parameterName){
         if(location!=null){
             if(parameterName!=null){
-                return operation+numOperation+"_"+location.toLowerCase()+"_"+parameterName;
+                if(!Objects.equals(parameterName.toString(), "")){
+                    return operation+numOperation+"_"+location.toLowerCase()+"_"+parameterName;
+                }else{
+                    return operation+numOperation+"_"+location.toLowerCase();
+                }
             }
             return operation+numOperation+"_"+location.toLowerCase();
         }

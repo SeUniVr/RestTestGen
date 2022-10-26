@@ -1,7 +1,6 @@
 package io.resttestgen.implementation.strategy;
 
 import io.resttestgen.core.openapi.Operation;
-import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.Strategy;
 import io.resttestgen.core.testing.TestRunner;
 import io.resttestgen.core.testing.TestSequence;
@@ -58,7 +57,6 @@ public class NominalAndErrorStrategy extends Strategy {
                     e.printStackTrace();
                 }
             }
-            numSequence++;
             globalNominalTestSequence.append(nominalSequences);
             sorter.removeFirst();
         }

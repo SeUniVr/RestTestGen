@@ -296,6 +296,24 @@ public abstract class ParameterElement extends Taggable {
         return defaultValue;
     }
 
+    public boolean setDefaultValue(Object defaultValue) {
+        if (operation.isReadOnly()) {
+            throw new EditReadOnlyOperationException(operation);
+        }
+        if (this.isObjectTypeCompliant(defaultValue)) {
+            this.defaultValue = defaultValue;
+        } else {
+            try {
+                this.defaultValue = ObjectHelper.castToParameterValueType(defaultValue, this.type);
+                logger.warn("Example value '" + defaultValue + castedWarn);
+            } catch (ClassCastException e) {
+                logger.warn("Example value '" + defaultValue + discardedWarn);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Set<Object> getEnumValues() {
         if (operation.isReadOnly()) {
             return Collections.unmodifiableSet(enumValues);

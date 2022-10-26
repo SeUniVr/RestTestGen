@@ -52,8 +52,9 @@ public abstract class ParameterLeaf extends ParameterElement {
 
         String encodedValue = getConcreteValue().toString();
 
-        // Encode only path parameters
-        if (this.getLocation() == ParameterLocation.PATH) {
+        // Encode only path parameters or body parameters in x-www-form-urlencoded
+        if (this.getLocation() == ParameterLocation.PATH || (this.getLocation() == ParameterLocation.REQUEST_BODY &&
+                this.getOperation().getRequestContentType().contains("application/x-www-form-urlencoded"))) {
             encodedValue = URLEncoder.encode(encodedValue, StandardCharsets.UTF_8);
         }
 
@@ -119,7 +120,8 @@ public abstract class ParameterLeaf extends ParameterElement {
         this.value = null;
     }
 
-    public abstract Object generateCompliantValue();
+    //TODO: remove: it is replaced by RandomValueProvider
+    //public abstract Object generateCompliantValue();
 
     /**
      * Replaces self with another leaf.
@@ -246,7 +248,6 @@ public abstract class ParameterLeaf extends ParameterElement {
         return new LinkedList<>();
     }
 
-    //TODO: remove for parametersCoverage (why?)
     @Override
     public boolean remove() {
 
@@ -276,6 +277,7 @@ public abstract class ParameterLeaf extends ParameterElement {
         return false;
     }
 
+    /* TODO: remove
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -286,6 +288,7 @@ public abstract class ParameterLeaf extends ParameterElement {
         }
         return false;
     }
+*/
 
     /**
      * Return a parameter element according to its JSON path.

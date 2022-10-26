@@ -188,6 +188,7 @@ public class NumberParameter extends ParameterLeaf {
         return Number.class.isAssignableFrom(o.getClass());
     }
 
+    /* TODO: remove: it is replaced by RandomValueProvider
     @Override
     public Object generateCompliantValue() {
 
@@ -263,11 +264,12 @@ public class NumberParameter extends ParameterLeaf {
                 generatedValue = random.nextDouble();
                 break;
         }
-
+        this.value=generatedValue;
         logger.debug("Generated numeric value for parameter " + normalizedName + " (" + name + "): " + generatedValue);
 
         return generatedValue;
     }
+    */
 
     /**
      * Infers a format from format, type, and name of the parameter.

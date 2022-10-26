@@ -1,6 +1,9 @@
 package io.resttestgen.core.helper;
 
 import com.google.common.io.Resources;
+import io.resttestgen.core.Environment;
+import io.resttestgen.core.dictionary.Dictionary;
+import io.resttestgen.core.dictionary.DictionaryEntry;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
 
@@ -66,8 +69,15 @@ public class ExtendedRandom extends Random {
     public String nextString(int length) {
         int p = nextInt(100);
 
-        if (p < 60) {
+        if (p < 50) {
             return nextWord(length);
+        } else if (p < 60) {
+            String dictionaryValue = nextGlobalDictionaryEntry(length);
+            if (dictionaryValue == null) {
+                return nextWord(length);
+            } else {
+                return dictionaryValue;
+            }
         } else if (p < 70) {
             return nextPhrase(length);
         } else if (p < 72) {
@@ -178,6 +188,12 @@ public class ExtendedRandom extends Random {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    public String nextGlobalDictionaryEntry(int length) {
+        Dictionary globalDictionary = Environment.getInstance().getGlobalDictionary();
+        Optional<DictionaryEntry> chosenEntry = nextElement(globalDictionary.getEntriesByValueLength(length));
+        return chosenEntry.map(dictionaryEntry -> dictionaryEntry.getValue().toString()).orElse(null);
     }
 
     /**

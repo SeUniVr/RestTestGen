@@ -6,8 +6,13 @@ public class ParameterName {
 
     private final String parameterName;
 
+    /**
+     * String that can only contains parameter names. The input string is trimmed because parameter named do not support
+     * spaces anyway, and trimmed values are more convenient for hashcode() and equals() methods.
+     * @param parameterName the name of the parameter as string. Will be trimmed.
+     */
     public ParameterName(String parameterName) {
-        this.parameterName = parameterName;
+        this.parameterName = parameterName.trim();
     }
 
     private ParameterName(ParameterName other) {

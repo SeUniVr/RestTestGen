@@ -154,6 +154,7 @@ public class StringParameter extends ParameterLeaf {
         return String.class.isAssignableFrom(o.getClass());
     }
 
+    /*TODO: remove: it is replaced by RandomValueProvider
     @Override
     public Object generateCompliantValue() {
 
@@ -225,17 +226,18 @@ public class StringParameter extends ParameterLeaf {
             }
         }
 
+        this.value=generatedString;
         logger.debug("Generated string value for parameter " + normalizedName + " (" + name + "): " + generatedString);
 
         // Returns the value
         return generatedString;
-    }
+    }*/
 
     /**
      * Infers a format from format, type, and name of the parameter.
      * @return the inferred format.
      */
-    private ParameterTypeFormat inferFormat() {
+    public ParameterTypeFormat inferFormat() {
 
         ExtendedRandom random = Environment.getInstance().getRandom();
 

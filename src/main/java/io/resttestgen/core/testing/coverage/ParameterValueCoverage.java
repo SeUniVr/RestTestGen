@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.datatype.parameter.ParameterType;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Coverage;
@@ -23,19 +24,21 @@ public class ParameterValueCoverage extends Coverage {
     public ParameterValueCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
             HashMap<ParameterElementWrapper,Set<Object>> newMapParameters = new HashMap<>();
-            for(ParameterElement parameter : operation.getLeaves()){
-                ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
-                Set<Object> values = new HashSet<>();
-                if(parameter.getType() == ParameterType.BOOLEAN){
-                    values.add(true);
-                    values.add(false);
-                }
-                if(parameter.isEnum()){
-                    values.add(parameter.getEnumValues());
-                }
-                if(!values.isEmpty()){
-                    newMapParameters.put(parameterWrapper,values);
-                    valuesToTest.put(operation,newMapParameters);
+            for(ParameterElement parameter : operation.getAllRequestParameters()){
+                if(parameter instanceof ParameterLeaf){
+                    ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
+                    Set<Object> values = new HashSet<>();
+                    if(parameter.getType() == ParameterType.BOOLEAN){
+                        values.add(true);
+                        values.add(false);
+                    }
+                    if(parameter.isEnum()){
+                        values.addAll(parameter.getEnumValues());
+                    }
+                    if(!values.isEmpty()){
+                        newMapParameters.put(parameterWrapper,values);
+                        valuesToTest.put(operation,newMapParameters);
+                    }
                 }
             }
         }
@@ -44,24 +47,25 @@ public class ParameterValueCoverage extends Coverage {
     public void updateCoverage(TestInteraction testInteraction) {
         Operation operation = testInteraction.getOperation();
         boolean containsOperation = valuesToTest.containsKey(operation);
-        for(ParameterElement parameter : operation.getLeaves()) {
-            ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
-            if(parameter.getType()== ParameterType.BOOLEAN || parameter.isEnum()){
-                if(containsOperation){
-                    if(valuesToTest.get(operation).containsKey(parameterWrapper)){
-                        if(valuesToTest.get(operation).get(parameterWrapper).contains(parameterWrapper.getParameterElement().getValue())) {
-                            insertParameterValueToSet(valuesDocumentedTested, operation, parameterWrapper, parameter.getValue());
+        for(ParameterElement parameter : operation.getAllRequestParameters()) {
+            if(parameter instanceof ParameterLeaf){
+                ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
+                if(parameter.getType()== ParameterType.BOOLEAN || parameter.isEnum()){
+                    if(containsOperation){
+                        if(valuesToTest.get(operation).containsKey(parameterWrapper)){
+                            if(valuesToTest.get(operation).get(parameterWrapper).contains(((ParameterLeaf)parameterWrapper.getParameterElement()).getConcreteValue())) {
+                                insertParameterValueToSet(valuesDocumentedTested, operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
+                            }else{
+                                insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
+                            }
                         }else{
-                            insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, parameterWrapper.getParameterElement().getValue());
+                            insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
                         }
                     }else{
-                        insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, parameter.getValue());
+                        insertParameterValueToSet(valuesNotDocumentedTested, operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
                     }
-                }else{
-                    insertParameterValueToSet(valuesNotDocumentedTested, operation, parameterWrapper, parameter.getValue());
                 }
             }
-
         }
     }
 
@@ -133,7 +137,11 @@ public class ParameterValueCoverage extends Coverage {
             for(ParameterElementWrapper parameter : operationsMap.get(op).keySet()){
                 JsonArray values = new JsonArray();
                 for(Object value : operationsMap.get(op).get(parameter)){
-                    values.add(value.toString());
+                    if(value != null){
+                        values.add(value.toString());
+                    }else{
+                        values.add("null");
+                    }
                 }
                 jsonObjectOperation.add(parameter.toString(),values);
             }

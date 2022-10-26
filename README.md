@@ -22,6 +22,16 @@ A framework for automated black-box testing of RESTful APIs.
 
 ---
 
+## Changelog
+### v22.10
+- Added support for basic inter-parameter dependencies (as defined by Martin-Lopez et al.) such as requires, or, onlyOne, allOrNone, zeroOrOne.
+- Added support for `application/x-www-form-urlencoded` request bodies.
+- Fixed mutation operators of error fuzzer
+- Fixed computation of coverage
+- Fixed REST-assured writer
+
+---
+
 ## Requirements
 - Java 11
 - Ubuntu, or other Linux distributions (RestTestGen was not tested on Windows)

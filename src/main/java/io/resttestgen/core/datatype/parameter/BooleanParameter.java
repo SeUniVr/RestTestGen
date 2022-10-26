@@ -83,18 +83,21 @@ public class BooleanParameter extends ParameterLeaf {
         return false;
     }
 
+    /* TODO: remove: it is replaced by RandomValueProvider
     @Override
     public Object generateCompliantValue() {
 
         // Generate random value
         Object generatedValue = Environment.getInstance().getRandom().nextBoolean();
 
+        this.value = generatedValue;
         // Log the generated value
         logger.debug("Generated boolean value for parameter " + normalizedName + " (" + name + "): " + generatedValue);
 
         // Return generated value
         return generatedValue;
     }
+    */
 
     /**
      * No arrays are available at this level. No underlying parameters are available in leaves.

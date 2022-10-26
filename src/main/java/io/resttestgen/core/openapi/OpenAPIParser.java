@@ -25,8 +25,8 @@ public class OpenAPIParser {
 
     /**
      * Constructor for creating an OpenAPI parser given an OpenAPI specification
-     * @param filePath Path to the OpenAPI specification file. If the given path does not exist throws
-     *                 a CannotParseOpenAPIException.
+     * @param filePath Path to the OpenAPI specification file. If the given path does not exist throws a
+     * CannotParseOpenAPIException.
      */
     public OpenAPIParser(Path filePath) throws CannotParseOpenAPIException {
         if (filePath == null || !Files.exists(filePath)) {
@@ -94,14 +94,14 @@ public class OpenAPIParser {
         // Read paths and create operations
         Map<String, Object> paths = (Map<String, Object>) this.openAPIMap.get("paths");
 
-        // fetch paths
+        // Fetch paths
         for (Map.Entry<String, Object> path : paths.entrySet()) {
 
             if (path.getKey().startsWith("x-")) {
                 continue;
             }
 
-            // fetch operations
+            // Fetch operations
             for (Map.Entry<String, Object> operation : ((Map<String, Object>) path.getValue()).entrySet()) {
 
                 if (operation.getKey().startsWith("x-")) {
@@ -125,7 +125,7 @@ public class OpenAPIParser {
      * for missing 'type' field
      */
     private void inferParameterTypes() {
-        logger.info("Inferring parameter types where missing..");
+        logger.info("Inferring parameter types where missing...");
 
         Map<String, Map<String, Map<String, Object>>> paths =
                 (Map<String, Map<String, Map<String, Object>>>) this.openAPIMap.get("paths");
@@ -142,8 +142,15 @@ public class OpenAPIParser {
 
                             Map<String, Object> requestBody = safeGet(operation, "requestBody", LinkedTreeMap.class);
                             Map<String, Object> content = safeGet(requestBody, "content", LinkedTreeMap.class);
-                            // At the moment support only json
+
+                            // At the moment we only support JSON and x-www-form-urlencoded
                             Map<String, Object> jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
+
+                            // In case no JSON content is provided, we try to use x-www-form-urlencoded content
+                            if (jsonContent.isEmpty()) {
+                                jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                            }
+
                             Map<String, Object> schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
                             if (!schema.isEmpty()) {
                                 recursiveTypeInference(schema);
@@ -154,8 +161,15 @@ public class OpenAPIParser {
                             for (Map.Entry<String, Object> responseMap : responses.entrySet()) {
                                 Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
                                 content = safeGet(response, "content", LinkedTreeMap.class);
-                                // currently support only json
+
+                                // At the moment we only support JSON and x-www-form-urlencoded
                                 jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
+
+                                // In case no JSON content is provided, we try to use x-www-form-urlencoded content
+                                if (jsonContent.isEmpty()) {
+                                    jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                                }
+
                                 schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
                                 if (!schema.isEmpty()) {
@@ -279,8 +293,15 @@ public class OpenAPIParser {
                 // Check for body parameters
                 Map<String, Object> requestBody = safeGet(operationMap, "requestBody", LinkedTreeMap.class);
                 Map<String, Object> content = safeGet(requestBody, "content", LinkedTreeMap.class);
-                // At the moment support only json
+
+                // At the moment we only support JSON and x-www-form-urlencoded
                 Map<String, Object> jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
+
+                // In case no JSON content is provided, we try to use x-www-form-urlencoded content
+                if (jsonContent.isEmpty()) {
+                    jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                }
+
                 Map<String, Object> schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
                 if (!schema.isEmpty()) {
@@ -296,8 +317,15 @@ public class OpenAPIParser {
                 for (Map.Entry<String, Object> responseMap : responses.entrySet()) {
                     Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
                     content = safeGet(response, "content", LinkedTreeMap.class);
-                    // currently support only json
+
+                    // At the moment we only support JSON and x-www-form-urlencoded
                     jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
+
+                    // In case no JSON content is provided, we try to use x-www-form-urlencoded content
+                    if (jsonContent.isEmpty()) {
+                        jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                    }
+
                     schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
                     if (!schema.isEmpty()) {
@@ -406,7 +434,7 @@ public class OpenAPIParser {
                         operationParameterSet.add(new Pair<>((String) parameter.get("name"), (String) parameter.get("in")))
                 );
 
-                // for each parameter if not duplicate, add to operation parameters
+                // For each parameter, if not duplicate, add to operation parameters
                 for (Map.Entry<Pair<String, String>, Map<String, Object>> parameter : parametersMap.entrySet()) {
                     if (!operationParameterSet.contains(parameter.getKey())) {
                         operationParameters.add(parameter.getValue());

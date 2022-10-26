@@ -57,4 +57,8 @@ public class Dictionary {
         return dictionary.stream().filter(e -> e.getParameterName().equals(parameterName) &&
                 e.getParameterType().equals(parameterType)).collect(Collectors.toList());
     }
+
+    public List<DictionaryEntry> getEntriesByValueLength(int length) {
+        return dictionary.stream().filter(e -> e.getValue().toString().length() == length).collect(Collectors.toList());
+    }
 }
