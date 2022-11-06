@@ -29,12 +29,11 @@ public class NominalAndErrorStrategy extends Strategy {
 
         // According to the order provided by the graph, execute the nominal fuzzer
         OperationsSorter sorter = new GraphBasedOperationsSorter();
-        int numSequence=0;
         while (!sorter.isEmpty()) {
             Operation operationToTest = sorter.getFirst();
             logger.debug("Testing operation " + operationToTest);
             NominalFuzzer nominalFuzzer = new NominalFuzzer(operationToTest);
-            List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(8);
+            List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(20);
 
             for (TestSequence testSequence : nominalSequences) {
 
@@ -50,7 +49,6 @@ public class NominalAndErrorStrategy extends Strategy {
                     ReportWriter reportWriter = new ReportWriter(testSequence);
                     reportWriter.write();
                     RestAssuredWriter restAssuredWriter = new RestAssuredWriter(testSequence);
-                    restAssuredWriter.setNumSequence(numSequence++);
                     restAssuredWriter.write();
                 } catch (IOException e) {
                     logger.warn("Could not write report to file.");
@@ -70,7 +68,7 @@ public class NominalAndErrorStrategy extends Strategy {
         //GraphTestCase.generateGraph(globalNominalTestSequence);
 
         ErrorFuzzer errorFuzzer = new ErrorFuzzer(globalNominalTestSequence);
-        errorFuzzer.generateTestSequences(5);
+        errorFuzzer.generateTestSequences(10);
 
         try {
             CoverageReportWriter coverageReportWriter = new CoverageReportWriter(TestRunner.getInstance().getCoverage());

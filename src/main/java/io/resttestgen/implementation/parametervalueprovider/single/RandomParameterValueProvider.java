@@ -24,7 +24,18 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
         } else if (parameterLeaf instanceof NullParameter) {
             return null;
         } else {
-            return generateCompliantString((StringParameter) parameterLeaf); //parameterLeaf.generateCompliantValue();
+            switch (random.nextInt(0, 5)) {
+                case 0:
+                    return random.nextString();
+                case 1:
+                    return random.nextInt();
+                case 2:
+                    return random.nextDouble(-100000., 100000.);
+                case 3:
+                    return random.nextBoolean();
+                default:
+                    return null;
+            }
         }
     }
 
@@ -91,6 +102,9 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                 case FISCAL_CODE:
                     // TODO Add Fiscal Code
                     generatedString = random.nextString(length);
+                    break;
+                case LOCATION:
+                    generatedString = random.nextLocation();
                     break;
                 default:
                     generatedString = random.nextString(length);
@@ -214,6 +228,13 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                 case UINT64:
                     min = 0;
                     break;
+                case LATITUDE:
+                    min = -90;
+                    max = 90;
+                    break;
+                case LONGITUDE:
+                    min = -180;
+                    max = 180;
             }
 
             // Set min and max value, if defined

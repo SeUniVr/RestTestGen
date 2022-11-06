@@ -151,6 +151,10 @@ public class OpenAPIParser {
                                 jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
                             }
 
+                            if (jsonContent.isEmpty()) {
+                                jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
+                            }
+
                             Map<String, Object> schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
                             if (!schema.isEmpty()) {
                                 recursiveTypeInference(schema);
@@ -168,6 +172,10 @@ public class OpenAPIParser {
                                 // In case no JSON content is provided, we try to use x-www-form-urlencoded content
                                 if (jsonContent.isEmpty()) {
                                     jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                                }
+
+                                if (jsonContent.isEmpty()) {
+                                    jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
                                 }
 
                                 schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
@@ -302,6 +310,10 @@ public class OpenAPIParser {
                     jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
                 }
 
+                if (jsonContent.isEmpty()) {
+                    jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
+                }
+
                 Map<String, Object> schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
                 if (!schema.isEmpty()) {
@@ -324,6 +336,10 @@ public class OpenAPIParser {
                     // In case no JSON content is provided, we try to use x-www-form-urlencoded content
                     if (jsonContent.isEmpty()) {
                         jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                    }
+
+                    if (jsonContent.isEmpty()) {
+                        jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
                     }
 
                     schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);

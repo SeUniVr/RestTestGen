@@ -846,7 +846,6 @@ public class TestParameters {
         assertEquals("null", nullApiKey.getValue());
         assertFalse(nullApiKey.isObjectTypeCompliant(new Object()));
         assertTrue(nullApiKey.isObjectTypeCompliant(null));
-        assertEquals("null", nullApiKey.generateCompliantValue());
         assertEquals(nullApiKey, nullApiKey.deepClone());
         assertEquals(nullApiKey, new NullParameter(new StringParameter(nullApiKey)));
     }

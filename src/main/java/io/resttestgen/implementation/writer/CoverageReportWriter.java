@@ -11,7 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class CoverageReportWriter{
-    private CoverageManager coverageManager;
+    private final CoverageManager coverageManager;
     private final Configuration configuration = Environment.getInstance().getConfiguration();
 
     public CoverageReportWriter(CoverageManager coverageManager){

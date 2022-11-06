@@ -69,13 +69,17 @@ public class NominalFuzzer extends Fuzzer {
 
         // Populate arrays. Use of cue to add to support concurrent modification of cue
         // TODO: support uniqueItems = true
-        // FIXME: all the elements of an array must be initialized, otherwise they could be removed and miss the min or
-        // max items number
         Collection<ParameterArray> arrays = editableOperation.getArrays();
         LinkedList<ParameterArray> queue = new LinkedList<>(arrays);
         while (!queue.isEmpty()) {
             ParameterArray array = queue.getFirst();
             int n = Environment.getInstance().getRandom().nextLength(array.getMinItems(), array.getMaxItems());
+
+            // Remove array with a 0.7 probability
+            if (random.nextInt(10) < 8) {
+                n = 0;
+            }
+
             for (int i = 0; i < n; i++) {
                 ParameterElement referenceElementCopy = array.getReferenceElement().deepClone();
                 array.addElement(referenceElementCopy);
@@ -91,7 +95,7 @@ public class NominalFuzzer extends Fuzzer {
 
             // Set value with 70% probability, if parameter is not mandatory or if it is not part of an array.
             // Null parameters will be removed by the request manager
-            if (leaf.isRequired() || Environment.getInstance().getRandom().nextInt(100) < 70 ||
+            if (leaf.isRequired() || random.nextInt(100) < 30 ||
                     (leaf.getParent() != null && leaf.getParent() instanceof ParameterArray)) {
                 leaf.setValue(parameterValueProvider.provideValueFor(leaf));
             }

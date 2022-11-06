@@ -177,4 +177,8 @@ public class TestExtendedRandom {
         }
     }
 
+    @Test
+    public void testLocation() {
+        System.out.println(random.nextLocation());
+    }
 }

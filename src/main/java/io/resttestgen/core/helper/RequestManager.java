@@ -105,8 +105,13 @@ public class RequestManager {
                     pathParameters.stream().filter(p -> p.getName().toString().equals(parameterName)).findFirst();
 
             if (pathParameter.isPresent()) {
-                endpoint = endpoint.replaceFirst("\\{" + parameterName + "\\}",
-                        pathParameter.get().getValueAsFormattedString());
+                try {
+                    endpoint = endpoint.replaceFirst("\\{" + parameterName + "\\}",
+                            pathParameter.get().getValueAsFormattedString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.warn("Could not apply path parameter");
+                }
             }
         }
 

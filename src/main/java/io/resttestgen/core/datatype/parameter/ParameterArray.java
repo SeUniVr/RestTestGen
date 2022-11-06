@@ -45,26 +45,27 @@ public class ParameterArray extends StructuredParameterElement {
                 schema :
                 (Map<String, Object>) schema.get("schema");
 
-        Map<String, Object> items = (Map<String, Object>) targetSource.get("items");
-        try {
-            items.put("in", getLocation().toString());
-            referenceElement = ParameterFactory.getParameterElement(this, items, operation, getNormalizedName().toString());
+        if (targetSource != null) {
+            Map<String, Object> items = (Map<String, Object>) targetSource.get("items");
+            try {
+                items.put("in", getLocation().toString());
+                referenceElement = ParameterFactory.getParameterElement(this, items, operation, getNormalizedName().toString());
 
-            // Propagate example values to children
-            for (Object example : super.examples) {
-                List<Object> exampleItems = (List<Object>) example;
-                for (Object item : exampleItems) {
-                    referenceElement.addExample(item);
+                // Propagate example values to children
+                for (Object example : super.examples) {
+                    List<Object> exampleItems = (List<Object>) example;
+                    for (Object item : exampleItems) {
+                        referenceElement.addExample(item);
+                    }
                 }
+
+            } catch (UnsupportedSpecificationFeature e) {
+                throw new ParameterCreationException("Unable to parse reference element for property \"" + name +
+                        "\" (normalized as: \"" + name + "\") " +
+                        "due to an unsupported feature in OpenAPI specification.");
+
             }
-
-        } catch (UnsupportedSpecificationFeature e) {
-            throw new ParameterCreationException("Unable to parse reference element for property \"" + name +
-                    "\" (normalized as: \"" + name + "\") " +
-                    "due to an unsupported feature in OpenAPI specification.");
-
         }
-
     }
 
     private ParameterArray(ParameterArray other) {
@@ -164,6 +165,10 @@ public class ParameterArray extends StructuredParameterElement {
 
     public ParameterElement getReferenceElement() {
         return this.referenceElement;
+    }
+
+    public void setReferenceElement(ParameterElement referenceElement) {
+        this.referenceElement = referenceElement;
     }
 
     @Override
@@ -511,7 +516,9 @@ public class ParameterArray extends StructuredParameterElement {
     public Collection<ParameterElement> getAllParameters() {
         HashSet<ParameterElement> parameters = new HashSet<>();
         parameters.add(this);
-        parameters.addAll(referenceElement.getAllParameters());
+        if (referenceElement != null) {
+            parameters.addAll(referenceElement.getAllParameters());
+        }
         elements.forEach(e -> parameters.addAll(e.getAllParameters()));
         return parameters;
     }

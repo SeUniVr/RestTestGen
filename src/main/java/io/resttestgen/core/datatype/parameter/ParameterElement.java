@@ -28,9 +28,9 @@ public abstract class ParameterElement extends Taggable {
     protected boolean required;
     protected ParameterType type;
     protected ParameterTypeFormat format;
-    private final ParameterLocation location; // Position of the parameter (e.g. path, header, query, etc. )
+    private ParameterLocation location; // Position of the parameter (e.g. path, header, query, etc. )
     private ParameterStyle style;
-    private final boolean explode;
+    private boolean explode;
 
     protected Object defaultValue;
     protected Set<Object> enumValues;
@@ -222,6 +222,77 @@ public abstract class ParameterElement extends Taggable {
     public abstract boolean remove();
 
     /**
+     * To replace a parameter with another one.
+     * @param newParameter the new parameter to put.
+     * @return true if the replacement could be completed.
+     */
+    public boolean replace(ParameterElement newParameter) {
+
+        newParameter.setOperation(this.getOperation());
+        newParameter.setParent(this.getParent());
+        newParameter.setLocation(this.getLocation());
+
+        // If the leaf has no parent (it is a root)
+        if (getParent() == null) {
+            switch (getLocation()) {
+                case REQUEST_BODY:
+                    if (this == getOperation().getRequestBody()) {
+                        if (newParameter instanceof StructuredParameterElement) {
+                            getOperation().setRequestBody((StructuredParameterElement) newParameter);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    break;
+                case RESPONSE_BODY:
+                    if (this == getOperation().getResponseBody()) {
+                        if (newParameter instanceof StructuredParameterElement) {
+                            getOperation().setResponseBody((StructuredParameterElement) newParameter);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    break;
+                case QUERY:
+                    if (getOperation().getQueryParameters().contains(this)) {
+                        return getOperation().getQueryParameters().remove(this) && getOperation().getQueryParameters().add(newParameter);
+                    }
+                    return false;
+                case PATH:
+                    if (getOperation().getPathParameters().contains(this)) {
+                        return getOperation().getPathParameters().remove(this) && getOperation().getQueryParameters().add(newParameter);
+                    }
+                    return false;
+                case HEADER:
+                    if (getOperation().getHeaderParameters().contains(this)) {
+                        return getOperation().getHeaderParameters().remove(this) && getOperation().getQueryParameters().add(newParameter);
+                    }
+                    return false;
+                case COOKIE:
+                    if (getOperation().getCookieParameters().contains(this)) {
+                        return getOperation().getCookieParameters().remove(this) && getOperation().getQueryParameters().add(newParameter);
+                    }
+                    return false;
+            }
+        }
+
+        // If the leaf is contained in a parent element (array or object), remove it from the parent
+        else {
+            if (getParent() instanceof ParameterArray) {
+                return ((ParameterArray) getParent()).getElements().remove(this) &&
+                        ((ParameterArray) getParent()).getElements().add(newParameter);
+            } else if (getParent() instanceof ParameterObject) {
+                return ((ParameterObject) getParent()).getProperties().remove(this) &&
+                ((ParameterArray) getParent()).getElements().add(newParameter);
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Function to check whether the object passed as parameter is compliant to the Parameter type.
      * Each ParameterElement subclass implements it checking the type against the one that it expects for its
      * values/enum values/examples/etc.
@@ -284,6 +355,18 @@ public abstract class ParameterElement extends Taggable {
 
     public ParameterStyle getStyle() {
         return style;
+    }
+
+    public void setStyle(ParameterStyle style) {
+        this.style = style;
+    }
+
+    public boolean isExplode() {
+        return explode;
+    }
+
+    public void setExplode(boolean explode) {
+        this.explode = explode;
     }
 
     public abstract boolean hasValue();
@@ -387,8 +470,16 @@ public abstract class ParameterElement extends Taggable {
         return operation;
     }
 
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
     public ParameterLocation getLocation() {
         return location;
+    }
+
+    public void setLocation(ParameterLocation location) {
+        this.location = location;
     }
 
     protected void setNormalizedName(NormalizedParameterName normalizedName) {
@@ -448,7 +539,10 @@ public abstract class ParameterElement extends Taggable {
         this.parent = parent;
 
         // Also update operation of the parameter, to match the one of the new parent
-        this.operation = parent.getOperation();
+        // FIXME: operation should be updated also when parent == null
+        if (parent != null) {
+            this.operation = parent.getOperation();
+        }
     }
 
     /**

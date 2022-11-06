@@ -332,6 +332,8 @@ public class StringParameter extends ParameterLeaf {
                 } else if (name.contains("sha-1") || name.endsWith("hash") || name.contains("md5") ||
                         name.contains("sha-256")) {
                     return ParameterTypeFormat.HASH;
+                } else if (name.endsWith("location")) {
+                    return ParameterTypeFormat.LOCATION;
                 }
                 return ParameterTypeFormat.MISSING;
         }

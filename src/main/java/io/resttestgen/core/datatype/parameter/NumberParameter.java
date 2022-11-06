@@ -179,13 +179,19 @@ public class NumberParameter extends ParameterLeaf {
 
     @Override
     public boolean isObjectTypeCompliant(Object o) {
+        // TODO: please test this method
         if (o == null) {
             return false;
         }
-        if (o instanceof NumberParameter) {
+        if (o instanceof NumberParameter || Number.class.isAssignableFrom(o.getClass())) {
             return true;
         }
-        return Number.class.isAssignableFrom(o.getClass());
+        try {
+            ObjectHelper.castToNumber(o);
+            return true;
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 
     /* TODO: remove: it is replaced by RandomValueProvider

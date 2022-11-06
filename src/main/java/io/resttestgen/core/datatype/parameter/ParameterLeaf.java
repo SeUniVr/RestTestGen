@@ -52,10 +52,15 @@ public abstract class ParameterLeaf extends ParameterElement {
 
         String encodedValue = getConcreteValue().toString();
 
-        // Encode only path parameters or body parameters in x-www-form-urlencoded
-        if (this.getLocation() == ParameterLocation.PATH || (this.getLocation() == ParameterLocation.REQUEST_BODY &&
-                this.getOperation().getRequestContentType().contains("application/x-www-form-urlencoded"))) {
+        // Encode body parameters in x-www-form-urlencoded
+        if (this.getLocation() == ParameterLocation.REQUEST_BODY &&
+                this.getOperation().getRequestContentType().contains("application/x-www-form-urlencoded")) {
             encodedValue = URLEncoder.encode(encodedValue, StandardCharsets.UTF_8);
+        }
+
+        // Remove slashes in path parameters
+        if (this.getLocation() == ParameterLocation.PATH) {
+            encodedValue = encodedValue.replaceAll("/", "").replaceAll("\\\\", "");
         }
 
         // If numeric value (double) is integer (not decimal), convert it to long to prevent the printing of .0
@@ -126,8 +131,9 @@ public abstract class ParameterLeaf extends ParameterElement {
     /**
      * Replaces self with another leaf.
      * @param newLeaf the new leaf.
+     * FIXME: commented out because implement in ParameterElement on 2022/10/31
      */
-    public boolean replace(ParameterLeaf newLeaf) {
+    /*public boolean replace(ParameterLeaf newLeaf) {
         ParameterElement parent = getParent();
         if (parent != null) {
             if (parent instanceof ParameterArray) {
@@ -169,7 +175,7 @@ public abstract class ParameterLeaf extends ParameterElement {
             }
         }
         return false;
-    }
+    }*/
 
     public String getJsonPath() {
 

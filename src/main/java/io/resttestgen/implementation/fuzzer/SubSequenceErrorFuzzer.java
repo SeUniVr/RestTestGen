@@ -16,14 +16,14 @@ import org.jgrapht.alg.util.Pair;
 import java.io.IOException;
 import java.util.*;
 
-public class ErrorFuzzer extends Fuzzer {
+public class SubSequenceErrorFuzzer extends Fuzzer {
 
     private static final Logger logger = LogManager.getLogger(Environment.class);
 
     private final TestSequence testSequenceToMutate;
     private final Set<Mutator> mutators;
 
-    public ErrorFuzzer(TestSequence testSequenceToMutate) {
+    public SubSequenceErrorFuzzer(TestSequence testSequenceToMutate) {
         this.testSequenceToMutate = testSequenceToMutate;
         mutators = new HashSet<>();
         mutators.add(new MissingRequiredMutator());
@@ -32,17 +32,17 @@ public class ErrorFuzzer extends Fuzzer {
     }
 
     public List<TestSequence> generateTestSequences(int numberOfSequences) {
-
         List<TestSequence> testSequences = new LinkedList<>();
-
-        // Iterate on interaction of test sequence
-        for (TestInteraction interaction : testSequenceToMutate) {
+        // Build up all the subsequences
+        for (int i = 1; i <= testSequenceToMutate.size(); i++) {
 
             // For each sequence, we generate n mutants for the last interaction
             for (int j = 0; j < numberOfSequences; j++) {
 
                 // Get clone of the subsequence
-                TestSequence currentTestSequence = new TestSequence(this, interaction.deepClone());
+                TestSequence currentTestSequence = testSequenceToMutate.getSubSequence(0, i).deepClone();
+                currentTestSequence.setGenerator(this);
+
 
                 // Get last interaction in the sequence
                 TestInteraction mutableInteraction = currentTestSequence.getLast();
@@ -104,5 +104,29 @@ public class ErrorFuzzer extends Fuzzer {
 
         // Return the list of test sequences
         return testSequences;
+    }
+
+    private void thoroughApplyMutations() {
+        // Compute all combinations of mutators applied to parameters
+        /*Set<Set<Pair<ParameterLeaf, Mutator>>> combinations = new HashSet<>();
+        for (int j = 1; j <= mutableParameters.size(); j++) {
+
+            // Get all combinations of a given size
+            Set<Set<Pair<ParameterLeaf, Mutator>>> allCombinations = Sets.combinations(mutableParameters, j);
+
+            // Remove combinations that apply mutations to the same parameter
+            combinations.addAll(allCombinations.stream().filter(c -> {
+                for (Pair<ParameterLeaf, Mutator> p1 : c) {
+                    Set<Pair<ParameterLeaf, Mutator>> c2 = new HashSet<>(c);
+                    c2.remove(p1);
+                    for (Pair<ParameterLeaf, Mutator> p2 : c2) {
+                        if (Objects.equals(p1.getFirst(), p2.getFirst())) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }).collect(Collectors.toSet()));
+        }*/
     }
 }

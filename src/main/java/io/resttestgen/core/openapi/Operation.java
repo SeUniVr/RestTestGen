@@ -27,6 +27,7 @@ public class Operation {
     private Set<ParameterElement> cookieParameters;
     private String requestContentType;
     private StructuredParameterElement requestBody;
+    private String requestBodyDescription;
 
     private final Map<String, StructuredParameterElement> outputParameters;
     private StructuredParameterElement responseBody;
@@ -135,6 +136,7 @@ public class Operation {
 
         // Check for body parameters
         Map<String, Object> requestBody = OpenAPIParser.safeGet(operationMap, "requestBody", LinkedTreeMap.class);
+        this.requestBodyDescription = OpenAPIParser.safeGet(requestBody, "description", String.class);
         Map<String, Object> content = OpenAPIParser.safeGet(requestBody, "content", LinkedTreeMap.class);
         Map<String, Object> jsonContent = OpenAPIParser.safeGet(content, "application/json", LinkedTreeMap.class);
         if (!jsonContent.isEmpty()) {
@@ -143,6 +145,11 @@ public class Operation {
             jsonContent = OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
             if (!jsonContent.isEmpty()) {
                 this.requestContentType = "application/x-www-form-urlencoded";
+            } else {
+                jsonContent = OpenAPIParser.safeGet(content, "*/*", LinkedTreeMap.class);
+                if (!jsonContent.isEmpty()) {
+                    this.requestContentType = "application/json";
+                }
             }
         }
         Map<String, Object> schema = OpenAPIParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
@@ -170,7 +177,10 @@ public class Operation {
             content = OpenAPIParser.safeGet(response, "content", LinkedTreeMap.class);
             jsonContent = OpenAPIParser.safeGet(content, "application/json", LinkedTreeMap.class);
             if (jsonContent.isEmpty()) {
-                OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                jsonContent = OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                if (jsonContent.isEmpty()) {
+                    jsonContent = OpenAPIParser.safeGet(content, "*/*", LinkedTreeMap.class);
+                }
             }
             schema = OpenAPIParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
@@ -243,6 +253,7 @@ public class Operation {
 
         requestContentType = other.requestContentType;
         requestBody = other.requestBody != null ? other.requestBody.deepClone(this, null) : null;
+        requestBodyDescription = other.requestBodyDescription;
         responseBody = other.responseBody != null ? other.responseBody.deepClone(this, null) : null;
 
         outputParameters = new HashMap<>();
@@ -344,6 +355,10 @@ public class Operation {
 
     public StructuredParameterElement getRequestBody() {
         return requestBody;
+    }
+
+    public String getRequestBodyDescription() {
+        return requestBodyDescription;
     }
 
     public StructuredParameterElement getResponseBody() {

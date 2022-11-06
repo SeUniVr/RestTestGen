@@ -13,16 +13,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RestAssuredWriter extends Writer {
 
+    // TODO : support Long Value with 'L'
+    private static final AtomicInteger nextSequenceId = new AtomicInteger(1);
+    private final int sequenceId = nextSequenceId.getAndIncrement();
     private final List<Operation> allOperation = new LinkedList<>();
-    private int num;
+    private int numberOfInteraction;
     private final Environment environment = Environment.getInstance();
-    private int numSequence;
+
     public RestAssuredWriter(TestSequence testSequence) {
         super(testSequence);
-        this.num=0;
+        this.numberOfInteraction=0;
     }
 
 
@@ -34,33 +38,22 @@ public class RestAssuredWriter extends Writer {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void write() throws IOException {
 
-        String path;
-        if(configuration.getProjectDirectoryRoot()==null){
-            path = getOutputPath();
-        }else{
-            path = configuration.getProjectDirectoryRoot();
-            path+= "/src/test/java/";
-            if(configuration.getPackageName()!=null){
-                path+=configuration.getPackageName().replaceAll("\\.","/") + "/" ;
-            }
-            path+=testSequence.getGenerator()+"/";
-        }
-        File file = new File(path);
+
+        StringBuilder path = new StringBuilder();
+        path.append(getOutputPath());
+        File file = new File(path.toString());
         file.mkdirs();
 
         FileWriter writer = new FileWriter(path + getSuggestedFileName("java").replaceAll("-","_"));
 
 
-        String content = "";
         //write imports
-        content += generateImport();
-        //write tests classes
-        content += generateClass();
-        //write mainClass
-        content += generateMainTestMethod();
-
-
-        content += "}\n";
+        String content = generateImport() +
+                //write tests classes
+                generateClass() +
+                //write mainClass
+                generateMainTestMethod() +
+                "}\n";
         writer.write(content);
 
 
@@ -70,15 +63,7 @@ public class RestAssuredWriter extends Writer {
 
 
     private String generateImport(){
-        String imports = "";
-
-        // Check for package name;
-        imports += "package ";
-        if(configuration.getPackageName()==null){
-            imports += testSequence.getGenerator()+ ";\n\n";
-        }else{
-            imports += configuration.getPackageName()+"."+testSequence.getGenerator()+ ";\n\n";
-        }
+        String imports = "package " + testSequence.getGenerator()+ ";\n\n";
 
         //utils imports
         imports +="import static io.restassured.RestAssured.*;\n"+
@@ -94,14 +79,14 @@ public class RestAssuredWriter extends Writer {
                 "import java.util.Map;\n"+
                 "import java.util.HashMap;\n"+
                 "import org.json.*;\n"+
-                "import org.junit.jupiter.api.*;\n"+ "//import org.junit.runners.*;\n\n";
-
+                "import org.junit.jupiter.api.*;\n"+
+                "//import org.junit.runners.*;\n\n";
         return imports;
     }
 
     private String generateClass(){
         String s = "//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)\n";
-        s += "@Order("+numSequence+")\n";
+        s += "@Order("+sequenceId+")\n";
         s += "public class " + testSequence.getName().replaceAll("-","_") +"{\n\n";
         return s;
     }
@@ -116,18 +101,18 @@ public class RestAssuredWriter extends Writer {
         //TODO: only on the last testInteraction or on all testInteractions ?
 
         // for all Test interaction generate method
-        TestInteraction testInteraction = testSequence.getLast();
-        //for (TestInteraction testInteraction : testSequence) {
+        // TestInteraction testInteraction = testSequence.getLast();
+        for (TestInteraction testInteraction : testSequence) {
             content.append(generateTestMethod(testInteraction));
-            this.num++;
-        //}
+            this.numberOfInteraction++;
+        }
 
         //write main class Test
         content.append("\t@Test\n");
         content.append("\tpublic void test_").append(testSequence.getName().replaceAll("-","_")).append("()  throws JSONException{\n");
 
 
-        for(int i=0; i<num;i++){
+        for( int i = 0; i < numberOfInteraction; i++){
             content.append("\t\ttest").append(i).append("();\n");
         }
 
@@ -146,7 +131,7 @@ public class RestAssuredWriter extends Writer {
         operationsInitialization(operation);
 
         //Test
-        content.append("\tprivate void test").append(this.num).append("() throws JSONException{\n");
+        content.append("\tprivate void test").append(this.numberOfInteraction).append("() throws JSONException{\n");
         //write method for get parameters
 
         writeOperation(content);
@@ -333,8 +318,5 @@ public class RestAssuredWriter extends Writer {
         return operation+numOperation;
     }
 
-    public void setNumSequence(int numSequence){
-        this.numSequence=numSequence;
-    }
 }
 

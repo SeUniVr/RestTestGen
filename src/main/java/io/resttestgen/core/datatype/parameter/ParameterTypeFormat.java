@@ -33,6 +33,9 @@ public enum ParameterTypeFormat {
     IBAN,
     SSN,
     FISCAL_CODE,
+    LATITUDE,
+    LONGITUDE,
+    LOCATION,
 
     MISSING,    // To codify missing format and increase fault tolerance
     UNKNOWN     // Unknown format. To increase fault tolerance

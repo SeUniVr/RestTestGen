@@ -215,12 +215,18 @@ public class ExtendedRandom extends Random {
     }
 
     /**
-     * Returns a random date and time (from 2000/01/01 inclusive to 2020/01/02 inclusive)
+     * Returns a random date and time (from 2000/01/01 inclusive to 2022/01/02 inclusive)
      * @return the date
      */
     public String nextDateTime() {
-        return nextDateTime(LocalDateTime.of(2000, 1, 1, 0, 0, 0),
-                LocalDateTime.of(2020, 1, 1, 0, 0, 0)); }
+        if (nextBoolean()) {
+            return nextDateTime(LocalDateTime.of(2000, 1, 1, 0, 0, 0),
+                    LocalDateTime.of(2022, 1, 1, 0, 0, 0));
+        } else {
+            // UNIX timestamp
+            return String.valueOf(System.currentTimeMillis() + nextLong(-100000L, 100000L));
+        }
+    }
 
     /**
      * Returns a random date and time between min and max
@@ -662,4 +668,15 @@ public class ExtendedRandom extends Random {
         return nextLong(start, end + 1);
     }
 
+    public double nextLatitude() {
+        return Double.parseDouble(String.format("%.8f", nextDouble(-90., 90.)));
+    }
+
+    public double nextLongitude() {
+        return Double.parseDouble(String.format("%.8f", nextDouble(-180., 180.)));
+    }
+
+    public String nextLocation() {
+        return nextLatitude() + "," + nextLongitude();
+    }
 }

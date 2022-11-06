@@ -28,8 +28,6 @@ public class Configuration {
     private String strategyName;
     private List<String> qualifiableNames;
     private String odgFileName;
-    private String projectDirectoryRoot;
-    private String packageName;
 
     /**
      * Initializes the default configuration
@@ -51,9 +49,6 @@ public class Configuration {
         qualifiableNames = new ArrayList<>();
         qualifiableNames.add("id");
         qualifiableNames.add("name");
-
-        projectDirectoryRoot = null;
-        packageName = null;
     }
 
     public Configuration(Boolean loadFromFile) {
@@ -73,8 +68,6 @@ public class Configuration {
                 this.strategyName = tempConfiguration.strategyName;
                 this.qualifiableNames = tempConfiguration.qualifiableNames;
                 this.odgFileName = tempConfiguration.odgFileName;
-                this.projectDirectoryRoot = tempConfiguration.projectDirectoryRoot;
-                this.packageName = tempConfiguration.packageName;
             } catch (IOException e) {
                 logger.warn("Could not read configuration from file. Using default configuration.");
             }
@@ -157,11 +150,4 @@ public class Configuration {
         this.odgFileName = odgFileName;
     }
 
-    public String getProjectDirectoryRoot() {
-        return projectDirectoryRoot;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
 }
