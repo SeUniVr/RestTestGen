@@ -29,6 +29,7 @@ public class ParameterFactory {
 
         // The type can be defined in the element map or in the schema defined in the element map, depending on
         // the kind of the parameter (request body/response body parameter vs. header/path/query/cookie parameter)
+        @SuppressWarnings("unchecked")
         Map<String, Object> targetMap = elementMap.containsKey("schema") ?
                 (Map<String, Object>) elementMap.get("schema") :
                 elementMap;

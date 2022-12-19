@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class OpenAPIParser {
 
     private static final String INVALID_SPEC = "Failed to load spec at '%s'";
@@ -55,12 +56,14 @@ public class OpenAPIParser {
      */
     public OpenAPI parse() throws InvalidOpenAPIException {
 
+        // The specification is invalid in case it does not contain servers or path properties
         if (!this.openAPIMap.containsKey("servers")) {
             throw new InvalidOpenAPIException("Missing 'servers' field.");
         }
         if (!this.openAPIMap.containsKey("paths")) {
             throw new InvalidOpenAPIException("Missing 'paths' field.");
         }
+
         /*
          * Add extension with schema names to enrich the specification and keep track of the specification fields
          * that have exactly the same schema
@@ -115,6 +118,21 @@ public class OpenAPIParser {
                 openAPI.addOperation(o);
             }
         }
+
+        // Finally, parse specification information
+        Map<String, Object> infoMap = safeGet(this.openAPIMap, "info", LinkedTreeMap.class);
+        Map<String, Object> contactMap = safeGet(infoMap, "contact", LinkedTreeMap.class);
+        Map<String, Object> licenseMap = safeGet(infoMap, "license", LinkedTreeMap.class);
+        openAPI.setTitle(safeGet(infoMap, "title", String.class));
+        openAPI.setSummary(safeGet(infoMap, "summary", String.class));
+        openAPI.setDescription(safeGet(infoMap, "description", String.class));
+        openAPI.setTermsOfService(safeGet(infoMap, "termsOfService", String.class));
+        openAPI.setContactName(safeGet(contactMap, "name", String.class));
+        openAPI.setContactUrl(safeGet(contactMap, "url", String.class));
+        openAPI.setContactEmail(safeGet(contactMap, "email", String.class));
+        openAPI.setLicenseName(safeGet(licenseMap, "name", String.class));
+        openAPI.setLicenseUrl(safeGet(licenseMap, "url", String.class));
+        openAPI.setVersion(safeGet(infoMap, "version", String.class));
 
         logger.info("Specification parsed.");
         return openAPI;
@@ -186,7 +204,6 @@ public class OpenAPIParser {
                             }
                         })
         );
-
     }
 
     /**
@@ -273,7 +290,7 @@ public class OpenAPIParser {
     private void unfoldRequiredAttributes() {
         Map<String, Object> paths = (Map<String, Object>) openAPIMap.get("paths");
 
-        // iterate through path items and look for 'parameters'
+        // Iterate through path items and look for 'parameters'
         for (Map.Entry<String, Object> pathItemMap : paths.entrySet()) {
 
             if (pathItemMap.getKey().startsWith("x-")) {

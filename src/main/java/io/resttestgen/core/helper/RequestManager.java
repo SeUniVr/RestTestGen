@@ -8,6 +8,7 @@ import io.resttestgen.core.openapi.Operation;
 import okhttp3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -371,7 +372,7 @@ public class RequestManager {
             Set<ParameterLeaf> leavesRequired = source.getRequestBody().getLeaves().stream()
                     .filter(ParameterElement::isRequired)
                     .collect(Collectors.toSet());
-            return (leavesRequired.size() <= 0 || operation.getRequestBody() != null) &&
+            return (leavesRequired.size() == 0 || operation.getRequestBody() != null) &&
                     operation.getRequestBody().getLeaves().containsAll(leavesRequired);
         }
 

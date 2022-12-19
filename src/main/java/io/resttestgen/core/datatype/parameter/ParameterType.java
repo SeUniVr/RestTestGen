@@ -50,4 +50,10 @@ public enum ParameterType {
                 return UNKNOWN;
         }
     }
+
+
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase();
+    }
 }

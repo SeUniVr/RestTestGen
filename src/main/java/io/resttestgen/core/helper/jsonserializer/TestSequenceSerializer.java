@@ -1,6 +1,7 @@
-package io.resttestgen.core.testing;
+package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
+import io.resttestgen.core.testing.TestSequence;
 
 import java.lang.reflect.Type;
 

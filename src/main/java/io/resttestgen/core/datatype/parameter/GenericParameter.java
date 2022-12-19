@@ -64,12 +64,6 @@ public class GenericParameter extends ParameterLeaf {
         return new GenericParameter(this, operation, parent);
     }
 
-    /* TODO: remove: it is replaced by RandomValueProvider
-    @Override
-    public Object generateCompliantValue() {
-        return null;
-    }*/
-
     /**
      * No arrays are available at this level. No underlying parameters are available in leaves.
      * @return an empty list

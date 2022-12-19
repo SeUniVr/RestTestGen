@@ -24,6 +24,7 @@ public class ParameterArray extends StructuredParameterElement {
 
     private static final Logger logger = LogManager.getLogger(ParameterArray.class);
 
+    @SuppressWarnings("unchecked")
     public ParameterArray(ParameterElement parent, Map<String, Object> schema, Operation operation, String name) {
         super(parent, schema, operation, name);
         elements = new LinkedList<>();
@@ -195,32 +196,6 @@ public class ParameterArray extends StructuredParameterElement {
     public boolean isEmpty() {
         return this.elements.isEmpty();
     }
-
-    // TODO: remove
-    /*@Override
-    public ParameterElement getElementByJsonPath(String jsonPath) {
-
-        String path = jsonPath.substring(jsonPath.indexOf("[")+1,jsonPath.indexOf("]"));
-        String remaining = jsonPath.substring(jsonPath.indexOf("]")+1);
-        ParameterElement parameter = this.elements.get(Integer.parseInt(path));
-        if(remaining.equals("")){
-            return parameter;
-        }else{
-            if(parameter instanceof ParameterLeaf){
-                return parameter;
-            }
-            if(parameter instanceof ParameterObject){
-                return ((ParameterObject) parameter).getElementByJsonPath(remaining);
-            }
-            if(parameter instanceof ParameterArray){
-                return ((ParameterArray) parameter).getElementByJsonPath(remaining);
-            }
-        }
-        return null;
-
-    }
-    */
-
 
     /**
      * This function only operates on elements in the instance element list. The reference item is only used as a
@@ -533,21 +508,6 @@ public class ParameterArray extends StructuredParameterElement {
 
         return combinedSchemas;
     }
-
-
-
-    /*@Override
-    public String getJsonPath() {
-        if (getParent() != null){
-            if (getParent() instanceof ParameterArray) {
-                return getParent().getJsonPath() +"[" +((ParameterArray) getParent()).indexOf(this)+ "]" ;
-            } else {
-                return this.getName().toString().isEmpty()? getParent().getJsonPath() : getParent().getJsonPath() +  "['" +getName().toString()+ "']";
-            }
-        } else {
-            return this.getName().toString().isEmpty()? "" :"['" +getName().toString()+ "']";
-        }
-    }*/
 
     /**
      * Return a parameter element according to its JSON path.

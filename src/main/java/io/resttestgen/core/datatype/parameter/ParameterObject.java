@@ -25,6 +25,7 @@ public class ParameterObject extends StructuredParameterElement {
 
     private static final Logger logger = LogManager.getLogger(ParameterObject.class);
 
+    @SuppressWarnings("unchecked")
     public ParameterObject(ParameterElement parent, Map<String, Object> schema, Operation operation, String name)  {
         super(parent, schema, operation, name);
         this.properties = new LinkedList<>();
@@ -408,35 +409,6 @@ public class ParameterObject extends StructuredParameterElement {
         return properties.isEmpty();
     }
 
-    // TODO: remove
-    /*@Override
-    public ParameterElement getElementByJsonPath(String jsonPath) {
-        String path = jsonPath.substring(jsonPath.indexOf("[")+2,jsonPath.indexOf("]")-1);
-        String remaining = jsonPath.substring(jsonPath.indexOf("]")+1);
-        if(remaining.equals("")){
-            for(ParameterElement property :this.properties){
-                    if(property.getName().toString().equalsIgnoreCase(path)){
-                        return property;
-                    }
-                }
-        }else{
-            for(ParameterElement property :this.properties){
-                if(property.getName().toString().equalsIgnoreCase(path)){
-                    if(property instanceof ParameterLeaf){
-                        return property;
-                    }
-                    if(property instanceof ParameterObject){
-                        return ((ParameterObject) property).getElementByJsonPath(remaining);
-                    }
-                    if(property instanceof ParameterArray){
-                        return ((ParameterArray) property).getElementByJsonPath(remaining);
-                    }
-                }
-            }
-        }
-        return null;
-    }*/
-
     @Override
     public void removeUninitializedParameters() {
         if (getOperation().isReadOnly()) {
@@ -578,23 +550,6 @@ public class ParameterObject extends StructuredParameterElement {
         }
         return elementPosition;
     }
-
-    // TODO: remove
-    /*@Override
-    public String getJsonPath() {
-        if (getParent() != null) {
-            if (getParent() instanceof ParameterArray) {
-                return getParent().getJsonPath() + "[" +((ParameterArray) getParent()).indexOf(this)+ "]";
-            } else {
-                return this.getName().toString().isEmpty() ?
-                        getParent().getJsonPath() :
-                        getParent().getJsonPath() +  "['" +getName().toString()+ "']";
-            }
-        } else {
-            return this.getName().toString().isEmpty()? "" :"['" +getName().toString()+ "']";
-        }
-
-    }*/
 
     /**
      * Return a parameter element according to its JSON path.

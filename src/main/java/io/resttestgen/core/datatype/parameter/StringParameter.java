@@ -26,6 +26,7 @@ public class StringParameter extends ParameterLeaf {
     public StringParameter(ParameterElement parent, Map<String, Object> parameterMap, Operation operation, String name) {
         super(parent, parameterMap, operation, name);
 
+        @SuppressWarnings("unchecked")
         Map<String, Object> sourceMap = parameterMap.containsKey("schema") ?
                 (Map<String, Object>) parameterMap.get("schema") :
                 parameterMap;
@@ -153,85 +154,6 @@ public class StringParameter extends ParameterLeaf {
         }
         return String.class.isAssignableFrom(o.getClass());
     }
-
-    /*TODO: remove: it is replaced by RandomValueProvider
-    @Override
-    public Object generateCompliantValue() {
-
-        ExtendedRandom random = Environment.getInstance().getRandom();
-
-        // Generate a random length according to the provided bounds
-        int length = random.nextLength(minLength, maxLength);
-
-        // Generate a random string in multiple format
-        String generatedString = random.nextString(length);
-
-        // Replace the generated string with the actual correct format in 90% of the cases
-        if (random.nextInt(10) < 9) {
-            switch (inferFormat()) {
-                case BYTE:
-                    generatedString = random.nextBase64();
-                    break;
-                case BINARY:
-                    generatedString = random.nextBinaryString();
-                    break;
-                case DATE:
-                    generatedString = random.nextDate();
-                    break;
-                case DATE_TIME:
-                    generatedString = random.nextDateTime();
-                    break;
-                case TIME:
-                    generatedString = random.nextTime();
-                    break;
-                case DURATION:
-                    generatedString = random.nextTimeDuration();
-                    break;
-                case PASSWORD:
-                    generatedString = random.nextRandomString(length);
-                    break;
-                case HOSTNAME:
-                    generatedString = random.nextDomain(true);
-                    break;
-                case URI:
-                    generatedString = random.nextURI();
-                    break;
-                case UUID:
-                    generatedString = random.nextUUID();
-                    break;
-                case IPV4:
-                    generatedString = random.nextIPV4();
-                    break;
-                case IPV6:
-                    generatedString = random.nextIPV6();
-                    break;
-                case EMAIL:
-                    generatedString = random.nextEmail();
-                    break;
-                case PHONE:
-                    generatedString = random.nextPhoneNumber();
-                    break;
-                case IBAN:
-                    generatedString = random.nextIBAN();
-                    break;
-                case SSN:
-                    generatedString = random.nextSSN();
-                    break;
-                case FISCAL_CODE:
-                    // TODO Add Fiscal Code
-                    generatedString = random.nextString(length);
-                    break;
-                default:
-                    generatedString = random.nextString(length);
-            }
-        }
-
-        this.value=generatedString;
-        logger.debug("Generated string value for parameter " + normalizedName + " (" + name + "): " + generatedString);
-
-        // Returns the value
-        return generatedString;
-    }*/
 
     /**
      * Infers a format from format, type, and name of the parameter.

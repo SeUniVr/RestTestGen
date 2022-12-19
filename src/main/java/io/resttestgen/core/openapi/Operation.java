@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Operation {
 
@@ -44,6 +45,7 @@ public class Operation {
 
     private static final Logger logger = LogManager.getLogger(Operation.class);
 
+    @SuppressWarnings("unchecked")
     public Operation(String endpoint, HttpMethod method, Map<String, Object> operationMap) throws InvalidOpenAPIException {
         this.endpoint = endpoint;
         this.method = method;
@@ -200,6 +202,7 @@ public class Operation {
             }
         }
 
+        // TODO: check if this code is required
         // Fill targetSchemas with the schemaNames found at the first level of depth
         /*this.targetSchemas.addAll(
                 pathParameters.stream().map(p -> p.getSchemaName())
@@ -287,10 +290,10 @@ public class Operation {
     }
 
     /**
-     * Return all the parameter elements in the request.
-     * @return all the parameter elements in the request.
+     * Return all the parameters in the request that are not in the body.,
+     * @return all the parameters in the request that are not in the body.,
      */
-    public Collection<ParameterElement> getAllRequestParameters() {
+    public Collection<ParameterElement> getAllRequestParametersNotInBody() {
         Set<ParameterElement> parameters = new HashSet<>();
 
         for (ParameterElement element : headerParameters) {
@@ -309,6 +312,19 @@ public class Operation {
             parameters.addAll(element.getAllParameters());
         }
 
+        return parameters;
+    }
+
+    /**
+     * Return all the parameter elements in the request.
+     * @return all the parameter elements in the request.
+     */
+    public Collection<ParameterElement> getAllRequestParameters() {
+
+        // Get all request parameters not in body
+        Collection<ParameterElement> parameters = getAllRequestParametersNotInBody();
+
+        // Add the parameters in the body, if any
         if (requestBody != null) {
             parameters.addAll(requestBody.getAllParameters());
         }
@@ -410,28 +426,6 @@ public class Operation {
         }
 
         return leaves;
-
-        // Old version by Amedeo
-        /*
-        List<ParameterLeaf> leaves = new LinkedList<>();
-        if (this.requestBody != null) {
-            leaves.addAll(this.requestBody.getLeaves());
-        }
-
-        List<ParameterElement> params = new LinkedList<>(this.headerParameters);
-        params.addAll(this.pathParameters);
-        params.addAll(this.cookieParameters);
-        params.stream().forEach(h -> {
-            if (h instanceof ParameterLeaf) {
-                leaves.add((ParameterLeaf) h);
-            } else if (h instanceof StructuredParameterElement) {
-                leaves.addAll(((StructuredParameterElement) h).getLeaves());
-            } else {
-                leaves.addAll(((CombinedSchemaParameter) h).getLeaves());
-            }
-        });
-
-        return leaves;*/
     }
 
     /**
@@ -533,18 +527,6 @@ public class Operation {
     // FIXME: add combined parameter management
     // The commented part is the old implementation. Newer implementation should work better
     public List<ParameterLeaf> getReferenceLeaves() {
-        /*Set<ParameterElement> parameters = new HashSet<>(pathParameters);
-        parameters.addAll(headerParameters);
-        parameters.addAll(queryParameters);
-        parameters.addAll(cookieParameters);
-
-        if (requestBody != null) {
-            parameters.addAll(requestBody.getLeaves());
-            requestBody.getArrays().forEach(parameterArray ->
-                    parameters.addAll(parameterArray.getReferenceElement().getLeaves()));
-        }
-
-        return parameters;*/
 
         List<ParameterLeaf> parameters = new LinkedList<>();
 
@@ -567,14 +549,19 @@ public class Operation {
         return outputParameters;
     }
 
-    public Set<ParameterElement> getFirstLevelInputParameters() {
-        Set<ParameterElement> firstLevelInputParameters = new HashSet<>();
-        firstLevelInputParameters.addAll(headerParameters);
-        firstLevelInputParameters.addAll(pathParameters);
-        firstLevelInputParameters.addAll(queryParameters);
-        firstLevelInputParameters.addAll(cookieParameters);
-        firstLevelInputParameters.addAll(getFirstLevelParameters(requestBody));
-        return firstLevelInputParameters;
+    public Collection<ParameterElement> getFirstLevelRequestParametersNotInBody() {
+        Collection<ParameterElement> parameters = new HashSet<>();
+        parameters.addAll(headerParameters);
+        parameters.addAll(pathParameters);
+        parameters.addAll(queryParameters);
+        parameters.addAll(cookieParameters);
+        return parameters;
+    }
+
+    public Collection<ParameterElement> getFirstLevelRequestParameters() {
+        Collection<ParameterElement> parameters = getFirstLevelRequestParametersNotInBody();
+        parameters.addAll(getFirstLevelParameters(requestBody));
+        return parameters;
     }
 
     public Set<ParameterElement> getFirstLevelOutputParameters() {
@@ -595,38 +582,34 @@ public class Operation {
         return firstLevelParameters;
     }
 
-    // FIXME: add combined parameter management
-    // The commented part is the old implementation. Newer implementation should work better
     public Set<ParameterElement> getOutputParametersSet() {
-         /*Set<ParameterElement> outParams = new HashSet<>();
-
-         for (StructuredParameterElement responseBody : outputParameters.values()) {
-             outParams.addAll(responseBody.getLeaves());
-             responseBody.getArrays().forEach(parameterArray ->
-                     outParams.addAll(parameterArray.getReferenceElement().getLeaves()));
-         }
-
-        return outParams;*/
         Set<ParameterElement> outParams = new HashSet<>();
-
         for (StructuredParameterElement responseBody : outputParameters.values()) {
             outParams.addAll(responseBody.getReferenceLeaves());
         }
-
         return outParams;
     }
 
-    public List<ParameterLeaf> searchInputParameterByNormalizedName(NormalizedParameterName normalizedParameterName) {
-        List<ParameterLeaf> foundParameters = new LinkedList<>();
-        getReferenceLeaves().forEach(p -> {
-            if (p.getNormalizedName().equals(normalizedParameterName)) {
+    public List<ParameterElement> searchRequestParametersByName(ParameterName parameterName) {
+        return getAllRequestParameters().stream().filter(p -> p.getName().equals(parameterName)).collect(Collectors.toList());
+    }
+
+    public List<ParameterElement> searchResponseParametersBydName(ParameterName parameterName) {
+        List<ParameterElement> foundParameters = new LinkedList<>();
+        getOutputParametersSet().forEach(p -> {
+            if (p.getName().equals(parameterName)) {
                 foundParameters.add(p);
             }
         });
         return foundParameters;
     }
 
-    public List<ParameterElement> searchOutputParameterByNormalizedName(NormalizedParameterName normalizedParameterName) {
+    // FIXME: check if all parameters can be used, rather than only reference leaves
+    public List<ParameterElement> searchReferenceRequestParametersByNormalizedName(NormalizedParameterName normalizedParameterName) {
+        return getReferenceLeaves().stream().filter(p -> p.getNormalizedName().equals(normalizedParameterName)).collect(Collectors.toList());
+    }
+
+    public List<ParameterElement> searchResponseParametersByNormalizedName(NormalizedParameterName normalizedParameterName) {
         List<ParameterElement> foundParameters = new LinkedList<>();
         getOutputParametersSet().forEach(p -> {
             if (p.getNormalizedName().equals(normalizedParameterName)) {

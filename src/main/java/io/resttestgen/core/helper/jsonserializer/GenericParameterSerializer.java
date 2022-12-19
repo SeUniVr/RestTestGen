@@ -1,0 +1,27 @@
+package io.resttestgen.core.helper.jsonserializer;
+
+import com.google.gson.*;
+import io.resttestgen.core.datatype.parameter.*;
+
+import java.lang.reflect.Type;
+
+public class GenericParameterSerializer implements JsonSerializer<GenericParameter> {
+
+    @Override
+    public JsonElement serialize(GenericParameter src, Type typeOfSrc, JsonSerializationContext context) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(ParameterObject.class, new ParameterObjectSerializer())
+                .registerTypeAdapter(ParameterArray.class, new ParameterArraySerializer())
+                .registerTypeAdapter(StringParameter.class, new StringParameterSerializer())
+                .registerTypeAdapter(NumberParameter.class, new NumberParameterSerializer())
+                .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())
+                .registerTypeAdapter(NullParameter.class, new NullParameterSerializer())
+                .registerTypeAdapter(GenericParameter.class, new GenericParameterSerializer())
+                .setPrettyPrinting()
+                .create();
+
+        JsonObject result = new JsonObject();
+        result.add("GenericParameter", gson.toJsonTree("GenericParameter"));
+        return result;
+    }
+}

@@ -17,7 +17,10 @@ import okio.Buffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.net.ssl.*;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,13 +37,12 @@ public class TestRunner {
     private static final Logger logger = LogManager.getLogger(TestRunner.class);
 
     private static TestRunner instance = null;
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client;
     private final List<ResponseProcessor> responseProcessors = new LinkedList<>();
     private final Set<HttpStatusCode> invalidStatusCodes = new HashSet<>();
     private static final int MAX_ATTEMPTS = 10;
     private AuthenticationInfo authenticationInfo = Environment.getInstance().getAuthenticationInfo(0);
-
-    private CoverageManager coverage = new CoverageManager();
+    private final CoverageManager coverage = new CoverageManager();
 
     /**
      * Constructor in which response processors are initialized and invalid status codes are defined. An invalid status
@@ -48,6 +50,34 @@ public class TestRunner {
      * external initializations.
      */
     private TestRunner() {
+        OkHttpClient client1;
+        try {
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            X509TrustManager TRUST_ALL_CERTS = new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                }
+
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new java.security.cert.X509Certificate[]{};
+                }
+            };
+            sslContext.init(null, new TrustManager[]{TRUST_ALL_CERTS}, new java.security.SecureRandom());
+
+            client1 = new OkHttpClient.Builder()
+                    .hostnameVerifier((hostname, session) -> true)
+                    .sslSocketFactory(sslContext.getSocketFactory(), TRUST_ALL_CERTS).build();
+
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            client1 = new OkHttpClient();
+            logger.warn("Could not instantiate OkHttp client to accept self-signed certificates. Using default client.");
+        }
+        client = client1;
         addResponseProcessor(new JsonParserResponseProcessor());
         addResponseProcessor(new DictionaryResponseProcessor());
         addResponseProcessor(new GraphResponseProcessor());
@@ -75,9 +105,8 @@ public class TestRunner {
 
     /**
      * Try to execute a test interaction with the API. Execution is retried in the case the server returned an invalid
-     * status code (eg. 429 too many requests). Execution is retried for a maximum number of attempts. Re-executions are
-     * delayed according to the "Retry-After" header of the response, or 10 seconds.
-     * FIXME: sleep in case of invalid status code
+     * status code (e.g., 429 too many requests). Execution is retried for a maximum number of attempts. Re-executions
+     * are delayed according to the "Retry-After" header of the response, or 10 seconds.
      * @param testInteraction the test interaction to execute.
      */
     @SuppressWarnings("BusyWait")

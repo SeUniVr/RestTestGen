@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,8 +50,7 @@ public class Environment {
      * @param configuration the provided configuration.
      */
     public void setUp(Configuration configuration) throws CannotParseOpenAPIException, InvalidOpenAPIException,
-            InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException,
-            IOException, InterruptedException {
+            IOException {
 
         this.configuration = configuration;
         NormalizedParameterName.setQualifiableNames(configuration.getQualifiableNames());
@@ -81,6 +79,7 @@ public class Environment {
         }
 
         try {
+            @SuppressWarnings("unchecked")
             Map<String, Object>[] maps = new Gson().fromJson(stringBuilder.toString(), Map[].class);
             this.authInfo = new LinkedList<>();
             for (Map<String, Object> map : maps) {

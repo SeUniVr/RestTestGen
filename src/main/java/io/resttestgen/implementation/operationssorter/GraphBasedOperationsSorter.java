@@ -91,8 +91,8 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
 
         Set<NormalizedParameterName> parametersInDictionary = new HashSet<>();
         for (NormalizedParameterName unsatisfiedParameter : unsatisfiedParameters) {
-            List<ParameterLeaf> foundParameters =
-                    node.getOperation().searchInputParameterByNormalizedName(unsatisfiedParameter);
+            List<ParameterLeaf> foundParameters = node.getOperation().searchReferenceRequestParametersByNormalizedName(unsatisfiedParameter)
+                    .stream().filter(p -> p instanceof ParameterLeaf).map(p -> (ParameterLeaf) p).collect(Collectors.toList());
             if (foundParameters.size() > 0) {
                 ParameterLeaf parameter = foundParameters.get(0);
                 if (provider.countAvailableValuesFor(parameter) > 0) {

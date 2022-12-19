@@ -58,12 +58,6 @@ public class NullParameter extends ParameterLeaf {
         return value == null || value.toString().equals("null") || value instanceof NullParameter;
     }
 
-    /* TODO: remove: it is replaced by RandomValueProvider
-    @Override
-    public Object generateCompliantValue() {
-        return "null";
-    }*/
-
     /**
      * No arrays are available at this level. No underlying parameters are available in leaves.
      * @return an empty list

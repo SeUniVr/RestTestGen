@@ -70,6 +70,7 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
 
     private void setupFields(Map<String, Object> parameterMap) {
         Operation operation = getOperation();
+        @SuppressWarnings("unchecked")
         List<Map<String, Object>> schemas = OpenAPIParser.safeGet(parameterMap, getKeyFiledName(), ArrayList.class);
         schemas.forEach(p -> {
             // Propagate location value to defined schemas

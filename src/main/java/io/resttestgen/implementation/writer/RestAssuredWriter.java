@@ -94,20 +94,19 @@ public class RestAssuredWriter extends Writer {
     private String generateMainTestMethod(){
         StringBuilder content = new StringBuilder();
 
-        //set baseURL from OpenAPI
+        // Set baseURL from OpenAPI
         content.append("String baseURL =\"").append(environment.getOpenAPI().getServers().get(0)).append("\";\n\n");
 
 
-        //TODO: only on the last testInteraction or on all testInteractions ?
+        // TODO: only on the last testInteraction or on all testInteractions ?
 
-        // for all Test interaction generate method
-        // TestInteraction testInteraction = testSequence.getLast();
+        // Generate method for all TestInteractions in the sequence
         for (TestInteraction testInteraction : testSequence) {
             content.append(generateTestMethod(testInteraction));
             this.numberOfInteraction++;
         }
 
-        //write main class Test
+        // Write main class Test
         content.append("\t@Test\n");
         content.append("\tpublic void test_").append(testSequence.getName().replaceAll("-","_")).append("()  throws JSONException{\n");
 
@@ -120,19 +119,19 @@ public class RestAssuredWriter extends Writer {
         return content.toString();
     }
 
-    //One method for each testInteraction
+    // One method for each testInteraction
     private String generateTestMethod(TestInteraction testInteraction){
 
         StringBuilder content = new StringBuilder();
 
-        // take operation
+        // Take operation
         Operation operation = testInteraction.getOperation();
-        //initialization of operations: take the first operation and generate recursively the operation for build the request
+        // initialization of operations: take the first operation and generate recursively the operation for build the request
         operationsInitialization(operation);
 
-        //Test
+        // Test
         content.append("\tprivate void test").append(this.numberOfInteraction).append("() throws JSONException{\n");
-        //write method for get parameters
+        // Write method for get parameters
 
         writeOperation(content);
         content.append("\t\t//OPERATION 0\n");

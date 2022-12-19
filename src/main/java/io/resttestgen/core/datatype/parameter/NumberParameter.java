@@ -20,19 +20,24 @@ public class NumberParameter extends ParameterLeaf {
     private Double maximum;
     private Double minimum;
 
-    private boolean exclusiveMaximum;
-    private boolean exclusiveMinimum;
+    private boolean exclusiveMaximum = false;
+    private boolean exclusiveMinimum = false;
 
     private static final Logger logger = LogManager.getLogger(NumberParameter.class);
 
     public NumberParameter(ParameterElement parent, Map<String, Object> parameterMap, Operation operation, String name) {
         super(parent, parameterMap, operation, name);
 
+        @SuppressWarnings("unchecked")
         Map<String, Object> sourceMap = parameterMap.containsKey("schema") ?
                 (Map<String, Object>) parameterMap.get("schema") :
                 parameterMap;
-        this.exclusiveMaximum = Boolean.parseBoolean((String) sourceMap.get("exclusiveMaximum"));
-        this.exclusiveMinimum = Boolean.parseBoolean((String) sourceMap.get("exclusiveMinimum"));
+        if (sourceMap.get("exclusiveMaximum") != null && sourceMap.get("exclusiveMaximum").toString().trim().equalsIgnoreCase("true")) {
+            this.exclusiveMaximum = true;
+        }
+        if (sourceMap.get("exclusiveMinimum") != null && sourceMap.get("exclusiveMinimum").toString().trim().equalsIgnoreCase("true")) {
+            this.exclusiveMinimum = true;
+        }
         if (sourceMap.containsKey("maximum")) {
             this.maximum = (Double) sourceMap.get("maximum");
         }
@@ -193,89 +198,6 @@ public class NumberParameter extends ParameterLeaf {
             return false;
         }
     }
-
-    /* TODO: remove: it is replaced by RandomValueProvider
-    @Override
-    public Object generateCompliantValue() {
-
-        ExtendedRandom random = Environment.getInstance().getRandom();
-
-        // Initialize value container
-        Object generatedValue = null;
-
-        // Generate numeric value base on the (inferred) format. In some cases, with 0.5 probability, we generate a
-        // small number (< 10).
-        boolean halfProb = random.nextBoolean();
-        switch (inferFormat()) {
-            case INT8:
-                if (halfProb) {
-                    generatedValue = random.nextLength(0, 120);
-                    break;
-                }
-                generatedValue = random.nextInt(-128, 127);
-                break;
-            case INT16:
-                if (halfProb) {
-                    generatedValue = random.nextLength(0, 120);
-                    break;
-                }
-                generatedValue = random.nextInt(-32768, 32767);
-                break;
-            case INT32:
-                if (halfProb) {
-                    generatedValue = random.nextLength(0, 120);
-                    break;
-                }
-                generatedValue = random.nextInt();
-                break;
-            case INT64:
-                if (halfProb) {
-                    generatedValue = Long.valueOf(random.nextLength(0, 120));
-                    break;
-                }
-                generatedValue = random.nextLong();
-                break;
-            case UINT8:
-                if (halfProb) {
-                    generatedValue = random.nextLength(0, 120);
-                    break;
-                }
-                generatedValue = random.nextInt(0, 255);
-                break;
-            case UINT16:
-                if (halfProb) {
-                    generatedValue = random.nextLength(0, 120);
-                    break;
-                }
-                generatedValue = random.nextInt(0, 65535);
-                break;
-            case UINT32:
-                if (halfProb) {
-                    generatedValue = Long.valueOf(random.nextLength(0, 120));
-                    break;
-                }
-                generatedValue = random.nextLong(0L, 4294967295L);
-                break;
-            case UINT64:
-                if (halfProb) {
-                    generatedValue = Long.valueOf(random.nextLength(0, 120));
-                    break;
-                }
-                generatedValue = random.nextLong(0L, 9223372036854775807L);
-                break;
-            case FLOAT:
-                generatedValue = random.nextFloat();
-                break;
-            case DOUBLE:
-                generatedValue = random.nextDouble();
-                break;
-        }
-        this.value=generatedValue;
-        logger.debug("Generated numeric value for parameter " + normalizedName + " (" + name + "): " + generatedValue);
-
-        return generatedValue;
-    }
-    */
 
     /**
      * Infers a format from format, type, and name of the parameter.

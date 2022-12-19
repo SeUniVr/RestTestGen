@@ -103,4 +103,27 @@ public enum ParameterTypeFormat {
                 return UNKNOWN;
         }
     }
+
+
+
+    public boolean isCompatibleWithType(ParameterType type) {
+        if (type == ParameterType.INTEGER) {
+            return this == INT8 || this == INT16 || this == INT32 || this == INT64 || this == UINT8 || this == UINT16 ||
+                    this == UINT32 || this == UINT64 || this == MISSING || this == UNKNOWN;
+        } else if (type == ParameterType.NUMBER) {
+            return this == INT8 || this == INT16 || this == INT32 || this == INT64 || this == UINT8 || this == UINT16 ||
+                    this == UINT32 || this == UINT64 || this == FLOAT || this == DOUBLE || this == DECIMAL ||
+                    this == MISSING || this == UNKNOWN;
+        } else if (type == ParameterType.STRING) {
+            return !(this == INT8 || this == INT16 || this == INT32 || this == INT64 || this == UINT8 || this == UINT16 ||
+                    this == UINT32 || this == UINT64 || this == FLOAT || this == DOUBLE || this == DECIMAL ||
+                    this == MISSING || this == UNKNOWN);
+        }
+        return type == ParameterType.MISSING || type == ParameterType.UNKNOWN;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase().replace("_", "");
+    }
 }

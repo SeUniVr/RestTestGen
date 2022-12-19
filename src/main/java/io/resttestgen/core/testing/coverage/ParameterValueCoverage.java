@@ -9,7 +9,6 @@ import io.resttestgen.core.datatype.parameter.ParameterType;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;

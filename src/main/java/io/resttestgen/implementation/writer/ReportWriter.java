@@ -2,7 +2,7 @@ package io.resttestgen.implementation.writer;
 
 import com.google.gson.GsonBuilder;
 import io.resttestgen.core.testing.TestSequence;
-import io.resttestgen.core.testing.TestSequenceSerializer;
+import io.resttestgen.core.helper.jsonserializer.TestSequenceSerializer;
 import io.resttestgen.core.testing.Writer;
 
 import java.io.File;

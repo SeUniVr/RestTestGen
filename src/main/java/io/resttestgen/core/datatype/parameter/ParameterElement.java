@@ -58,6 +58,7 @@ public abstract class ParameterElement extends Taggable {
 
         // Difference between parameter and request body/response body
         // Parameters can have a schema definition which contains type, format, default and enum values
+        @SuppressWarnings("unchecked")
         Map<String, Object> sourceMap = parameterMap.containsKey("schema") ?
                 (Map<String, Object>) parameterMap.get("schema") :
                 parameterMap;
@@ -109,6 +110,7 @@ public abstract class ParameterElement extends Taggable {
         }
         
         this.enumValues = new HashSet<>();
+        @SuppressWarnings("unchecked")
         List<Object> values = OpenAPIParser.safeGet(sourceMap, "enum", ArrayList.class);
         values.forEach(value -> {
             if (isObjectTypeCompliant(value)) {
@@ -142,6 +144,7 @@ public abstract class ParameterElement extends Taggable {
             }
         }
 
+        @SuppressWarnings("unchecked")
         Map<String, Map<String, Object>> examples = OpenAPIParser.safeGet(parameterMap, "examples", LinkedTreeMap.class);
         examples.values().forEach(example -> {
             if (example.containsKey("value")) {
@@ -232,7 +235,7 @@ public abstract class ParameterElement extends Taggable {
         newParameter.setParent(this.getParent());
         newParameter.setLocation(this.getLocation());
 
-        // If the leaf has no parent (it is a root)
+        // If the parameter has no parent (it is a root)
         if (getParent() == null) {
             switch (getLocation()) {
                 case REQUEST_BODY:
@@ -278,14 +281,16 @@ public abstract class ParameterElement extends Taggable {
             }
         }
 
-        // If the leaf is contained in a parent element (array or object), remove it from the parent
+        // If the parameter is contained in a parent element (array or object), remove it from the parent
         else {
             if (getParent() instanceof ParameterArray) {
-                return ((ParameterArray) getParent()).getElements().remove(this) &&
-                        ((ParameterArray) getParent()).getElements().add(newParameter);
-            } else if (getParent() instanceof ParameterObject) {
-                return ((ParameterObject) getParent()).getProperties().remove(this) &&
+                ((ParameterArray) getParent()).getElements().remove(this);
                 ((ParameterArray) getParent()).getElements().add(newParameter);
+                return true;
+            } else if (getParent() instanceof ParameterObject) {
+                ((ParameterObject) getParent()).getProperties().remove(this);
+                ((ParameterObject) getParent()).getProperties().add(newParameter);
+                return true;
             }
         }
 

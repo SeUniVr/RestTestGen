@@ -14,18 +14,6 @@ public class ObjectHelper {
     public static <T> T deepCloneObject(T o) {
         if (o instanceof Number) {
             return o;
-
-            // The following is commented because it might be useless
-        /*
-        if (o instanceof Integer) {
-            return (T) Integer.valueOf((Integer) o);
-        } else if (o instanceof Long) {
-            return (T) Long.valueOf((Long) o);
-        } else if (o instanceof Float) {
-            return (T) Float.valueOf((Float) o);
-        } else if (o instanceof Double) {
-            return (T) Double.valueOf((Double) o);
-        }*/
         } else if (o instanceof ParameterLeaf) {
             return o;
         } else {

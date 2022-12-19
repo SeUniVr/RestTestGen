@@ -125,58 +125,6 @@ public abstract class ParameterLeaf extends ParameterElement {
         this.value = null;
     }
 
-    //TODO: remove: it is replaced by RandomValueProvider
-    //public abstract Object generateCompliantValue();
-
-    /**
-     * Replaces self with another leaf.
-     * @param newLeaf the new leaf.
-     * FIXME: commented out because implement in ParameterElement on 2022/10/31
-     */
-    /*public boolean replace(ParameterLeaf newLeaf) {
-        ParameterElement parent = getParent();
-        if (parent != null) {
-            if (parent instanceof ParameterArray) {
-                List<ParameterElement> elements = ((ParameterArray) parent).getElements();
-                int index = elements.indexOf(this);
-                elements.set(index, newLeaf);
-                return true;
-            } else if (parent instanceof ParameterObject) {
-                List<ParameterElement> properties = ((ParameterObject) parent).getProperties();
-                int index = properties.indexOf(this);
-                properties.set(index, newLeaf);
-                return true;
-            }
-        } else {
-            if (getLocation() == ParameterLocation.HEADER) {
-                if (getOperation().getHeaderParameters().contains(this)) {
-                    getOperation().getHeaderParameters().remove(this);
-                    getOperation().getHeaderParameters().add(newLeaf);
-                    return true;
-                }
-            } else if (getLocation() == ParameterLocation.PATH) {
-                if (getOperation().getPathParameters().contains(this)) {
-                    getOperation().getPathParameters().remove(this);
-                    getOperation().getPathParameters().add(newLeaf);
-                    return true;
-                }
-            } else if (getLocation() == ParameterLocation.QUERY) {
-                if (getOperation().getQueryParameters().contains(this)) {
-                    getOperation().getQueryParameters().remove(this);
-                    getOperation().getQueryParameters().add(newLeaf);
-                    return true;
-                }
-            } else if (getLocation() == ParameterLocation.COOKIE) {
-                if (getOperation().getPathParameters().contains(this)) {
-                    getOperation().getPathParameters().remove(this);
-                    getOperation().getPathParameters().add(newLeaf);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }*/
-
     public String getJsonPath() {
 
         String thisJsonPath = "['" + this.getName() + "']";
@@ -202,13 +150,6 @@ public abstract class ParameterLeaf extends ParameterElement {
         } else {
             return getParent().getJsonPath() + thisJsonPath;
         }
-
-        // TODO: remove
-        /*if (getParent() instanceof ParameterArray) {
-            return getParent().getJsonPath() + "[" + ((ParameterArray) getParent()).indexOf(this) + "]." + getName().toString();
-        } else {
-            return getParent() != null ? getParent().getJsonPath() + "['" +getName().toString()+ "']" :  "['" +getName().toString()+ "']";
-        }*/
     }
 
 
