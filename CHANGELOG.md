@@ -1,5 +1,8 @@
 # RestTestGen Changelog
 
+### v23.01
+- Added mass assignment vulnerability detection security testing strategy (beta). (Add `"strategyName": "MassAssignmentSecurityTestingStrategy"` to the configuration file to use this strategy).
+
 ### v22.12
 - Self-signed certificates are trusted by internal HTTPS client.
 - Added feature to export the parsed, and possibly modified, internal representation of the OpenAPI specification.
