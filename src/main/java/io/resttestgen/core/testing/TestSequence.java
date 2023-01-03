@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
  */
 public class TestSequence extends Taggable implements List<TestInteraction> {
 
+    public String readOnlyParameter = "";
+
     private String generator = "UserInstantiated";
     private String name = generateRandomTestSequenceName();
     private List<TestInteraction> testInteractions = new LinkedList<>();

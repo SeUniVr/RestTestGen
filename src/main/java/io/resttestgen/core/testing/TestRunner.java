@@ -34,6 +34,9 @@ import java.util.regex.Pattern;
  */
 public class TestRunner {
 
+
+    public static final TestSequence globalTestSequenceForDebug = new TestSequence();
+
     private static final Logger logger = LogManager.getLogger(TestRunner.class);
 
     private static TestRunner instance = null;
@@ -212,6 +215,11 @@ public class TestRunner {
             testInteraction.setTestStatus(TestStatus.ERROR);
         }
 
+        // FIXME: process only valid responses (move outside this method)
+        processResponse(testInteraction);
+
+        // FIXME: remove
+        globalTestSequenceForDebug.append(testInteraction);
     }
 
     /**

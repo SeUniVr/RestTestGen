@@ -2,6 +2,7 @@ package io.resttestgen.core.openapi;
 
 import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.HttpMethod;
+import io.resttestgen.core.datatype.CRUDSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
@@ -21,6 +22,12 @@ public class Operation {
     private final String operationId;
 
     private final String description;
+
+    private CRUDSemantics crudSemantics;
+    private CRUDSemantics inferredCrudSemantics;
+
+    private String crudResourceType;
+    private String inferredCrudResourceType;
 
     private Set<ParameterElement> headerParameters;
     private Set<ParameterElement> pathParameters;
@@ -49,6 +56,10 @@ public class Operation {
     public Operation(String endpoint, HttpMethod method, Map<String, Object> operationMap) throws InvalidOpenAPIException {
         this.endpoint = endpoint;
         this.method = method;
+
+        this.crudSemantics = CRUDSemantics.parseSemantics(
+                OpenAPIParser.safeGet(operationMap, "x-crudOperationSemantics", String.class));
+        this.crudResourceType = OpenAPIParser.safeGet(operationMap, "x-crudResourceType", String.class).trim();
 
         headerParameters = new HashSet<>();
         pathParameters = new HashSet<>();
@@ -234,6 +245,7 @@ public class Operation {
         logger.debug("\tOutputParamsSet: " + getOutputParametersSet());
 
         this.isReadOnly = true;
+        inferredCrudSemantics = CRUDSemantics.inferSemantics(this);
     }
 
     private Operation(Operation other) {
@@ -241,6 +253,11 @@ public class Operation {
         method = HttpMethod.getMethod(other.method.toString());
         operationId = other.operationId;
         description = other.description;
+
+        crudSemantics = other.crudSemantics;
+        inferredCrudSemantics = other.inferredCrudSemantics;
+        crudResourceType = other.crudResourceType;
+        inferredCrudResourceType = other.inferredCrudResourceType;
 
         headerParameters = new HashSet<>();
         other.headerParameters.forEach(p -> headerParameters.add(p.deepClone(this, null)));
@@ -590,11 +607,43 @@ public class Operation {
         return outParams;
     }
 
+    public CRUDSemantics getCrudSemantics() {
+        return this.crudSemantics;
+    }
+
+    public void setCrudSemantics(CRUDSemantics crudSemantics) {
+        this.crudSemantics = crudSemantics;
+    }
+
+    public String getCrudResourceType() {
+        return this.crudResourceType;
+    }
+
+    public void setCrudResourceType(String crudResourceType) {
+        this.crudResourceType = crudResourceType;
+    }
+
+    public CRUDSemantics getInferredCrudSemantics() {
+        return inferredCrudSemantics;
+    }
+
+    public void setInferredCrudSemantics(CRUDSemantics inferredCrudSemantics) {
+        this.inferredCrudSemantics = inferredCrudSemantics;
+    }
+
+    public String getInferredCrudResourceType() {
+        return inferredCrudResourceType;
+    }
+
+    public void setInferredCrudResourceType(String inferredCrudResourceType) {
+        this.inferredCrudResourceType = inferredCrudResourceType;
+    }
+
     public List<ParameterElement> searchRequestParametersByName(ParameterName parameterName) {
         return getAllRequestParameters().stream().filter(p -> p.getName().equals(parameterName)).collect(Collectors.toList());
     }
 
-    public List<ParameterElement> searchResponseParametersBydName(ParameterName parameterName) {
+    public List<ParameterElement> searchResponseParametersByName(ParameterName parameterName) {
         List<ParameterElement> foundParameters = new LinkedList<>();
         getOutputParametersSet().forEach(p -> {
             if (p.getName().equals(parameterName)) {

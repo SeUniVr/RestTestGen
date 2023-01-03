@@ -2,6 +2,7 @@ package io.resttestgen.core.datatype.parameter;
 
 import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
+import io.resttestgen.core.openapi.OpenAPIParser;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,23 +16,35 @@ public abstract class ParameterLeaf extends ParameterElement {
     private static final Logger logger = LogManager.getLogger(ParameterLeaf.class);
 
     protected Object value;
+    protected boolean resourceIdentifier = false;
+    protected boolean inferredResourceIdentifier = false;
 
     public ParameterLeaf(ParameterElement parent, Map<String, Object> parameterMap, Operation operation, String name) {
         super(parent, parameterMap, operation, name);
+        if (parameterMap.containsKey("x-crudResourceIdentifier")) {
+            this.resourceIdentifier = OpenAPIParser.safeGet(parameterMap, "x-crudResourceIdentifier", Boolean.class);
+        }
     }
 
     public ParameterLeaf(ParameterElement parent, Map<String, Object> parameterMap, Operation operation) {
         this(parent, parameterMap, operation,null);
+        if (parameterMap.containsKey("x-crudResourceIdentifier")) {
+            this.resourceIdentifier = OpenAPIParser.safeGet(parameterMap, "x-crudResourceIdentifier", Boolean.class);
+        }
     }
 
     protected ParameterLeaf(ParameterLeaf other) {
         super(other);
         value = ObjectHelper.deepCloneObject(other.value);
+        resourceIdentifier = other.resourceIdentifier;
+        inferredResourceIdentifier = other.inferredResourceIdentifier;
     }
 
     protected ParameterLeaf(ParameterLeaf other, Operation operation, ParameterElement parent) {
         super(other, operation, parent);
         value = ObjectHelper.deepCloneObject(other.value);
+        resourceIdentifier = other.resourceIdentifier;
+        inferredResourceIdentifier = other.inferredResourceIdentifier;
     }
 
     protected ParameterLeaf(ParameterElement other) {
@@ -43,6 +56,12 @@ public abstract class ParameterLeaf extends ParameterElement {
     }
 
     public abstract boolean isValueCompliant(Object value);
+
+    private boolean inferResourceIdentifier() {
+        return normalizedName.toString().toLowerCase().endsWith("id") ||
+                normalizedName.toString().toLowerCase().endsWith("usernam") ||
+                normalizedName.toString().toLowerCase().endsWith("username");
+    }
 
     public String getValueAsFormattedString(ParameterStyle style, boolean explode) {
         if (value == null) {
@@ -152,6 +171,18 @@ public abstract class ParameterLeaf extends ParameterElement {
         }
     }
 
+
+    public boolean isResourceIdentifier() {
+        return resourceIdentifier;
+    }
+
+    public boolean isInferredResourceIdentifier() {
+        return inferredResourceIdentifier;
+    }
+
+    public void setInferredResourceIdentifier(boolean inferredResourceIdentifier) {
+        this.inferredResourceIdentifier = inferredResourceIdentifier;
+    }
 
     @Override
     public boolean hasValue() {

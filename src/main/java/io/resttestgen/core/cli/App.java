@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class);
-    private static final String toolVersion = "22.11";
+    private static final String toolVersion = "23.01";
     private static final String messageHeader = "RestTestGen Core " + toolVersion;
     private static final String helpMessage = messageHeader + "\n"
             + "Arguments:\n"
@@ -30,7 +30,7 @@ public class App {
 
     /**
      * Entry point of the CLI application.
-     * @param args command line arguments
+     * @param args command line arguments.
      */
     public static void main(String[] args) {
 

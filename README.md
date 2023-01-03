@@ -2,31 +2,48 @@
 
 A framework for automated black-box testing of RESTful APIs.
 
-> **v2:** this is a re-implementation of the original tool proposed by our research team in 2020. This new version is implemented as a framework that allows researchers and practitioners to implement their own testing strategy on top of our [core](#core-features). Testing strategies presented in our papers are included, and available in the `io.resttestgen.implementation` package.
+> **v2:** this is a re-implementation of the original tool proposed by our research team in 2020. This new version is implemented as a framework that allows researchers and practitioners to implement their own testing strategy on top of our core. Testing strategies presented in our papers are included, and available in the `io.resttestgen.implementation` package.
 
-> **Citing our work:** please cite our latest journal paper about RestTestGen: *Automated Black-Box Testing of Nominal and Error Scenarios in RESTful APIs*. BibTeX:
-> ```
-> @article{Corradini2022,
->     doi = {10.1002/stvr.1808},
->     url = {https://doi.org/10.1002/stvr.1808},
->     year = {2022},
->     month = jan,
->     publisher = {Wiley},
->     author = {Davide Corradini and Amedeo Zampieri and Michele Pasqua and Emanuele Viglianisi and Michael Dallago and Mariano Ceccato},
->     title = {Automated black-box testing of nominal and error scenarios in RESTful APIs},
->     journal = {Software Testing, Verification and Reliability}
-> }
-> ```
+> **Citing our work:** bibtex entries for our papers are available in the [CITE.md](CITE.md) file.
+
+The core of the RestTestGen framework provides the following features:
+- custom parser for OpenAPI specifications v3 in JSON format (we dropped Swagger Codegen that caused instability)
+  - please convert Swagger 2.0 files or YAML specifications to JSON v3 specification using [https://editor.swagger.io/](https://editor.swagger.io/)
+  - combined parameter schemas (OneOf, AllOf, AnyOf) are supported by the parser, but currently not used in our strategies (wip)
+- the Operation Dependency Graph (ODG), that models data dependencies among operations
+- dictionaries storing values observed at testing time
+- smart parameter management using hierarchical data structures
+  - these data structures are automatically converted to HTTP requests
+- fuzzers to generate parameter values
+- mutation operators
+  - data type mutation operator
+  - missing required mutation operator
+  - constraint violation mutation operator
+- response processors to elaborate responses
+- operations sorters to provide customized operations testing ordering
+  - random sorter
+  - ODG-based dynamic sorter
+- oracles to evaluate test executions
+  - nominal status code oracle
+  - error status code oracle
+  - schema validation oracle (wip)
+- writers to output test cases and test results to file
+  - JSON report writer
+  - JUnit + OkHttp test case writer (wip)
+  - JUnit + REST Assured test case writer
+- coverage measurements
+  - path coverage
+  - operations coverage
+  - status code coverage
+  - parameter coverage
+  - parameter value coverage
 
 ---
 
 ## Changelog
 
-### v22.12
-- Self-signed certificates are trusted by internal HTTPS client.
-- Added feature to export the parsed, and possibly modified, internal representation of the OpenAPI specification.
-- Fixed parsing of `exclusiveMinimum` and `exclusiveMaximum` properties of OpenAPI parameters.
-- Fixed `ClassCastException` in method `replace()` of `ParameterElement`.
+### v23.01
+- Added mass assignment vulnerability detection security testing strategy (beta). (Add `"strategyName": "MassAssignmentSecurityTestingStrategy"` to the configuration file to use this strategy).
 
 For the changelog of past versions see the [CHANGELOG.md](CHANGELOG.md) file.
 
@@ -90,40 +107,6 @@ To build and run RestTestGen with Gradle use the command: `./gradlew run`
 Alternatively, you can open the RestTestGen Gradle project with IntelliJ IDEA. To run RestTestGen, click the play icon alongside the `main` method of the class `io.resttestgen.core.cli.App`.
 
 > Warning: make sure that your gradlew file is executable. Moreover, some test cases only work with the default OpenAPI specification, so in the case the execution fails due to failed test cases, we recommend to skip tests adding `-x test` to Gradle commands.
-
-## <a id="core-features"></a> Features
-The core of the RestTestGen framework provides the following features:
-- custom parser for OpenAPI specifications v3 in JSON format (we dropped Swagger Codegen that caused instability)
-  - please convert Swagger 2.0 files or YAML specifications to JSON v3 specification using [https://editor.swagger.io/](https://editor.swagger.io/)
-  - combined parameter schemas (OneOf, AllOf, AnyOf) are supported by the parser, but currently not used in our strategies (wip)
-- the Operation Dependency Graph (ODG), that models data dependency among operations
-- dictionaries storing values observed at testing time
-- smart parameter management using hierarchical data structures
-  - these data structures are automatically converted to HTTP requests
-- fuzzers to generate parameter values
-- mutation operators
-  - data type mutation operator
-  - missing required mutation operator
-  - constraint violation mutation operator
-- response processors to elaborate responses
-- operations sorters to provide customized operations testing ordering
-  - random sorter
-  - ODG-based dynamic sorter
-- oracles to evaluate test executions
-  - nominal status code oracle
-  - error status code oracle
-  - schema validation oracle (wip)
-- writers to output test cases and test results to file
-  - JSON report writer
-  - JUnit + OkHttp test case writer (wip)
-  - JUnit + REST Assured test case writer
-- coverage measurements
-  - path coverage 
-  - operations coverage
-  - status code coverage
-  - parameter coverage
-  - parameter value coverage
-
 
 ## Contributing
 
