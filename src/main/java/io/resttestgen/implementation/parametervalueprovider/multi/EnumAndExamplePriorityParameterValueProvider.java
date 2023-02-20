@@ -22,14 +22,18 @@ public class EnumAndExamplePriorityParameterValueProvider extends ParameterValue
         // If the leaf is an enum, return a random enum value
         EnumParameterValueProvider enumParameterValueProvider = new EnumParameterValueProvider();
         enumParameterValueProvider.setStrict(this.strict);
-        if (enumParameterValueProvider.countAvailableValuesFor(parameterLeaf) > 0 && random.nextInt(1, 10) <= 9) {
-            return enumParameterValueProvider.provideValueFor(parameterLeaf);
-        }
-
         ExamplesParameterValueProvider examplesParameterValueProvider = new ExamplesParameterValueProvider();
         examplesParameterValueProvider.setStrict(this.strict);
-        if (examplesParameterValueProvider.countAvailableValuesFor(parameterLeaf) > 0 && random.nextInt(1, 10) <= 7) {
-            return examplesParameterValueProvider.provideValueFor(parameterLeaf);
+
+        int numEnums = enumParameterValueProvider.countAvailableValuesFor(parameterLeaf);
+        int numExamples = examplesParameterValueProvider.countAvailableValuesFor(parameterLeaf);
+
+        if (numEnums + numExamples > 0 && random.nextInt(1, 10) <= 8) {
+            if (random.nextInt(numEnums + numExamples) < numEnums) {
+                return enumParameterValueProvider.provideValueFor(parameterLeaf);
+            } else {
+                return examplesParameterValueProvider.provideValueFor(parameterLeaf);
+            }
         }
 
         ExtendedRandom random = Environment.getInstance().getRandom();

@@ -2,7 +2,7 @@ package io.resttestgen.core.openapi;
 
 import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.HttpMethod;
-import io.resttestgen.core.datatype.CRUDSemantics;
+import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
@@ -23,8 +23,8 @@ public class Operation {
 
     private final String description;
 
-    private CRUDSemantics crudSemantics;
-    private CRUDSemantics inferredCrudSemantics;
+    private OperationSemantics operationSemantics;
+    private OperationSemantics inferredOperationSemantics;
 
     private String crudResourceType;
     private String inferredCrudResourceType;
@@ -57,7 +57,7 @@ public class Operation {
         this.endpoint = endpoint;
         this.method = method;
 
-        this.crudSemantics = CRUDSemantics.parseSemantics(
+        this.operationSemantics = OperationSemantics.parseSemantics(
                 OpenAPIParser.safeGet(operationMap, "x-crudOperationSemantics", String.class));
         this.crudResourceType = OpenAPIParser.safeGet(operationMap, "x-crudResourceType", String.class).trim();
 
@@ -245,7 +245,7 @@ public class Operation {
         logger.debug("\tOutputParamsSet: " + getOutputParametersSet());
 
         this.isReadOnly = true;
-        inferredCrudSemantics = CRUDSemantics.inferSemantics(this);
+        inferredOperationSemantics = OperationSemantics.inferSemantics(this);
     }
 
     private Operation(Operation other) {
@@ -254,8 +254,8 @@ public class Operation {
         operationId = other.operationId;
         description = other.description;
 
-        crudSemantics = other.crudSemantics;
-        inferredCrudSemantics = other.inferredCrudSemantics;
+        operationSemantics = other.operationSemantics;
+        inferredOperationSemantics = other.inferredOperationSemantics;
         crudResourceType = other.crudResourceType;
         inferredCrudResourceType = other.inferredCrudResourceType;
 
@@ -607,12 +607,12 @@ public class Operation {
         return outParams;
     }
 
-    public CRUDSemantics getCrudSemantics() {
-        return this.crudSemantics;
+    public OperationSemantics getCrudSemantics() {
+        return this.operationSemantics;
     }
 
-    public void setCrudSemantics(CRUDSemantics crudSemantics) {
-        this.crudSemantics = crudSemantics;
+    public void setCrudSemantics(OperationSemantics operationSemantics) {
+        this.operationSemantics = operationSemantics;
     }
 
     public String getCrudResourceType() {
@@ -623,12 +623,12 @@ public class Operation {
         this.crudResourceType = crudResourceType;
     }
 
-    public CRUDSemantics getInferredCrudSemantics() {
-        return inferredCrudSemantics;
+    public OperationSemantics getInferredCrudSemantics() {
+        return inferredOperationSemantics;
     }
 
-    public void setInferredCrudSemantics(CRUDSemantics inferredCrudSemantics) {
-        this.inferredCrudSemantics = inferredCrudSemantics;
+    public void setInferredCrudSemantics(OperationSemantics inferredOperationSemantics) {
+        this.inferredOperationSemantics = inferredOperationSemantics;
     }
 
     public String getInferredCrudResourceType() {

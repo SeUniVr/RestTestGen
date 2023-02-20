@@ -419,7 +419,7 @@ public class ParameterObject extends StructuredParameterElement {
         this.properties.stream().filter(
                 p -> ParameterLeaf.class.isAssignableFrom(p.getClass()) && p.getValue() == null
         ).forEach(p -> {
-            logger.warn("Empty valued parameter '" + p.getName() + "' found. It will be removed.");
+            //logger.warn("Empty valued parameter '" + p.getName() + "' found. It will be removed.");
             newProperties.remove(p);
         });
 
@@ -429,7 +429,7 @@ public class ParameterObject extends StructuredParameterElement {
             StructuredParameterElement structuredP = (StructuredParameterElement) p;
             structuredP.removeUninitializedParameters();
             if (structuredP.isEmpty() && !structuredP.isKeepIfEmpty()) {
-                logger.warn("Empty valued parameter '" + p.getName() + "' found. It will be removed.");
+                //logger.warn("Empty valued parameter '" + p.getName() + "' found. It will be removed.");
                 newProperties.remove(p);
             }
         });
@@ -537,6 +537,16 @@ public class ParameterObject extends StructuredParameterElement {
         }
 
         return combinedSchemas;
+    }
+
+    @Override
+    public boolean isSet() {
+        for (ParameterElement parameterElement : properties) {
+            if (parameterElement.isSet()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int getIndexOfParameterObject(){

@@ -1,5 +1,16 @@
 # RestTestGen Changelog
 
+### v23.02
+- Values in "requires" inter-parameter dependencies are used as example values for parameters.
+- Added several utility methods to ParameterElements and subclasses.
+- `CRUDSemantics` is now `OperationSemantics`, supporting multiple semantics other than CRUD (e.g., login, logout).
+- Added method to `ExtendedRandom` to generate short lengths for strings and arrays.
+- Fixed bug in application of several inter-parameter dependency.
+- Fixed a bug that caused mandatory array parameters to be removed in some cases.
+- Fixed exceptions caused by response processors trying to process non-executed test interactions.
+- Fixed exception caused by `nextLength(minLength, maxLength)` method of `ExtendedRandom`, when `minLength` and `maxLength` had the same value.
+- Fixed bug in status code coverage computation.
+
 ### v23.01
 - Added mass assignment vulnerability detection security testing strategy (beta). (Add `"strategyName": "MassAssignmentSecurityTestingStrategy"` to the configuration file to use this strategy).
 

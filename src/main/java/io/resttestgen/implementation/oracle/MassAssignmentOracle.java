@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.oracle;
 
 import com.google.common.collect.Sets;
-import io.resttestgen.core.datatype.CRUDSemantics;
+import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.ParameterArray;
 import io.resttestgen.core.datatype.parameter.ParameterElement;
@@ -133,7 +133,7 @@ public class MassAssignmentOracle extends Oracle {
                 resourceIdentifierVal = extractNewlyCreatedResourceIdentifier(createOperation);
             } else {
                 previousReadOperation = testSequence.get(injectedOperationIndex - 1).getOperation();
-                if (getCRUDSemantics(testSequence.get(injectedOperationIndex).getOperation()).equals(CRUDSemantics.UPDATE)) {
+                if (getCRUDSemantics(testSequence.get(injectedOperationIndex).getOperation()).equals(OperationSemantics.UPDATE)) {
                     previousReadOperation = testSequence.get(injectedOperationIndex - 3).getOperation();
                 }
                 resourceIdentifierVal = extractNewlyCreatedResourceIdentifier(previousReadOperation, followingReadOperation);
@@ -141,7 +141,7 @@ public class MassAssignmentOracle extends Oracle {
         }
 
 
-        if (getCRUDSemantics(followingReadOperation).equals(CRUDSemantics.READ) &&
+        if (getCRUDSemantics(followingReadOperation).equals(OperationSemantics.READ) &&
                 followingReadOperation.getResponseBody() != null) {
             for (ParameterLeaf leaf : followingReadOperation.getResponseBody().getLeaves()) {
                 if (leaf.getNormalizedName().equals(injectedLeaf.getNormalizedName())) {
@@ -152,9 +152,9 @@ public class MassAssignmentOracle extends Oracle {
                     candidateLeaf = Optional.of(leaf);
                 }
             }
-        } else if (getCRUDSemantics(followingReadOperation).equals(CRUDSemantics.READ_MULTI) &&
+        } else if (getCRUDSemantics(followingReadOperation).equals(OperationSemantics.READ_MULTI) &&
                 followingReadOperation.getResponseBody() != null && previousReadOperation != null &&
-                getCRUDSemantics(previousReadOperation).equals(CRUDSemantics.READ_MULTI) &&
+                getCRUDSemantics(previousReadOperation).equals(OperationSemantics.READ_MULTI) &&
                 previousReadOperation.getResponseBody() != null) {
 
             ParameterElement newObject = extractNewlyCreatedObject(previousReadOperation, followingReadOperation);
@@ -170,7 +170,7 @@ public class MassAssignmentOracle extends Oracle {
                     }
                 }
             }
-        } else if (getCRUDSemantics(followingReadOperation).equals(CRUDSemantics.READ_MULTI) &&
+        } else if (getCRUDSemantics(followingReadOperation).equals(OperationSemantics.READ_MULTI) &&
                 followingReadOperation.getResponseBody() != null && previousReadOperation == null) {
 
             ParameterElement newObject =
@@ -289,7 +289,7 @@ public class MassAssignmentOracle extends Oracle {
         return null;
     }
 
-    private CRUDSemantics getCRUDSemantics(Operation operation) {
+    private OperationSemantics getCRUDSemantics(Operation operation) {
         if (useInferredCRUDInformation) {
             return operation.getInferredCrudSemantics();
         }

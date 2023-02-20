@@ -26,4 +26,8 @@ public abstract class OperationsSorter {
     public void remove(Operation operationToRemove) {
         queue.remove(operationToRemove);
     }
-}
+
+    public int getQueueSize() {
+        return queue.size();
+    }
+ }

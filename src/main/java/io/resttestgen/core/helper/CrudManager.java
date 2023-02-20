@@ -6,28 +6,28 @@ import io.resttestgen.core.openapi.Operation;
 import java.util.*;
 
 /**
- * Helper class to manage batches of CRUD operations. Operations belonging to the same batch are operations that
+ * Helper class to manage groups of CRUD operations. Operations belonging to the same batch are operations that
  * operate on the same target object.
  */
-public class CRUDManager {
+public class CrudManager {
 
     private final Set<String> resourceTypes;
-    private Map<String, CRUDGroup> groups;
+    private Map<String, CrudGroup> groups;
 
     private final Set<String> inferredResourceTypes;
-    private Map<String, CRUDGroup> inferredGroups;
+    private Map<String, CrudGroup> inferredGroups;
 
-    public CRUDManager(OpenAPI openAPI) {
+    public CrudManager(OpenAPI openAPI) {
         this.groups = new HashMap<>();
         this.resourceTypes = collectResourceTypes(openAPI);
         for (String resourceType : resourceTypes) {
-            groups.put(resourceType, new CRUDGroup(openAPI, resourceType, false));
+            groups.put(resourceType, new CrudGroup(openAPI, resourceType, false));
         }
 
         this.inferredGroups = new HashMap<>();
         this.inferredResourceTypes = collectInferredResourceTypes(openAPI);
         for (String inferredResourceType : inferredResourceTypes) {
-            inferredGroups.put(inferredResourceType, new CRUDGroup(openAPI, inferredResourceType, true));
+            inferredGroups.put(inferredResourceType, new CrudGroup(openAPI, inferredResourceType, true));
         }
     }
 
@@ -35,19 +35,19 @@ public class CRUDManager {
         return resourceTypes;
     }
 
-    public Collection<CRUDGroup> getGroups() {
+    public Collection<CrudGroup> getGroups() {
         return groups.values();
     }
 
-    public void setGroups(Map<String, CRUDGroup> groups) {
+    public void setGroups(Map<String, CrudGroup> groups) {
         this.groups = groups;
     }
 
-    public Collection<CRUDGroup> getInferredGroups() {
+    public Collection<CrudGroup> getInferredGroups() {
         return inferredGroups.values();
     }
 
-    public CRUDGroup getGroup(String targetObjectID) {
+    public CrudGroup getGroup(String targetObjectID) {
         return groups.get(targetObjectID);
     }
 

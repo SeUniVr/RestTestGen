@@ -162,7 +162,7 @@ public class TestInteraction extends Taggable {
         this.testStatus = TestStatus.EXECUTED;
     }
 
-    public void reset() {
+    public TestInteraction reset() {
 
         // Reset request info
         requestMethod = null;
@@ -180,6 +180,8 @@ public class TestInteraction extends Taggable {
 
         // Reset test status
         testStatus = TestStatus.CREATED;
+
+        return this;
     }
 
     public TestInteraction deepClone() {

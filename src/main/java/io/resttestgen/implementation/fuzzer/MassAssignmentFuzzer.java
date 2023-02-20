@@ -4,14 +4,14 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.CRUDSemantics;
+import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.ParameterArray;
 import io.resttestgen.core.datatype.parameter.ParameterElement;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.datatype.parameter.ParameterObject;
-import io.resttestgen.core.helper.CRUDGroup;
+import io.resttestgen.core.helper.CrudGroup;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Fuzzer;
 import io.resttestgen.core.testing.TestInteraction;
@@ -56,15 +56,15 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
     private Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-    public MassAssignmentFuzzer(CRUDGroup crudGroup) {
+    public MassAssignmentFuzzer(CrudGroup crudGroup) {
 
         this.useInferredCRUDInformation = crudGroup.isInferred();
 
-        this.createOperations = new HashSet<>(crudGroup.getOperations(CRUDSemantics.CREATE));
-        this.readOperations = new HashSet<>(crudGroup.getOperations(CRUDSemantics.READ));
-        this.readOperations.addAll(crudGroup.getOperations(CRUDSemantics.READ_MULTI));
-        this.updateOperations = new HashSet<>(crudGroup.getOperations(CRUDSemantics.UPDATE));
-        this.deleteOperations = new HashSet<>(crudGroup.getOperations(CRUDSemantics.DELETE));
+        this.createOperations = new HashSet<>(crudGroup.getOperations(OperationSemantics.CREATE));
+        this.readOperations = new HashSet<>(crudGroup.getOperations(OperationSemantics.READ));
+        this.readOperations.addAll(crudGroup.getOperations(OperationSemantics.READ_MULTI));
+        this.updateOperations = new HashSet<>(crudGroup.getOperations(OperationSemantics.UPDATE));
+        this.deleteOperations = new HashSet<>(crudGroup.getOperations(OperationSemantics.DELETE));
 
         // Compute producer parameters, as the output parameters of 2XX responses of producer operations
         // (read and read-multi operations)
@@ -533,7 +533,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         // Set new value for resource identifiers parameters or unique parameters.
         // Unique parameters' name ends with id or name.
         for (TestInteraction interaction : toReplayTestSequence) {
-            if (getCRUDSemantics(interaction.getOperation()).equals(CRUDSemantics.CREATE)) {
+            if (getCRUDSemantics(interaction.getOperation()).equals(OperationSemantics.CREATE)) {
                 for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
                     if (isCrudResourceIdentifier(leaf) || leaf.getNormalizedName().toString().toLowerCase().endsWith("id") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("nam") ||
@@ -543,7 +543,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
                     }
                 }
             }
-            if (getCRUDSemantics(interaction.getOperation()).equals(CRUDSemantics.UPDATE)) {
+            if (getCRUDSemantics(interaction.getOperation()).equals(OperationSemantics.UPDATE)) {
                 for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
                     if (!isCrudResourceIdentifier(leaf)  && (leaf.getNormalizedName().toString().toLowerCase().endsWith("id") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("nam") ||
@@ -556,7 +556,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         }
 
         int subsequenceSize = 1;
-        if (getCRUDSemantics(testSequence.get(0).getOperation()).equals(CRUDSemantics.READ_MULTI)) {
+        if (getCRUDSemantics(testSequence.get(0).getOperation()).equals(OperationSemantics.READ_MULTI)) {
             subsequenceSize = 3;
         }
 
@@ -586,7 +586,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         return toReplayTestSequence;
     }
 
-    private CRUDSemantics getCRUDSemantics(Operation operation) {
+    private OperationSemantics getCRUDSemantics(Operation operation) {
         if (useInferredCRUDInformation) {
             return operation.getInferredCrudSemantics();
         }

@@ -1,9 +1,9 @@
 package io.resttestgen.implementation.strategy;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.helper.CRUDGroup;
-import io.resttestgen.core.helper.CRUDInferredVsGroundTruthComparator;
-import io.resttestgen.core.helper.CRUDManager;
+import io.resttestgen.core.helper.CrudGroup;
+import io.resttestgen.core.helper.CrudInferredVsGroundTruthComparator;
+import io.resttestgen.core.helper.CrudManager;
 import io.resttestgen.core.helper.CrudInformationExtractor;
 import io.resttestgen.core.testing.Strategy;
 import io.resttestgen.core.testing.TestRunner;
@@ -31,13 +31,13 @@ public class MassAssignmentSecurityTestingStrategy extends Strategy {
         CrudInformationExtractor crudInformationExtractor = new CrudInformationExtractor();
         crudInformationExtractor.extract();
 
-        CRUDInferredVsGroundTruthComparator.compare();
+        CrudInferredVsGroundTruthComparator.compare();
 
         // Instantiate CRUD manager to get groups/batches of CRUD operations
-        CRUDManager crudManager = new CRUDManager(Environment.getInstance().getOpenAPI());
+        CrudManager crudManager = new CrudManager(Environment.getInstance().getOpenAPI());
 
         // Iterate on batches of CRUD operations
-        for (CRUDGroup crudGroup : crudManager.getInferredGroups()) {
+        for (CrudGroup crudGroup : crudManager.getInferredGroups()) {
 
             MassAssignmentFuzzer massAssignmentFuzzer = new MassAssignmentFuzzer(crudGroup);
             massAssignmentFuzzer.setUseInferredCRUDInformation(true);

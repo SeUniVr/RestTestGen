@@ -295,9 +295,10 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
         }
     }
 
-    public void reset() {
+    public TestSequence reset() {
         testInteractions.forEach(TestInteraction::reset);
         testResults = new HashMap<>();
+        return this;
     }
 
     public TestSequence deepClone() {

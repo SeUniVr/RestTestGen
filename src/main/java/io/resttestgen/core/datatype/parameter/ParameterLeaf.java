@@ -144,6 +144,11 @@ public abstract class ParameterLeaf extends ParameterElement {
         this.value = null;
     }
 
+    @Override
+    public boolean isSet() {
+        return getConcreteValue() != null || this instanceof NullParameter;
+    }
+
     public String getJsonPath() {
 
         String thisJsonPath = "['" + this.getName() + "']";

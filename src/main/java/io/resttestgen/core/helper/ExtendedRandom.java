@@ -37,14 +37,52 @@ public class ExtendedRandom extends Random {
      * @param maxLength maximum length, if null no maximum value is used
      * @return an integer value among minLength (or 0 if null) and maxLength, or without bound if maxLength == null
      */
-    public Integer nextLength(Integer minLength, Integer maxLength) {
+    public int nextLength(Integer minLength, Integer maxLength) {
         if (maxLength != null && maxLength == 0) {
             return 0;
         }
         if (minLength == null || minLength < 0) {
             minLength = 0;
         }
+
+        // If minLength and maxLength are the same, there is no reason to generate a random length.
+        if (minLength.equals(maxLength)) {
+            return minLength;
+        }
+
         int length = (int) Math.abs(this.nextGaussian() * 10) + minLength;
+        if (maxLength != null) {
+            if (length > maxLength) {
+                length -= length - maxLength + nextInt(maxLength - minLength);
+            }
+        }
+        return length;
+    }
+
+    /**
+     * Same as nextLength(), but returns lower values.
+     * @param minLength minimum length, null = 0
+     * @param maxLength maximum length, if null no maximum value is used
+      @return an integer value among minLength (or 0 if null) and maxLength, or without bound if maxLength == null
+     */
+    public int nextShortLength(Integer minLength, Integer maxLength) {
+        if (maxLength != null && maxLength == 0) {
+            return 0;
+        }
+        if (minLength == null || minLength < 0) {
+            minLength = 0;
+        }
+
+        // If minLength and maxLength are the same, there is no reason to generate a random length.
+        if (minLength.equals(maxLength)) {
+            return minLength;
+        }
+
+        if (minLength == 0 && nextInt(0, 100) < 70) {
+            return 1;
+        }
+
+        int length = (int) Math.abs(this.nextGaussian() * 2) + minLength;
         if (maxLength != null) {
             if (length > maxLength) {
                 length -= length - maxLength + nextInt(maxLength - minLength);

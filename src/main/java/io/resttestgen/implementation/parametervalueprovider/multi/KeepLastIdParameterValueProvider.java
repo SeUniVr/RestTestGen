@@ -1,6 +1,6 @@
 package io.resttestgen.implementation.parametervalueprovider.multi;
 
-import io.resttestgen.core.datatype.CRUDSemantics;
+import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.parameter.ParameterLeaf;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
@@ -20,9 +20,9 @@ public class KeepLastIdParameterValueProvider extends ParameterValueProvider {
         }
 
         if (isCrudResourceIdentifier(parameterLeaf) &&
-                (getCRUDSemantics(parameterLeaf.getOperation()).equals(CRUDSemantics.UPDATE) ||
-                getCRUDSemantics(parameterLeaf.getOperation()).equals(CRUDSemantics.READ) ||
-                getCRUDSemantics(parameterLeaf.getOperation()).equals(CRUDSemantics.DELETE))) {
+                (getCRUDSemantics(parameterLeaf.getOperation()).equals(OperationSemantics.UPDATE) ||
+                getCRUDSemantics(parameterLeaf.getOperation()).equals(OperationSemantics.READ) ||
+                getCRUDSemantics(parameterLeaf.getOperation()).equals(OperationSemantics.DELETE))) {
 
             if (currentIdValue != null) {
                 return currentIdValue;
@@ -81,7 +81,7 @@ public class KeepLastIdParameterValueProvider extends ParameterValueProvider {
         }
     }
 
-    private CRUDSemantics getCRUDSemantics(Operation operation) {
+    private OperationSemantics getCRUDSemantics(Operation operation) {
         if (useInferredCrudSemantics) {
             return operation.getInferredCrudSemantics();
         }

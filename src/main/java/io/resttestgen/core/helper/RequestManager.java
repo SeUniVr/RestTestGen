@@ -32,7 +32,7 @@ public class RequestManager {
     public RequestManager(Operation operation) {
         this.client = new OkHttpClient();
         this.source = operation;
-        this.operation = operation;
+        this.operation = operation.deepClone();
     }
 
     /**
@@ -304,8 +304,8 @@ public class RequestManager {
     public void removeUninitializedParameters() {
         Set<ParameterElement> newPathParameters = new HashSet<>(this.operation.getPathParameters());
         this.operation.getPathParameters().stream().filter(p -> p.getValue() == null).forEach(p -> {
-            logger.warn("Empty-valued path parameter '" + p.getName() + "' found in operation '" + this.operation
-                    + "'. It will be valued with its name.");
+            /*logger.warn("Empty-valued path parameter '" + p.getName() + "' found in operation '" + this.operation
+                    + "'. It will be valued with its name.");*/
             newPathParameters.remove(p);
             StringParameter sp = new StringParameter(p);
             sp.setValue(sp.getName().toString());
@@ -408,7 +408,7 @@ public class RequestManager {
         elements.forEach(e -> {
             if (ParameterLeaf.class.isAssignableFrom(e.getClass())) {
                 if (e.getValue() == null) {
-                    logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
+                    //logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
                     newElements.remove(e);
                 }
             } else if (StructuredParameterElement.class.isAssignableFrom(e.getClass())) {
@@ -416,7 +416,7 @@ public class RequestManager {
                 structuredE.removeUninitializedParameters();
 
                 if (structuredE.isEmpty() && !structuredE.isKeepIfEmpty()) {
-                    logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
+                    //logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
                     newElements.remove(e);
                 }
             }

@@ -611,4 +611,70 @@ public abstract class ParameterElement extends Taggable {
      * @return the collection of combined schemas in the parameter
      */
     public abstract Collection<CombinedSchemaParameter> getCombinedSchemas();
+
+    public abstract boolean isSet();
+
+    public boolean isObject() {
+        return this instanceof ParameterObject;
+    }
+
+    public boolean isArray() {
+        return this instanceof ParameterArray;
+    }
+
+    public boolean isArrayOfLeaves() {
+        return this instanceof ParameterArray && ((ParameterArray) this).getReferenceElement() instanceof ParameterLeaf;
+    }
+
+    public boolean isArrayOfArrays() {
+        return this instanceof ParameterArray && ((ParameterArray) this).getReferenceElement() instanceof ParameterArray;
+    }
+
+    public boolean isArrayOfObjects() {
+        return this instanceof ParameterArray && ((ParameterArray) this).getReferenceElement() instanceof ParameterObject;
+    }
+
+    public boolean isLeaf() {
+        return this instanceof ParameterLeaf;
+    }
+
+    public boolean isNumber() {
+        return this instanceof NumberParameter;
+    }
+
+    public boolean isString() {
+        return this instanceof StringParameter;
+    }
+
+    public boolean isBoolean() {
+        return this instanceof BooleanParameter;
+    }
+
+    public boolean isNull() {
+        return this instanceof NullParameter;
+    }
+
+    /**
+     * Check if a parameter element is a reference element of an array parameter.
+     * @return true if parameter is reference element.
+     */
+    public boolean isReferenceElement() {
+        return parent != null && parent instanceof ParameterArray && ((ParameterArray) parent).getReferenceElement() == this;
+    }
+
+    /**
+     * Check if a parameter is an element of an array parameter.
+     * @return true if parameter is an element of an array parameter.
+     */
+    public boolean isArrayElement() {
+        return parent != null && parent instanceof ParameterArray && ((ParameterArray) parent).getElements().contains(this);
+    }
+
+    /**
+     * Check if a parameter is a property of an object.
+     * @return true if parameter is property of an object.
+     */
+    public boolean isObjectProperty() {
+        return parent != null && parent instanceof ParameterObject && ((ParameterObject) parent).getProperties().contains(this);
+    }
 }

@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class CRUDInferredVsGroundTruthComparator {
+public class CrudInferredVsGroundTruthComparator {
 
     public static void compare() {
 

@@ -23,7 +23,9 @@ public class StatusCodeCoverage  extends Coverage {
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
             Set<HttpStatusCode> codes = new HashSet<>();
             for(String code : operation.getOutputParameters().keySet()){
-                codes.add(new HttpStatusCode(Integer.parseInt(code)));
+                try {
+                    codes.add(new HttpStatusCode(Integer.parseInt(code)));
+                } catch (NumberFormatException ignored) {}
             }
             statusCodeToTest.put(operation,codes);
         }

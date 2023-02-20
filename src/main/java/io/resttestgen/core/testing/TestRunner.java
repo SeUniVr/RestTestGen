@@ -223,11 +223,13 @@ public class TestRunner {
     }
 
     /**
-     * Process responses with response processor
-     * @param testInteraction the test interaction containing the response to process
+     * Process responses with response processors, only if the test interaction is marked as executed.
+     * @param testInteraction the test interaction containing the response to process.
      */
     private void processResponse(TestInteraction testInteraction) {
-        responseProcessors.forEach(responseProcessor -> responseProcessor.process(testInteraction));
+        if (testInteraction.getTestStatus() == TestStatus.EXECUTED && testInteraction.getResponseBody().length() < 1000000) {
+            responseProcessors.forEach(responseProcessor -> responseProcessor.process(testInteraction));
+        }
     }
 
     public void addResponseProcessor(ResponseProcessor responseProcessor) {

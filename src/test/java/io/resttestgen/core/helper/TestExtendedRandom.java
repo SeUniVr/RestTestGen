@@ -22,6 +22,13 @@ public class TestExtendedRandom {
     }
 
     @Test
+    public void testShortLengthGeneration() {
+        for (int i = 0; i < 100; i++) {
+            System.out.println(random.nextShortLength(1, 50));
+        }
+    }
+
+    @Test
     public void testWord() {
         for (int i = 0; i < 10; i++) {
             System.out.println(random.nextWord());

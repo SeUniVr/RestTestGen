@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ParameterArray extends StructuredParameterElement {
 
@@ -213,7 +214,7 @@ public class ParameterArray extends StructuredParameterElement {
         newElements.forEach(e -> {
             if (ParameterLeaf.class.isAssignableFrom(e.getClass())) {
                 if (e.getValue() == null) {
-                    logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
+                    //logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
                     elementsToRemove.add(e);
                 }
             } else if (StructuredParameterElement.class.isAssignableFrom(e.getClass())) {
@@ -221,7 +222,7 @@ public class ParameterArray extends StructuredParameterElement {
                 structuredE.removeUninitializedParameters();
 
                 if (structuredE.isEmpty() && !structuredE.isKeepIfEmpty()) {
-                    logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
+                    //logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
                     elementsToRemove.add(e);
                 }
             }
@@ -458,7 +459,7 @@ public class ParameterArray extends StructuredParameterElement {
 
     /**
      * Returns itself, plus the arrays contained in its elements.
-     * @return an empty list
+     * @return itself, plus the arrays contained in its elements.
      */
     @Override
     public Collection<ParameterArray> getArrays() {
@@ -509,6 +510,11 @@ public class ParameterArray extends StructuredParameterElement {
         return combinedSchemas;
     }
 
+    @Override
+    public boolean isSet() {
+        return elements.size() > 0;
+    }
+
     /**
      * Return a parameter element according to its JSON path.
      * @param jsonPath the JSON path of the parameter we want to get.
@@ -546,6 +552,71 @@ public class ParameterArray extends StructuredParameterElement {
             // Missing parenthesis
             return null;
         }
+    }
 
+    /**
+     * Check if the values of the elements in the array correspond to those specified in the provided string.
+     * FIXME: deal with decimal numbers in some way.
+     * @param commaSeparatedValues the values in the array, comma-separated.
+     * @return true if the array has the provided values.
+     */
+    public boolean hasValues(String commaSeparatedValues) {
+
+        // Only applicable to array of leaves
+        if (this.isArrayOfLeaves()) {
+
+            boolean hasValues = true;
+
+            List<String> stringValues = elements.stream().map(e -> ((ParameterLeaf) e).getConcreteValue().toString()).collect(Collectors.toList());
+
+            // Remove square brackets, if present
+            if (commaSeparatedValues.length() > 2 && commaSeparatedValues.startsWith("[") && commaSeparatedValues.endsWith("]")) {
+                commaSeparatedValues = commaSeparatedValues.substring(1, commaSeparatedValues.length() - 1);
+            }
+
+            String[] values = commaSeparatedValues.split(",");
+            if (values.length == elements.size()) {
+                for (String value : values) {
+
+                    // Cut out quotes from values
+                    if (value.length() > 2 && (value.startsWith("'") && value.endsWith("'")) ||
+                            (value.startsWith("\"") && value.endsWith("\""))) {
+                        value = value.substring(1, value.length() - 1);
+                    }
+
+                    hasValues = hasValues && stringValues.remove(value);
+                }
+                return hasValues;
+            }
+        }
+        return false;
+    }
+
+    public void setValuesFromCommaSeparatedString(String commaSeparatedValues) {
+
+        // Only applicable to array of leaves
+        if (this.isArrayOfLeaves()) {
+
+            // Remove square brackets, if present
+            if (commaSeparatedValues.length() > 2 && commaSeparatedValues.startsWith("[") && commaSeparatedValues.endsWith("]")) {
+                commaSeparatedValues = commaSeparatedValues.substring(1, commaSeparatedValues.length() - 1);
+            }
+
+            String[] values = commaSeparatedValues.split(",");
+
+            for (String value : values) {
+
+                // Cut out quotes from values
+                if (value.length() > 2 && (value.startsWith("'") && value.endsWith("'")) ||
+                        (value.startsWith("\"") && value.endsWith("\""))) {
+                    value = value.substring(1, value.length() - 1);
+                }
+
+                // Create new element for the array from reference element
+                ParameterLeaf newLeaf = (ParameterLeaf) this.getReferenceElement().deepClone();
+                newLeaf.setValue(value);
+                this.addElement(newLeaf);
+            }
+        }
     }
 }

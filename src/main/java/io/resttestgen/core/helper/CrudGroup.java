@@ -1,6 +1,6 @@
 package io.resttestgen.core.helper;
 
-import io.resttestgen.core.datatype.CRUDSemantics;
+import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.parameter.ParameterElement;
 import io.resttestgen.core.openapi.OpenAPI;
 import io.resttestgen.core.openapi.Operation;
@@ -10,15 +10,15 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CRUDGroup {
+public class CrudGroup {
 
     private final boolean isInferred;
     private final String resourceType;
     private final Set<Operation> operations;
 
-    private static final Logger logger = LogManager.getLogger(CRUDGroup.class);
+    private static final Logger logger = LogManager.getLogger(CrudGroup.class);
 
-    public CRUDGroup(OpenAPI openAPI, String resourceType, boolean isInferred) {
+    public CrudGroup(OpenAPI openAPI, String resourceType, boolean isInferred) {
         this.isInferred = isInferred;
         this.resourceType = resourceType;
         this.operations = new HashSet<>();
@@ -33,13 +33,13 @@ public class CRUDGroup {
         }
     }
 
-    public boolean hasOperationsWithCRUDSemantics(CRUDSemantics crudSemantics) {
-        return operations.stream().anyMatch(o -> o.getCrudSemantics() == crudSemantics);
+    public boolean hasOperationsWithCRUDSemantics(OperationSemantics operationSemantics) {
+        return operations.stream().anyMatch(o -> o.getCrudSemantics() == operationSemantics);
     }
 
-    public boolean hasCRUDOperations(Collection<CRUDSemantics> crudSemanticsCollection) {
-        Set<CRUDSemantics> crudSemanticsSet = new HashSet<>(crudSemanticsCollection);
-        for (CRUDSemantics crudSemantics : crudSemanticsSet) {
+    public boolean hasCRUDOperations(Collection<OperationSemantics> operationSemanticsCollection) {
+        Set<OperationSemantics> operationSemanticsSet = new HashSet<>(operationSemanticsCollection);
+        for (OperationSemantics operationSemantics : operationSemanticsSet) {
             return false;
             /*if (hasCRUDOperation(crudSemantics) < 1) {
                 return false;
@@ -48,27 +48,27 @@ public class CRUDGroup {
         return true;
     }
 
-    public int countOperations(CRUDSemantics crudSemantics) {
-        return (int) operations.stream().filter(o -> o.getCrudSemantics() == crudSemantics).count();
+    public int countOperations(OperationSemantics operationSemantics) {
+        return (int) operations.stream().filter(o -> o.getCrudSemantics() == operationSemantics).count();
     }
 
     // Returns a random operation among those with a given CRUD semantics
-    public Operation pickRandomOperation(CRUDSemantics crudSemantics) {
+    public Operation pickRandomOperation(OperationSemantics operationSemantics) {
         Random random = new Random(); // FIXME: use global random
         List<Operation> matchingOperations = operations.stream()
-                .filter(o -> o.getCrudSemantics() == crudSemantics).collect(Collectors.toList());
+                .filter(o -> o.getCrudSemantics() == operationSemantics).collect(Collectors.toList());
         return matchingOperations.get(random.nextInt(matchingOperations.size()));
     }
 
     // Returns the operation with index i among those with a given CRUD semantics
-    public Operation getOperation(CRUDSemantics crudSemantics, int index) {
+    public Operation getOperation(OperationSemantics operationSemantics, int index) {
         List<Operation> matchingOperations;
         if (isInferred) {
             matchingOperations = operations.stream()
-                    .filter(o -> o.getInferredCrudSemantics() == crudSemantics).collect(Collectors.toList());
+                    .filter(o -> o.getInferredCrudSemantics() == operationSemantics).collect(Collectors.toList());
         } else {
             matchingOperations = operations.stream()
-                    .filter(o -> o.getCrudSemantics() == crudSemantics).collect(Collectors.toList());
+                    .filter(o -> o.getCrudSemantics() == operationSemantics).collect(Collectors.toList());
         }
         if (index >= 0 && index < matchingOperations.size()) {
             return matchingOperations.get(index);
@@ -78,14 +78,14 @@ public class CRUDGroup {
 
     /**
      * Get all the operations in the batch with a given CRUD semantics.
-     * @param crudSemantics the CRUD semantics of the wanted operations.
+     * @param operationSemantics the CRUD semantics of the wanted operations.
      * @return a set of operation with the corresponding CRUD semantics.
      */
-    public Set<Operation> getOperations(CRUDSemantics crudSemantics) {
+    public Set<Operation> getOperations(OperationSemantics operationSemantics) {
         if (isInferred) {
-            return operations.stream().filter(o -> o.getInferredCrudSemantics().equals(crudSemantics)).collect(Collectors.toSet());
+            return operations.stream().filter(o -> o.getInferredCrudSemantics().equals(operationSemantics)).collect(Collectors.toSet());
         }
-        return operations.stream().filter(o -> o.getCrudSemantics().equals(crudSemantics)).collect(Collectors.toSet());
+        return operations.stream().filter(o -> o.getCrudSemantics().equals(operationSemantics)).collect(Collectors.toSet());
     }
 
     public Set<Operation> getOperations() {

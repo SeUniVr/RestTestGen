@@ -149,6 +149,11 @@ public abstract class CombinedSchemaParameter extends ParameterElement {
         return outputParameterSchema != null && outputParameterSchema.hasValue();
     }
 
+    @Override
+    public boolean isSet() {
+        return false;
+    }
+
     public Collection<ParameterLeaf> getLeaves() {
         Collection<ParameterLeaf> leaves = new LinkedList<>();
 
