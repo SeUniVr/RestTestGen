@@ -1,17 +1,20 @@
 package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
-import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.leaves.*;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 
 import java.lang.reflect.Type;
 
-public class ParameterArraySerializer implements JsonSerializer<ParameterArray> {
+public class ParameterArraySerializer implements JsonSerializer<ArrayParameter> {
 
     @Override
-    public JsonElement serialize(ParameterArray src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(ArrayParameter src, Type typeOfSrc, JsonSerializationContext context) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(ParameterObject.class, new ParameterObjectSerializer())
-                .registerTypeAdapter(ParameterArray.class, new ParameterArraySerializer())
+                .registerTypeAdapter(ObjectParameter.class, new ParameterObjectSerializer())
+                .registerTypeAdapter(ArrayParameter.class, new ParameterArraySerializer())
                 .registerTypeAdapter(StringParameter.class, new StringParameterSerializer())
                 .registerTypeAdapter(NumberParameter.class, new NumberParameterSerializer())
                 .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())

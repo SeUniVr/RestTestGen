@@ -1,7 +1,7 @@
 package io.resttestgen.core.datatype;
 
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,11 +70,11 @@ public class NormalizedParameterName {
         return normalizedName.toString();
     }
 
-    public static NormalizedParameterName computeParameterNormalizedName(ParameterElement parameter) {
+    public static NormalizedParameterName computeParameterNormalizedName(Parameter parameter) {
         return new NormalizedParameterName(qualifyName(parameter));
     }
 
-    public static String qualifyName(ParameterElement parameter) {
+    public static String qualifyName(Parameter parameter) {
 
         String name = parameter.getName().toString();
 
@@ -83,7 +83,7 @@ public class NormalizedParameterName {
                 !parameter.getLocation().equals(ParameterLocation.HEADER)) {
 
             // First, check out if it has a parent
-            ParameterElement parent = parameter.getParent();
+            Parameter parent = parameter.getParent();
 
             // Check for parent node name
             if (parent != null && parent.getNormalizedName().toString().length() > 0) {
@@ -142,7 +142,7 @@ public class NormalizedParameterName {
      * @param parameter the parameter for which a qualified name should be computed.
      * @return the qualified name.
      */
-    public static String alternativeQualifyName(ParameterElement parameter) {
+    public static String alternativeQualifyName(Parameter parameter) {
 
         String name = parameter.getName().toString();
 
@@ -155,7 +155,7 @@ public class NormalizedParameterName {
             }
 
             // Alternatively, check out if it has a parent
-            ParameterElement parent = parameter.getParent();
+            Parameter parent = parameter.getParent();
 
             // Check for parent node name
             if (parent != null && parent.getNormalizedName().toString().length() > 0) {

@@ -1,5 +1,14 @@
 # RestTestGen Changelog
 
+### v23.05
+- Included new strategy (`NlpStrategy`) to enhance specifications with NLP techniques (constraints and example values are automatically extracted from text descriptions and added to the specification). To use this strategy make sure you have the Rule Extractor service running at `http://localhost:4000`. You can download the Rule Extractor from [https://github.com/codingsoo/nlp2rest/](https://github.com/codingsoo/nlp2rest/). Deployment with Docker container is suggested.
+- Major refactoring of `Operation` and `Parameter` classes (including sub-classes). Introduced safe setters for hierarchical parameters, renamed several classes.
+- Specification export now supports multiple examples and inter-parameter dependencies.
+
+### v23.04
+- Added support to REST path, to quickly query parameters in REST requests and responses.
+- Added method `size()` to `ParameterArray` to get the size of the array.
+
 ### v23.02
 - Values in "requires" inter-parameter dependencies are used as example values for parameters.
 - Added several utility methods to ParameterElements and subclasses.

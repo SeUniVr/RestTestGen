@@ -33,7 +33,7 @@ public class StatusCodeCoverage  extends Coverage {
 
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        Operation op = testInteraction.getOperation();
+        Operation op = testInteraction.getFuzzedOperation();
         if(statusCodeToTest.containsKey(op)){
             if(statusCodeToTest.get(op).contains(testInteraction.getResponseStatusCode())){
                 insertStatusCodeToSet(statusCodeDocumentedTested,op,testInteraction.getResponseStatusCode());

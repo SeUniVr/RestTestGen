@@ -3,7 +3,7 @@ package io.resttestgen.core.operationdependencygraph;
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.openapi.OpenAPI;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
@@ -95,11 +95,11 @@ public class OperationDependencyGraph {
                 Set<NormalizedParameterName> commonParametersNames = new HashSet<>();
 
                 // For each output parameter of source operation
-                for (ParameterElement outputParameter : sourceOperation.getOutputParametersSet()) {
+                for (Parameter outputParameter : sourceOperation.getOutputParametersSet()) {
                     if (outputParameter.getNormalizedName() != null) {
 
                         // For each input parameter of target operation
-                        for (ParameterElement inputParameter : targetOperation.getReferenceLeaves()) {
+                        for (Parameter inputParameter : targetOperation.getReferenceLeaves()) {
 
                             // If input and output parameters have the same normalized name
                             if (outputParameter.getNormalizedName().equals(inputParameter.getNormalizedName())) {

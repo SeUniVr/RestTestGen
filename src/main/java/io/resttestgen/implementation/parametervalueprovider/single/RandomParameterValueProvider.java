@@ -1,7 +1,8 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterTypeFormat;
+import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
 
@@ -13,15 +14,15 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
     private static final ExtendedRandom random = Environment.getInstance().getRandom();
 
     @Override
-    public Object provideValueFor(ParameterLeaf parameterLeaf) {
+    public Object provideValueFor(LeafParameter leafParameter) {
 
-        if (parameterLeaf instanceof StringParameter) {
-            return generateCompliantString((StringParameter) parameterLeaf);
-        } else if (parameterLeaf instanceof NumberParameter) {
-            return generateCompliantNumber((NumberParameter) parameterLeaf);
-        } else if (parameterLeaf instanceof BooleanParameter) {
+        if (leafParameter instanceof StringParameter) {
+            return generateCompliantString((StringParameter) leafParameter);
+        } else if (leafParameter instanceof NumberParameter) {
+            return generateCompliantNumber((NumberParameter) leafParameter);
+        } else if (leafParameter instanceof BooleanParameter) {
             return random.nextBoolean();
-        } else if (parameterLeaf instanceof NullParameter) {
+        } else if (leafParameter instanceof NullParameter) {
             return null;
         } else {
             switch (random.nextInt(0, 5)) {

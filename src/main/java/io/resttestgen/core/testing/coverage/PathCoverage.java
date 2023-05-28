@@ -23,10 +23,10 @@ public class PathCoverage extends Coverage {
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        if(pathsToTest.contains(testInteraction.getOperation().getEndpoint())){
-            pathsDocumentedTested.add(testInteraction.getOperation().getEndpoint());
+        if(pathsToTest.contains(testInteraction.getFuzzedOperation().getEndpoint())){
+            pathsDocumentedTested.add(testInteraction.getFuzzedOperation().getEndpoint());
         }else{
-            pathsNotDocumentedTested.add(testInteraction.getOperation().getEndpoint());
+            pathsNotDocumentedTested.add(testInteraction.getFuzzedOperation().getEndpoint());
         }
     }
     @Override

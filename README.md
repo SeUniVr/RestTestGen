@@ -42,16 +42,10 @@ The core of the RestTestGen framework provides the following features:
 
 ## Changelog
 
-### v23.02
-- Values in "requires" inter-parameter dependencies are used as example values for parameters.
-- Added several utility methods to ParameterElements and subclasses.
-- `CRUDSemantics` is now `OperationSemantics`, supporting multiple semantics other than CRUD (e.g., login, logout).
-- Added method to `ExtendedRandom` to generate short lengths for strings and arrays.
-- Fixed bug in application of several inter-parameter dependency.
-- Fixed a bug that caused mandatory array parameters to be removed in some cases.
-- Fixed exceptions caused by response processors trying to process non-executed test interactions.
-- Fixed exception caused by `nextLength(minLength, maxLength)` method of `ExtendedRandom`, when `minLength` and `maxLength` had the same value.
-- Fixed bug in status code coverage computation. 
+### v23.05
+- Included new strategy (`NlpStrategy`) to enhance specifications with NLP techniques (constraints and example values are automatically extracted from text descriptions and added to the specification). To use this strategy make sure you have the Rule Extractor service running at `http://localhost:4000`. You can download the Rule Extractor from [https://github.com/codingsoo/nlp2rest/](https://github.com/codingsoo/nlp2rest/). Deployment with Docker container is suggested.
+- Major refactoring of `Operation` and `Parameter` classes (including sub-classes). Introduced safe setters for hierarchical parameters, renamed several classes.
+- Specification export now supports multiple examples and inter-parameter dependencies.
 
 For the changelog of past versions see the [CHANGELOG.md](CHANGELOG.md) file.
 
@@ -115,6 +109,12 @@ To build and run RestTestGen with Gradle use the command: `./gradlew run`
 Alternatively, you can open the RestTestGen Gradle project with IntelliJ IDEA. To run RestTestGen, click the play icon alongside the `main` method of the class `io.resttestgen.core.cli.App`.
 
 > Warning: make sure that your gradlew file is executable. Moreover, some test cases only work with the default OpenAPI specification, so in the case the execution fails due to failed test cases, we recommend to skip tests adding `-x test` to Gradle commands.
+
+## Currently available testing strategies
+
+- `NominalAndErrorStrategy`: performs nominal and error testing of the selected REST API.
+- `MassAssignmentSecurityTestingStrategy`: tests the selected REST API for mass assignment vulnerabilities.
+- `NlpStrategy`: enhances the OpenAPI specification of the selected REST API by extracting constraints and example values from textual descriptions in natural language. Requires Rule Extraction service to be running at [http://localhost:4000/](). Download and deploy the Rule Extractor service from the [NLP2REST repository](https://github.com/codingsoo/nlp2rest/).
 
 ## Contributing
 

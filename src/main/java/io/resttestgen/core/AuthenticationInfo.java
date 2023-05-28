@@ -1,7 +1,7 @@
 package io.resttestgen.core;
 
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -2,8 +2,8 @@ package io.resttestgen.core.helper;
 
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.OpenAPI;
 import io.resttestgen.core.openapi.Operation;
 import weka.clusterers.EM;
@@ -110,12 +110,12 @@ public class CrudInformationExtractor {
             // Apply tag to parameter with identified name
 
             if (resourceIdentifierName != null) {
-                Collection<ParameterElement> foundParameters = operation.getAllRequestParameters();
+                Collection<Parameter> foundParameters = operation.getAllRequestParameters();
                 foundParameters.addAll(operation.getOutputParametersSet());
 
-                for (ParameterElement element : foundParameters) {
-                    if (element instanceof ParameterLeaf && element.getNormalizedName().equals(resourceIdentifierName)) {
-                        ((ParameterLeaf) element).setInferredResourceIdentifier(true);
+                for (Parameter element : foundParameters) {
+                    if (element instanceof LeafParameter && element.getNormalizedName().equals(resourceIdentifierName)) {
+                        ((LeafParameter) element).setInferredResourceIdentifier(true);
                     }
                 }
             }
@@ -203,10 +203,10 @@ public class CrudInformationExtractor {
 
         List<NormalizedParameterName> normalizedParameterNames = new ArrayList<>();
 
-        Set<ParameterElement> elements = new HashSet<>(operation.getAllRequestParameters());
+        Set<Parameter> elements = new HashSet<>(operation.getAllRequestParameters());
         elements.addAll(operation.getOutputParametersSet());
-        for (ParameterElement element : elements) {
-            if (element instanceof ParameterLeaf) {
+        for (Parameter element : elements) {
+            if (element instanceof LeafParameter) {
                 normalizedParameterNames.add(element.getNormalizedName());
             }
         }
@@ -218,10 +218,10 @@ public class CrudInformationExtractor {
 
         List<NormalizedParameterName> normalizedParameterNames = new ArrayList<>();
 
-        Set<ParameterElement> elements = new HashSet<>(operation.getFirstLevelRequestParameters());
+        Set<Parameter> elements = new HashSet<>(operation.getFirstLevelRequestParameters());
         elements.addAll(operation.getFirstLevelOutputParameters());
-        for (ParameterElement element : elements) {
-            if (element instanceof ParameterLeaf) {
+        for (Parameter element : elements) {
+            if (element instanceof LeafParameter) {
                 normalizedParameterNames.add(element.getNormalizedName());
             }
         }

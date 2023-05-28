@@ -707,11 +707,17 @@ public class ExtendedRandom extends Random {
     }
 
     public double nextLatitude() {
-        return Double.parseDouble(String.format("%.8f", nextDouble(-90., 90.)));
+        double nextDouble = nextDouble(-90., 90.);
+
+        // keeping 8 decimal digits
+        return (int) (nextDouble * 100_000_000) / 100_000_000.0;
     }
 
     public double nextLongitude() {
-        return Double.parseDouble(String.format("%.8f", nextDouble(-180., 180.)));
+        double nextDouble = nextDouble(-180., 180.);
+
+        // keeping 8 decimal digits
+        return (int) (nextDouble * 100_000_000) / 100_000_000.0;
     }
 
     public String nextLocation() {

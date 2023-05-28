@@ -3,7 +3,7 @@ package io.resttestgen.core.operationdependencygraph;
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.openapi.CannotParseOpenAPIException;
 import io.resttestgen.core.openapi.InvalidOpenAPIException;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +44,7 @@ public class  OperationDependencyGraphTest {
         for (DependencyEdge edge : environment.getOperationDependencyGraph().getGraph().edgeSet()) {
 
             Set<NormalizedParameterName> parametersNormalizedNames = new HashSet<>();
-            for (ParameterElement parameter : environment.getOperationDependencyGraph().getGraph().getEdgeSource(edge).getOperation().getReferenceLeaves()) {
+            for (Parameter parameter : environment.getOperationDependencyGraph().getGraph().getEdgeSource(edge).getOperation().getReferenceLeaves()) {
                 if (parameter.getNormalizedName() != null) {
                     parametersNormalizedNames.add(parameter.getNormalizedName());
                 }
@@ -52,7 +52,7 @@ public class  OperationDependencyGraphTest {
             assertTrue(parametersNormalizedNames.contains(edge.getNormalizedName()));
 
             parametersNormalizedNames = new HashSet<>();
-            for (ParameterElement parameter : environment.getOperationDependencyGraph().getGraph().getEdgeTarget(edge).getOperation().getOutputParametersSet()) {
+            for (Parameter parameter : environment.getOperationDependencyGraph().getGraph().getEdgeTarget(edge).getOperation().getOutputParametersSet()) {
                 if (parameter.getNormalizedName() != null) {
                     parametersNormalizedNames.add(parameter.getNormalizedName());
                 }

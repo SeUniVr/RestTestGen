@@ -3,7 +3,7 @@ package io.resttestgen.core.openapi;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.core.datatype.HttpMethod;
-import io.resttestgen.core.datatype.parameter.ParameterType;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 import io.resttestgen.core.helper.ObjectHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

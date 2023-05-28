@@ -1,8 +1,8 @@
 package io.resttestgen.core.testing;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.helper.Taggable;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
 
 /**
  * Represents an ordered sequence of test interactions. Although the current implementations of fuzzers do not require
@@ -272,16 +274,15 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
      */
     public void inferVariablesFromConcreteValues() {
         for (int i = testInteractions.size() - 1; i > 0; i--) {
-            for (ParameterLeaf responseLeaf : testInteractions.get(i).getOperation().getLeaves()) {
+            for (LeafParameter responseLeaf : testInteractions.get(i).getFuzzedOperation().getLeaves()) {
 
                 boolean found = false;
 
                 for (int j = i - 1; j >= 0 && !found; j--) {
 
-                    ParameterElement responseBody = testInteractions.get(j).getOperation().getResponseBody();
+                    Parameter responseBody = testInteractions.get(j).getFuzzedOperation().getResponseBody();
                     if (responseBody != null) {
-                        for (ParameterLeaf requestLeaf : responseBody.getLeaves()) {
-
+                        for (LeafParameter requestLeaf : getLeaves(responseBody)) {
                             if (requestLeaf.getName().equals(responseLeaf.getName()) &&
                                     requestLeaf.getValue().toString().equals(responseLeaf.getValue().toString())) {
                                 requestLeaf.setValue(responseLeaf);

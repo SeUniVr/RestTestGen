@@ -1,7 +1,10 @@
 package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
-import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.leaves.*;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 
 import java.lang.reflect.Type;
 
@@ -10,8 +13,8 @@ public class BooleanParameterSerializer implements JsonSerializer<BooleanParamet
     @Override
     public JsonElement serialize(BooleanParameter src, Type typeOfSrc, JsonSerializationContext context) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(ParameterObject.class, new ParameterObjectSerializer())
-                .registerTypeAdapter(ParameterArray.class, new ParameterArraySerializer())
+                .registerTypeAdapter(ObjectParameter.class, new ParameterObjectSerializer())
+                .registerTypeAdapter(ArrayParameter.class, new ParameterArraySerializer())
                 .registerTypeAdapter(StringParameter.class, new StringParameterSerializer())
                 .registerTypeAdapter(NumberParameter.class, new NumberParameterSerializer())
                 .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())
@@ -79,9 +82,9 @@ public class BooleanParameterSerializer implements JsonSerializer<BooleanParamet
             }
 
             // Add examples, if examples are provided
-            // FIXME: export all examples, not just the first one
-            if (src.getExamples().stream().findFirst().isPresent()) {
-                result.add("example", gson.toJsonTree(src.getExamples().stream().findFirst().get()));
+            // FIXME: check if export format is correct
+            if (src.getExamples().size() > 0) {
+                result.add("example", gson.toJsonTree(src.getExamples()));
             }
 
             result.add("schema", schema);

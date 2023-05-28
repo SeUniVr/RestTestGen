@@ -1,24 +1,24 @@
 package io.resttestgen.core.testing.coverage;
 
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
 
 import java.util.Objects;
 
 public class ParameterElementWrapper {
 
-    private ParameterElement parameterElement;
+    private Parameter parameter;
 
-    public ParameterElementWrapper(ParameterElement parameterElement){
-        this.parameterElement = parameterElement;
+    public ParameterElementWrapper(Parameter parameter){
+        this.parameter = parameter;
     }
 
-    public ParameterElement getParameterElement() {
-        return parameterElement;
+    public Parameter getParameterElement() {
+        return parameter;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this.parameterElement == o) {
+        if (this.parameter == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
@@ -26,21 +26,21 @@ public class ParameterElementWrapper {
         }
         ParameterElementWrapper parameterWrapper = (ParameterElementWrapper) o;
 
-        return Objects.equals(this.parameterElement.getName(), parameterWrapper.parameterElement.getName()) &&
-                Objects.equals(this.parameterElement.getLocation(), parameterWrapper.parameterElement.getLocation()) &&
-                Objects.equals(this.parameterElement.getOperation(), parameterWrapper.parameterElement.getOperation()) &&
+        return Objects.equals(this.parameter.getName(), parameterWrapper.parameter.getName()) &&
+                Objects.equals(this.parameter.getLocation(), parameterWrapper.parameter.getLocation()) &&
+                Objects.equals(this.parameter.getOperation(), parameterWrapper.parameter.getOperation()) &&
                 // If even one of the parameters has null parent, then ignore normalized name. Else, consider it.
                 // This behaviour is to restrict the most possible the use of normalizedName in equals
-                (this.parameterElement.getParent() == null || parameterWrapper.parameterElement.getParent() == null || Objects.equals(this.parameterElement.getNormalizedName(), parameterWrapper.parameterElement.getNormalizedName()));
+                (this.parameter.getParent() == null || parameterWrapper.parameter.getParent() == null || Objects.equals(this.parameter.getNormalizedName(), parameterWrapper.parameter.getNormalizedName()));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(parameterElement.getName(), parameterElement.getLocation(), parameterElement.getOperation());
+        return Objects.hash(parameter.getName(), parameter.getLocation(), parameter.getOperation());
     }
 
     @Override
     public String toString() {
-        return this.parameterElement.getName() + " (" + this.parameterElement.getNormalizedName() + ", " + this.parameterElement.getLocation() + ")";
+        return this.parameter.getName() + " (" + this.parameter.getNormalizedName() + ", " + this.parameter.getLocation() + ")";
     }
 }

@@ -1,7 +1,7 @@
 package io.resttestgen.core.datatype;
 
-import io.resttestgen.core.datatype.parameter.ParameterArray;
-import io.resttestgen.core.datatype.parameter.ParameterObject;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.openapi.Operation;
 
 public enum OperationSemantics {
@@ -42,12 +42,12 @@ public enum OperationSemantics {
 
         // Infer if read is actually read-multi
         if (inferredOperationSemantics == READ && operation.getSuccessfulOutputParameters() != null) {
-            if (operation.getSuccessfulOutputParameters() instanceof ParameterArray) {
+            if (operation.getSuccessfulOutputParameters() instanceof ArrayParameter) {
                 inferredOperationSemantics = READ_MULTI;
             }
-            if (operation.getSuccessfulOutputParameters() instanceof ParameterObject) {
-                ParameterObject rootObject = (ParameterObject) operation.getSuccessfulOutputParameters();
-                if (rootObject.getProperties().size() == 1 && rootObject.getProperties().get(0) instanceof ParameterArray) {
+            if (operation.getSuccessfulOutputParameters() instanceof ObjectParameter) {
+                ObjectParameter rootObject = (ObjectParameter) operation.getSuccessfulOutputParameters();
+                if (rootObject.getProperties().size() == 1 && rootObject.getProperties().get(0) instanceof ArrayParameter) {
                     inferredOperationSemantics = READ_MULTI;
                 }
             }

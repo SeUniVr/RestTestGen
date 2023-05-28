@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'io.resttestgen'
-version '23.02'
+version '23.05'
 
 mainClassName = 'io.resttestgen.core.cli.App'
 

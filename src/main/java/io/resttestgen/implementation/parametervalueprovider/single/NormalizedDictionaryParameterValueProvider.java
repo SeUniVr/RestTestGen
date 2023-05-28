@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.dictionary.DictionaryEntry;
 import io.resttestgen.core.helper.ExtendedRandom;
@@ -16,25 +16,25 @@ public class NormalizedDictionaryParameterValueProvider extends CountableParamet
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
 
     @Override
-    public int countAvailableValuesFor(ParameterLeaf parameterLeaf) {
+    public int countAvailableValuesFor(LeafParameter leafParameter) {
         if (!strict) {
-            return dictionary.getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(), parameterLeaf.getType()).size();
+            return dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType()).size();
         } else {
-            return (int) dictionary.getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(), parameterLeaf.getType())
-                    .stream().filter(e -> parameterLeaf.isValueCompliant(e.getValue())).count();
+            return (int) dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType())
+                    .stream().filter(e -> leafParameter.isValueCompliant(e.getValue())).count();
         }
     }
 
     @Override
-    public Object provideValueFor(ParameterLeaf parameterLeaf) {
+    public Object provideValueFor(LeafParameter leafParameter) {
         ExtendedRandom random = Environment.getInstance().getRandom();
         Optional<DictionaryEntry> entry;
         if (!strict) {
-            entry = random.nextElement(dictionary.getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(),
-                    parameterLeaf.getType()));
+            entry = random.nextElement(dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(),
+                    leafParameter.getType()));
         } else {
-            entry = random.nextElement(dictionary.getEntriesByNormalizedParameterName(parameterLeaf.getNormalizedName(),
-                    parameterLeaf.getType()).stream().filter(e -> parameterLeaf.isValueCompliant(e.getValue()))
+            entry = random.nextElement(dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(),
+                    leafParameter.getType()).stream().filter(e -> leafParameter.isValueCompliant(e.getValue()))
                     .collect(Collectors.toSet()));
         }
         return entry.map(DictionaryEntry::getSource).orElse(null);

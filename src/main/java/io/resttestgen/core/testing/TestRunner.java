@@ -181,7 +181,7 @@ public class TestRunner {
     private void executeTestInteraction(TestInteraction testInteraction) {
 
         // Build request with RequestManager
-        RequestManager requestManager = new RequestManager(testInteraction.getOperation());
+        RequestManager requestManager = new RequestManager(testInteraction.getFuzzedOperation());
         requestManager.setAuthenticationInfo(authenticationInfo);
         Request request = requestManager.buildRequest();
 

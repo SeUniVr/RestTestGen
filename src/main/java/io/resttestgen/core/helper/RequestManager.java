@@ -3,13 +3,22 @@ package io.resttestgen.core.helper;
 import io.resttestgen.core.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
-import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.ParameterName;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.ParameterUtils;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.combined.CombinedSchemaParameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.leaves.NullParameter;
+import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
+import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.openapi.Operation;
 import okhttp3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -18,7 +27,6 @@ import java.util.stream.Collectors;
 
 public class RequestManager {
 
-    private final OkHttpClient client;
     private final Operation source;
     private final Operation operation;
 
@@ -30,7 +38,6 @@ public class RequestManager {
     private AuthenticationInfo authenticationInfo = Environment.getInstance().getAuthenticationInfo(0);
 
     public RequestManager(Operation operation) {
-        this.client = new OkHttpClient();
         this.source = operation;
         this.operation = operation.deepClone();
     }
@@ -84,8 +91,9 @@ public class RequestManager {
     private Request requestBuilder(String token, boolean dropAuth, boolean asFuzzed) {
         logger.debug("Building request for operation " + operation);
 
-        // To avoid okhttp crashes, remove parameters with null values
+        // To avoid OkHttp crashes, remove parameters with null values
         removeUninitializedParameters();
+
         URL server = Environment.getInstance().getOpenAPI().getDefaultServer();
         HttpUrl.Builder httpBuilder = new HttpUrl.Builder();
         Request.Builder requestBuilder = new Request.Builder();
@@ -93,17 +101,17 @@ public class RequestManager {
         for (String segment : server.getPath().split("/")) {
             httpBuilder.addPathSegment(segment);
         }
+
         // Extract endpoint and substitute path parameters
         String endpoint = operation.getEndpoint().replaceFirst("^/", "");
 
-        Set<ParameterElement> pathParameters = operation.getPathParameters();
+        Set<Parameter> pathParameters = operation.getPathParameters();
         Matcher matcher = Pattern.compile("\\{[^{}]*\\}").matcher(endpoint);
         while (matcher.find()) {
-            String parameterName = matcher.group().substring(1, matcher.group().length() - 1);
+            ParameterName parameterName = new ParameterName(matcher.group().substring(1, matcher.group().length() - 1));
 
-            // FIXME: had to add optional because it happened that the value was not present. Check with Amedeo
-            Optional<ParameterElement> pathParameter =
-                    pathParameters.stream().filter(p -> p.getName().toString().equals(parameterName)).findFirst();
+            Optional<Parameter> pathParameter =
+                    pathParameters.stream().filter(p -> p.getName().equals(parameterName)).findFirst();
 
             if (pathParameter.isPresent()) {
                 try {
@@ -132,15 +140,13 @@ public class RequestManager {
         // TODO: add cookie parameters support
 
         RequestBody requestBody;
-        if (operation.getMethod().equals(HttpMethod.POST) ||
-                operation.getMethod().equals(HttpMethod.PUT) ||
-                operation.getMethod().equals(HttpMethod.PATCH)
-        ) {
+        if (operation.getMethod().equals(HttpMethod.POST) || operation.getMethod().equals(HttpMethod.PUT) ||
+                operation.getMethod().equals(HttpMethod.PATCH)) {
             if (operation.getRequestBody() != null) {
                 if (operation.getRequestContentType().contains("application/x-www-form-urlencoded") &&
-                        operation.getRequestBody() instanceof ParameterObject) {
+                        operation.getRequestBody() instanceof ObjectParameter) {
                     Map<String, String> formParametersMap = new HashMap<>();
-                    ((ParameterObject) operation.getRequestBody()).getProperties().forEach(
+                    ((ObjectParameter) operation.getRequestBody()).getProperties().forEach(
                             p -> formParametersMap.put(p.getName().toString(), p.getValueAsFormattedString())
                     );
                     StringJoiner formUrlEncoded = new StringJoiner("&");
@@ -160,9 +166,8 @@ public class RequestManager {
         // By default, accept application/json. If differently defined (in the specification) it will be overridden
         requestBuilder.header("Accept", "application/json");
 
-        operation.getHeaderParameters().forEach(
-                p -> requestBuilder.header(p.getName().toString(), p.getValueAsFormattedString())
-        );
+        operation.getHeaderParameters().forEach(p ->
+                requestBuilder.header(p.getName().toString(), p.getValueAsFormattedString()));
 
         // Apply authorization
         if (authenticationInfo != null) {
@@ -214,20 +219,12 @@ public class RequestManager {
         return requestBuilder.build();
     }
 
-    public Response run() throws IOException {
-        return client.newCall(buildRequest()).execute();
-    }
-
-    public Response run(Request request) throws IOException {
-        return client.newCall(request).execute();
-    }
-
     /**
      * Adds the given parameter to the operation. If another parameter that results equals to it is already defined,
      * it will be substituted.
      * @param parameter the parameter to be added.
      */
-    public void addParameter(ParameterElement parameter) {
+    public void addParameter(Parameter parameter) {
         switch (parameter.getLocation()) {
 
             case HEADER:
@@ -243,11 +240,11 @@ public class RequestManager {
                 this.operation.getCookieParameters().add(parameter);
                 break;
             case REQUEST_BODY:
-                if (!(parameter instanceof StructuredParameterElement)) {
+                if (!(parameter instanceof StructuredParameter)) {
                     logger.error("Cannot cast parameter '" + parameter.getName() + "' to a structured parameter in " +
                             "'" + this.operation + "' request body.");
                 } else {
-                    this.operation.setRequestBody((StructuredParameterElement) parameter);
+                    this.operation.setRequestBody((StructuredParameter) parameter);
                 }
                 break;
             case RESPONSE_BODY:
@@ -262,7 +259,7 @@ public class RequestManager {
         }
     }
 
-    public void removeParameter(ParameterElement parameter) {
+    public void removeParameter(Parameter parameter) {
         switch (parameter.getLocation()) {
 
             case HEADER:
@@ -291,7 +288,7 @@ public class RequestManager {
         }
     }
 
-    public void setNullParameter(ParameterElement parameter) {
+    public void setNullParameter(Parameter parameter) {
         if (parameter.getLocation() == ParameterLocation.REQUEST_BODY) {
             removeParameter(parameter);
             return;
@@ -302,7 +299,7 @@ public class RequestManager {
     }
 
     public void removeUninitializedParameters() {
-        Set<ParameterElement> newPathParameters = new HashSet<>(this.operation.getPathParameters());
+        Set<Parameter> newPathParameters = new HashSet<>(this.operation.getPathParameters());
         this.operation.getPathParameters().stream().filter(p -> p.getValue() == null).forEach(p -> {
             /*logger.warn("Empty-valued path parameter '" + p.getName() + "' found in operation '" + this.operation
                     + "'. It will be valued with its name.");*/
@@ -332,11 +329,11 @@ public class RequestManager {
         return operation;
     }
 
-    public Collection<ParameterLeaf> getLeaves() {
+    public Collection<LeafParameter> getLeaves() {
         return this.operation.getLeaves();
     }
 
-    public Collection<ParameterArray> getArrays() {
+    public Collection<ArrayParameter> getArrays() {
         return this.operation.getArrays();
     }
 
@@ -350,30 +347,30 @@ public class RequestManager {
             return false;
         }
 
-        Set<ParameterElement> sourceHeaderRequired =
-                source.getHeaderParameters().stream().filter(ParameterElement::isRequired).collect(Collectors.toSet());
+        Set<Parameter> sourceHeaderRequired =
+                source.getHeaderParameters().stream().filter(Parameter::isRequired).collect(Collectors.toSet());
         if (!operation.getHeaderParameters().containsAll(sourceHeaderRequired)) {
             return false;
         }
 
-        Set<ParameterElement> sourceQueryRequired =
-                source.getQueryParameters().stream().filter(ParameterElement::isRequired).collect(Collectors.toSet());
+        Set<Parameter> sourceQueryRequired =
+                source.getQueryParameters().stream().filter(Parameter::isRequired).collect(Collectors.toSet());
         if (!operation.getQueryParameters().containsAll(sourceQueryRequired)) {
             return false;
         }
 
-        Set<ParameterElement> sourceCookieRequired =
-                source.getCookieParameters().stream().filter(ParameterElement::isRequired).collect(Collectors.toSet());
+        Set<Parameter> sourceCookieRequired =
+                source.getCookieParameters().stream().filter(Parameter::isRequired).collect(Collectors.toSet());
         if (!operation.getCookieParameters().containsAll(sourceCookieRequired)) {
             return false;
         }
 
         if (source.getRequestBody() != null) {
-            Set<ParameterLeaf> leavesRequired = source.getRequestBody().getLeaves().stream()
-                    .filter(ParameterElement::isRequired)
+            Set<LeafParameter> leavesRequired = ParameterUtils.getLeaves(source.getRequestBody()).stream()
+                    .filter(Parameter::isRequired)
                     .collect(Collectors.toSet());
             return (leavesRequired.size() == 0 || operation.getRequestBody() != null) &&
-                    operation.getRequestBody().getLeaves().containsAll(leavesRequired);
+                    ParameterUtils.getLeaves(operation.getRequestBody()).containsAll(leavesRequired);
         }
 
         return true;
@@ -402,17 +399,17 @@ public class RequestManager {
         }
     }
 
-    private static Set<ParameterElement> cleanupEmptyValuedParametersFromList(Set<ParameterElement> elements) {
-        Set<ParameterElement> newElements = new HashSet<>(elements);
+    private static Set<Parameter> cleanupEmptyValuedParametersFromList(Set<Parameter> elements) {
+        Set<Parameter> newElements = new HashSet<>(elements);
 
         elements.forEach(e -> {
-            if (ParameterLeaf.class.isAssignableFrom(e.getClass())) {
+            if (LeafParameter.class.isAssignableFrom(e.getClass())) {
                 if (e.getValue() == null) {
                     //logger.warn("Empty valued parameter '" + e.getName() + "' found. It will be removed.");
                     newElements.remove(e);
                 }
-            } else if (StructuredParameterElement.class.isAssignableFrom(e.getClass())) {
-                StructuredParameterElement structuredE = (StructuredParameterElement) e;
+            } else if (StructuredParameter.class.isAssignableFrom(e.getClass())) {
+                StructuredParameter structuredE = (StructuredParameter) e;
                 structuredE.removeUninitializedParameters();
 
                 if (structuredE.isEmpty() && !structuredE.isKeepIfEmpty()) {

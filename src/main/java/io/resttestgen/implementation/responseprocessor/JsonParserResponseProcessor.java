@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import io.resttestgen.core.datatype.parameter.ParameterFactory;
-import io.resttestgen.core.datatype.parameter.StructuredParameterElement;
+import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.testing.ResponseProcessor;
 import io.resttestgen.core.testing.TestInteraction;
 import org.apache.logging.log4j.LogManager;
@@ -29,9 +29,9 @@ public class JsonParserResponseProcessor extends ResponseProcessor {
         Gson gson = new Gson();
         try {
             JsonElement parsedJSON = gson.fromJson(testInteraction.getResponseBody(), JsonElement.class);
-            StructuredParameterElement responseBody = (StructuredParameterElement)
-                    ParameterFactory.getParameterElement(null, parsedJSON, testInteraction.getOperation(), null);
-            testInteraction.getOperation().setResponseBody(responseBody);
+            StructuredParameter responseBody = (StructuredParameter)
+                    ParameterFactory.getParameterElement(parsedJSON, null);
+            testInteraction.getFuzzedOperation().setResponseBody(responseBody);
         } catch (JsonSyntaxException | ClassCastException e) {
             logger.warn("GSON could not parse the response body of this interaction.");
         }

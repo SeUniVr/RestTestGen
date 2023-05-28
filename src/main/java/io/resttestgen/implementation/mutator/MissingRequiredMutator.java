@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.testing.Mutator;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +15,7 @@ public class MissingRequiredMutator extends Mutator {
      * @return true if the parameter is mutable, false otherwise
      */
     @Override
-    public boolean isParameterMutable(ParameterLeaf parameter) {
+    public boolean isParameterMutable(LeafParameter parameter) {
         return parameter.isRequired();
     }
 
@@ -25,7 +25,7 @@ public class MissingRequiredMutator extends Mutator {
      * @return the leaf with mutated value.
      */
     @Override
-    public ParameterLeaf mutate(ParameterLeaf parameter) {
+    public LeafParameter mutate(LeafParameter parameter) {
         if (isParameterMutable(parameter)) {
             parameter.removeValue();
         } else {

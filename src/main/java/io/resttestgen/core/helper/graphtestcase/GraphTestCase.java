@@ -2,7 +2,7 @@ package io.resttestgen.core.helper.graphtestcase;
 
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestSequence;
@@ -32,11 +32,11 @@ public class GraphTestCase {
             String targetNode = getNodeFromInteraction(testSequence, interaction);
             graph.addVertex(targetNode);
 
-            for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
-                if (leaf.getValue() instanceof ParameterLeaf) {
+            for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
+                if (leaf.getValue() instanceof LeafParameter) {
                     String sourceNode = getNodeFromInteraction(testSequence,
-                            getInteractionFromOperation(testSequence, ((ParameterLeaf) leaf.getValue()).getOperation()));
-                    ParameterEdge edge = new ParameterEdge((ParameterLeaf) leaf.getValue(), leaf);
+                            getInteractionFromOperation(testSequence, ((LeafParameter) leaf.getValue()).getOperation()));
+                    ParameterEdge edge = new ParameterEdge((LeafParameter) leaf.getValue(), leaf);
                     graph.addEdge(sourceNode, targetNode, edge);
                 } else {
                     ParameterEdge edge = new ParameterEdge(leaf, leaf);
@@ -63,14 +63,14 @@ public class GraphTestCase {
     private static String getNodeFromInteraction(TestSequence sequence, TestInteraction interaction) {
         if (sequence != null && interaction != null) {
             int number = sequence.indexOf(interaction) + 1;
-            return number + ": " + interaction.getOperation().toString();
+            return number + ": " + interaction.getFuzzedOperation().toString();
         }
         return "Error";
     }
 
     private static TestInteraction getInteractionFromOperation(TestSequence sequence, Operation operation) {
         for (TestInteraction interaction : sequence) {
-            if (interaction.getOperation() == operation) {
+            if (interaction.getFuzzedOperation() == operation) {
                 return interaction;
             }
         }

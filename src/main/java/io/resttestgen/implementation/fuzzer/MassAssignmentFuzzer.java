@@ -7,10 +7,11 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterArray;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.ParameterObject;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.ParameterUtils;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.helper.CrudGroup;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Fuzzer;
@@ -30,6 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getReferenceObjects;
 
 /**
  * Generates mass assignment injection sequences, given a CRUD batch (set of CRUD operations on the same object)
@@ -69,14 +73,14 @@ public class MassAssignmentFuzzer extends Fuzzer {
         // Compute producer parameters, as the output parameters of 2XX responses of producer operations
         // (read and read-multi operations)
         this.producerParameterNames = new HashSet<>();
-        readOperations.forEach(o -> producerParameterNames.addAll(getSuccessfulOutputReferenceLeaves(o).stream().map(ParameterElement::getNormalizedName).collect(Collectors.toSet())));
+        readOperations.forEach(o -> producerParameterNames.addAll(getSuccessfulOutputReferenceLeaves(o).stream().map(Parameter::getNormalizedName).collect(Collectors.toSet())));
 
         // Compute consumer parameters, as the input of consumer operations (create and update operations)
         this.consumerParameterNames = new HashSet<>();
         createOperations.forEach(o -> consumerParameterNames.addAll(o.getAllRequestParameters().stream()
-                .map(ParameterElement::getNormalizedName).collect(Collectors.toSet())));
+                .map(Parameter::getNormalizedName).collect(Collectors.toSet())));
         updateOperations.forEach(o -> consumerParameterNames.addAll(o.getAllRequestParameters().stream()
-                .map(ParameterElement::getNormalizedName).collect(Collectors.toSet())));
+                .map(Parameter::getNormalizedName).collect(Collectors.toSet())));
 
         // Compute set of read-only parameter normalized names
         readOnlyParameterNames = new HashSet<>(Sets.difference(producerParameterNames, consumerParameterNames));
@@ -196,14 +200,14 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
                             if (createOperationDoesNotOutputResourceIdentifier) {
                                 TestInteraction readInteraction =
-                                        new TestInteraction(finalTestSequence.get(0).getOperation().deepClone());
+                                        new TestInteraction(finalTestSequence.get(0).getFuzzedOperation().deepClone());
                                 TestSequence readSequence = new TestSequence(this, readInteraction);
                                 testRunner.run(readSequence);
                                 finalTestSequence.append(readSequence);
-                                resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(finalTestSequence.get(0).getOperation(),
-                                        readSequence.get(0).getOperation());
+                                resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(finalTestSequence.get(0).getFuzzedOperation(),
+                                        readSequence.get(0).getFuzzedOperation());
                             } else {
-                                resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(injectedSequence.getFirst().getOperation());
+                                resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(injectedSequence.getFirst().getFuzzedOperation());
                                 TestSequence readSequence = fuzzUntilSuccessful(readOperation, resourceIdentifierValue);
                                 finalTestSequence.append(readSequence);
                             }
@@ -299,14 +303,14 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
                                 if (createOperationDoesNotOutputResourceIdentifier) {
                                     TestInteraction readInteraction =
-                                            new TestInteraction(finalTestSequence.get(0).getOperation().deepClone());
+                                            new TestInteraction(finalTestSequence.get(0).getFuzzedOperation().deepClone());
                                     TestSequence readSequence = new TestSequence(this, readInteraction);
                                     testRunner.run(readSequence);
                                     finalTestSequence.append(readSequence);
-                                    resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(finalTestSequence.get(0).getOperation(),
-                                            readSequence.get(0).getOperation());
+                                    resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(finalTestSequence.get(0).getFuzzedOperation(),
+                                            readSequence.get(0).getFuzzedOperation());
                                 } else {
-                                    resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(createSequence.getFirst().getOperation());
+                                    resourceIdentifierValue = extractNewlyCreatedResourceIdentifier(createSequence.getFirst().getFuzzedOperation());
                                     TestSequence readSequence = fuzzUntilSuccessful(readOperation, resourceIdentifierValue);
                                     finalTestSequence.append(readSequence);
                                 }
@@ -317,7 +321,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
                                 if (createOperationDoesNotOutputResourceIdentifier) {
                                     TestInteraction readInteraction =
-                                            new TestInteraction(finalTestSequence.get(0).getOperation().deepClone());
+                                            new TestInteraction(finalTestSequence.get(0).getFuzzedOperation().deepClone());
                                     TestSequence readSequence = new TestSequence(this, readInteraction);
                                     testRunner.run(readSequence);
                                     finalTestSequence.append(readSequence);
@@ -378,7 +382,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
      * @return true if the operation contains a parameter with the given normalized parameter name.
      */
     private boolean operationHasOutputParameter(Operation operation, NormalizedParameterName normalizedParameterName) {
-        for (ParameterLeaf leaf : getSuccessfulOutputReferenceLeaves(operation)) {
+        for (LeafParameter leaf : getSuccessfulOutputReferenceLeaves(operation)) {
             if (leaf.getNormalizedName().equals(normalizedParameterName)) {
                 return true;
             }
@@ -387,7 +391,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
     }
 
     private boolean operationHasOutputWithResourceIdentifier(Operation operation) {
-        for (ParameterLeaf leaf : getSuccessfulOutputReferenceLeaves(operation)) {
+        for (LeafParameter leaf : getSuccessfulOutputReferenceLeaves(operation)) {
             if (isCrudResourceIdentifier(leaf)) {
                 return true;
             }
@@ -418,16 +422,16 @@ public class MassAssignmentFuzzer extends Fuzzer {
         Operation injectedOperation = operationToInject.deepClone();
 
         // Find read-only parameter in read-only operation, siblings are the leaf at the same level
-        ParameterLeaf foundLeaf = null;
+        LeafParameter foundLeaf = null;
         Set<NormalizedParameterName> siblings = new HashSet<>();
-        for (ParameterLeaf leaf : getSuccessfulOutputReferenceLeaves(operationWithParameter)) {
+        for (LeafParameter leaf : getSuccessfulOutputReferenceLeaves(operationWithParameter)) {
             if (leaf.getNormalizedName().equals(normalizedParameterName)) {
                 foundLeaf = leaf;
                 break;
             }
         }
-        if (foundLeaf != null && foundLeaf.getParent() != null && foundLeaf.getParent() instanceof ParameterObject) {
-            ((ParameterObject) foundLeaf.getParent()).getProperties().forEach(p -> {
+        if (foundLeaf != null && foundLeaf.getParent() != null && foundLeaf.getParent() instanceof ObjectParameter) {
+            ((ObjectParameter) foundLeaf.getParent()).getProperties().forEach(p -> {
                 if (!p.getNormalizedName().equals(normalizedParameterName)) {
                     siblings.add(p.getNormalizedName());
                 }
@@ -435,12 +439,12 @@ public class MassAssignmentFuzzer extends Fuzzer {
         }
 
         int commonSiblingsCount = 0;
-        ParameterObject mostSimilarObject = null;
+        ObjectParameter mostSimilarObject = null;
 
         // We try to find the more correct location for injection, by maximizing the common siblings
-        for (ParameterObject object : injectedOperation.getRequestBody().getReferenceObjects()) {
+        for (ObjectParameter object : getReferenceObjects(injectedOperation.getRequestBody())) {
             List<NormalizedParameterName> objectParameters = object.getProperties().stream()
-                    .map(ParameterElement::getNormalizedName).collect(Collectors.toList());
+                    .map(Parameter::getNormalizedName).collect(Collectors.toList());
 
             // Keep only elements which are in common with the siblings
             objectParameters.retainAll(siblings);
@@ -452,11 +456,11 @@ public class MassAssignmentFuzzer extends Fuzzer {
         }
 
         if (mostSimilarObject != null && foundLeaf != null) {
-            ParameterElement injectedLeaf = foundLeaf.deepClone();
+            Parameter injectedLeaf = foundLeaf.deepClone();
             injectedLeaf.addTag("injected");
             injectedLeaf.setParent(mostSimilarObject);
             injectedLeaf.setRequired(true);
-            mostSimilarObject.addProperty(injectedLeaf);
+            mostSimilarObject.addChild(injectedLeaf);
         }
 
         // TODO: Also consider similarity with query parameters
@@ -472,7 +476,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
     private TestSequence changeInjectedParameters(TestSequence testSequence) {
         TestSequence changedTestSequence = testSequence.deepClone();
         for (TestInteraction interaction : changedTestSequence) {
-            for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
+            for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
                 if (leaf.getTags().size() > 0 && leaf.getTags().contains("injected")) {
                     if (leaf.getConcreteValue() instanceof Boolean) {
                         leaf.setValue(!((Boolean) leaf.getConcreteValue()));
@@ -533,8 +537,8 @@ public class MassAssignmentFuzzer extends Fuzzer {
         // Set new value for resource identifiers parameters or unique parameters.
         // Unique parameters' name ends with id or name.
         for (TestInteraction interaction : toReplayTestSequence) {
-            if (getCRUDSemantics(interaction.getOperation()).equals(OperationSemantics.CREATE)) {
-                for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
+            if (getCRUDSemantics(interaction.getFuzzedOperation()).equals(OperationSemantics.CREATE)) {
+                for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
                     if (isCrudResourceIdentifier(leaf) || leaf.getNormalizedName().toString().toLowerCase().endsWith("id") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("nam") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("name")) {
@@ -543,8 +547,8 @@ public class MassAssignmentFuzzer extends Fuzzer {
                     }
                 }
             }
-            if (getCRUDSemantics(interaction.getOperation()).equals(OperationSemantics.UPDATE)) {
-                for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
+            if (getCRUDSemantics(interaction.getFuzzedOperation()).equals(OperationSemantics.UPDATE)) {
+                for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
                     if (!isCrudResourceIdentifier(leaf)  && (leaf.getNormalizedName().toString().toLowerCase().endsWith("id") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("nam") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("name"))) {
@@ -556,7 +560,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         }
 
         int subsequenceSize = 1;
-        if (getCRUDSemantics(testSequence.get(0).getOperation()).equals(OperationSemantics.READ_MULTI)) {
+        if (getCRUDSemantics(testSequence.get(0).getFuzzedOperation()).equals(OperationSemantics.READ_MULTI)) {
             subsequenceSize = 3;
         }
 
@@ -565,16 +569,16 @@ public class MassAssignmentFuzzer extends Fuzzer {
         Object newIdentifierValue;
 
         if (subsequenceSize == 1) {
-            newIdentifierValue = extractNewlyCreatedResourceIdentifier(toReplayTestSequence.getFirst().getOperation());
+            newIdentifierValue = extractNewlyCreatedResourceIdentifier(toReplayTestSequence.getFirst().getFuzzedOperation());
         } else {
-            newIdentifierValue = extractNewlyCreatedResourceIdentifier(toReplayTestSequence.getFirst().getOperation(),
-                    toReplayTestSequence.get(2).getOperation());
+            newIdentifierValue = extractNewlyCreatedResourceIdentifier(toReplayTestSequence.getFirst().getFuzzedOperation(),
+                    toReplayTestSequence.get(2).getFuzzedOperation());
         }
 
         TestSequence secondPart = toReplayTestSequence.getSubSequence(subsequenceSize, toReplayTestSequence.size());
 
         for (TestInteraction interaction : secondPart) {
-            for (ParameterLeaf leaf : interaction.getOperation().getLeaves()) {
+            for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
                 if (isCrudResourceIdentifier(leaf) && leaf.getConcreteValue().toString().equals(currentIdValue.toString())) {
                     leaf.setValue(newIdentifierValue);
                 }
@@ -593,7 +597,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         return operation.getCrudSemantics();
     }
 
-    private boolean isCrudResourceIdentifier(ParameterLeaf leaf) {
+    private boolean isCrudResourceIdentifier(LeafParameter leaf) {
         if (useInferredCRUDInformation) {
             return leaf.isInferredResourceIdentifier();
         }
@@ -604,12 +608,12 @@ public class MassAssignmentFuzzer extends Fuzzer {
         this.useInferredCRUDInformation = useInferredCRUDInformation;
     }
 
-    private Set<String> getSetOfIdentifiers(ParameterArray array, ParameterName identifierName) {
+    private Set<String> getSetOfIdentifiers(ArrayParameter array, ParameterName identifierName) {
 
         Set<String> identifiers = new HashSet<>();
 
-        for (ParameterElement element : array.getElements()) {
-            for (ParameterLeaf leaf : element.getLeaves()) {
+        for (Parameter element : array.getElements()) {
+            for (LeafParameter leaf : getLeaves(element)) {
                 if (leaf.getName().equals(identifierName)) {
                     identifiers.add(leaf.getConcreteValue().toString());
                 }
@@ -619,9 +623,9 @@ public class MassAssignmentFuzzer extends Fuzzer {
         return identifiers;
     }
 
-    private ParameterElement getElementWithIdentifierEqualTo(ParameterArray array, ParameterName identifierName, String identifierValue) {
-        for (ParameterElement element : array.getElements()) {
-            for (ParameterLeaf leaf : element.getLeaves()) {
+    private Parameter getElementWithIdentifierEqualTo(ArrayParameter array, ParameterName identifierName, String identifierValue) {
+        for (Parameter element : array.getElements()) {
+            for (LeafParameter leaf : getLeaves(element)) {
                 if (leaf.getName().equals(identifierName) && leaf.getValue().toString().equals(identifierValue)) {
                     return element;
                 }
@@ -630,17 +634,17 @@ public class MassAssignmentFuzzer extends Fuzzer {
         return null;
     }
 
-    private ParameterArray getResponseBodyHigherLevelArray(Operation operation) {
+    private ArrayParameter getResponseBodyHigherLevelArray(Operation operation) {
 
-        ParameterElement responseBody = operation.getResponseBody();
+        Parameter responseBody = operation.getResponseBody();
 
         if (responseBody != null) {
-            if (responseBody instanceof ParameterArray) {
-                return (ParameterArray) responseBody;
-            } else if (responseBody instanceof ParameterObject) {
-                for (ParameterElement element : ((ParameterObject) responseBody).getProperties()) {
-                    if (element instanceof ParameterArray) {
-                        return (ParameterArray) element;
+            if (responseBody instanceof ArrayParameter) {
+                return (ArrayParameter) responseBody;
+            } else if (responseBody instanceof ObjectParameter) {
+                for (Parameter element : ((ObjectParameter) responseBody).getProperties()) {
+                    if (element instanceof ArrayParameter) {
+                        return (ArrayParameter) element;
                     }
                 }
             }
@@ -649,7 +653,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
     }
 
     private ParameterName getResourceIdentifierName(Operation operation) {
-        for (ParameterLeaf leaf : getSuccessfulOutputReferenceLeaves(operation)) {
+        for (LeafParameter leaf : getSuccessfulOutputReferenceLeaves(operation)) {
             if (isCrudResourceIdentifier(leaf)) {
                 return leaf.getName();
             }
@@ -659,11 +663,11 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
 
 
-    private ParameterElement extractNewlyCreatedObject(Operation before, Operation after) {
+    private Parameter extractNewlyCreatedObject(Operation before, Operation after) {
 
         ParameterName resourceIdentifierName = getResourceIdentifierName(before);
-        ParameterArray beforeArray = getResponseBodyHigherLevelArray(before);
-        ParameterArray afterArray = getResponseBodyHigherLevelArray(after);
+        ArrayParameter beforeArray = getResponseBodyHigherLevelArray(before);
+        ArrayParameter afterArray = getResponseBodyHigherLevelArray(after);
 
         if (beforeArray != null && afterArray != null && resourceIdentifierName != null &&
                 beforeArray.getElements().size() < afterArray.getElements().size() &&
@@ -688,8 +692,8 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
     public Object extractNewlyCreatedResourceIdentifier(Operation before, Operation after) {
         ParameterName resourceIdentifierName = getResourceIdentifierName(before);
-        ParameterArray beforeArray = getResponseBodyHigherLevelArray(before);
-        ParameterArray afterArray = getResponseBodyHigherLevelArray(after);
+        ArrayParameter beforeArray = getResponseBodyHigherLevelArray(before);
+        ArrayParameter afterArray = getResponseBodyHigherLevelArray(after);
 
         if (beforeArray != null && afterArray != null && resourceIdentifierName != null &&
                 beforeArray.getElements().size() < afterArray.getElements().size() &&
@@ -728,7 +732,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         ParameterName resourceIdentifierName = getResourceIdentifierName(createOperation);
 
         if (createOperation.getResponseBody() != null) {
-            for (ParameterLeaf leaf : createOperation.getResponseBody().getLeaves()) {
+            for (LeafParameter leaf : getLeaves(createOperation.getResponseBody())) {
                 if (leaf.getName().equals(resourceIdentifierName)) {
                     return leaf.getConcreteValue();
                 }
@@ -739,9 +743,9 @@ public class MassAssignmentFuzzer extends Fuzzer {
     }
 
     @NotNull
-    public Collection<ParameterLeaf> getSuccessfulOutputReferenceLeaves(Operation operation) {
+    public Collection<LeafParameter> getSuccessfulOutputReferenceLeaves(Operation operation) {
         if (operation.getSuccessfulOutputParameters() != null) {
-            return operation.getSuccessfulOutputParameters().getReferenceLeaves();
+            return ParameterUtils.getReferenceLeaves(operation.getSuccessfulOutputParameters());
         }
         return new HashSet<>();
     }

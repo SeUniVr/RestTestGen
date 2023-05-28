@@ -2,8 +2,8 @@ package io.resttestgen.core.dictionary;
 
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.ParameterType;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -16,11 +16,11 @@ public class DictionaryEntry {
     private ParameterName parameterName;
     private NormalizedParameterName normalizedParameterName;
     private ParameterType type;
-    private ParameterLeaf source;
+    private LeafParameter source;
     private Timestamp discoveryTime;
     private Object value;
 
-    public DictionaryEntry(ParameterLeaf leaf) {
+    public DictionaryEntry(LeafParameter leaf) {
         if (leaf.getName() != null && leaf.getNormalizedName() != null && leaf.getType() != null &&
                 leaf.getOperation() != null && leaf.getValue() != null) {
             this.parameterName = leaf.getName();
@@ -58,11 +58,11 @@ public class DictionaryEntry {
         this.type = type;
     }
 
-    public ParameterLeaf getSource() {
+    public LeafParameter getSource() {
         return source;
     }
 
-    public void setSource(ParameterLeaf source) {
+    public void setSource(LeafParameter source) {
         this.source = source;
     }
 

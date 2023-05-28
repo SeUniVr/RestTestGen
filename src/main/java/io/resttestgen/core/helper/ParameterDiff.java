@@ -2,7 +2,8 @@ package io.resttestgen.core.helper;
 
 import com.google.common.collect.Sets;
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.ParameterUtils;
 import io.resttestgen.core.openapi.Operation;
 
 import java.util.HashSet;
@@ -18,8 +19,8 @@ public class ParameterDiff {
      * @param consumer the operation consuming some input parameters.
      * @return the list of not common parameters.
      */
-    public static List<ParameterElement> staticDiff(Operation producer, Operation consumer) {
-        List<ParameterElement> diffParameters = new LinkedList<>();
+    public static List<Parameter> staticDiff(Operation producer, Operation consumer) {
+        List<Parameter> diffParameters = new LinkedList<>();
 
         Set<NormalizedParameterName> producerNormalizedParameterNames = new HashSet<>();
         producer.getOutputParametersSet().forEach(p -> producerNormalizedParameterNames.add(p.getNormalizedName()));
@@ -45,16 +46,16 @@ public class ParameterDiff {
      * @param consumer the operation consuming some input parameters.
      * @return the list of not common parameters.
      */
-    public static List<ParameterElement> dynamicDiff(Operation producer, Operation consumer) {
+    public static List<Parameter> dynamicDiff(Operation producer, Operation consumer) {
 
         if (producer.getResponseBody() == null) {
             return null;
         }
 
-        List<ParameterElement> diffParameters = new LinkedList<>();
+        List<Parameter> diffParameters = new LinkedList<>();
 
         Set<NormalizedParameterName> producerNormalizedParameterNames = new HashSet<>();
-        producer.getResponseBody().getReferenceLeaves().forEach(p -> producerNormalizedParameterNames.add(p.getNormalizedName()));
+        ParameterUtils.getReferenceLeaves(producer.getResponseBody()).forEach(p -> producerNormalizedParameterNames.add(p.getNormalizedName()));
         Set<NormalizedParameterName> consumerNormalizedParameterNames = new HashSet<>();
         consumer.getAllRequestParameters().forEach(p -> consumerNormalizedParameterNames.add(p.getNormalizedName()));
 

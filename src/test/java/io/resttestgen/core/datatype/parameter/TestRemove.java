@@ -3,6 +3,7 @@ package io.resttestgen.core.datatype.parameter;
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.CannotParseOpenAPIException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ public class TestRemove {
         Operation operation = environment.getOpenAPI().getOperations().stream().filter(o -> o.getMethod() == HttpMethod.PUT).collect(Collectors.toList()).get(0).deepClone();
         int inizialSize = operation.getAllRequestParameters().size();
         System.out.println(operation + ": " + operation.getAllRequestParameters().size() + " parameters.");
-        for (ParameterLeaf leaf : operation.getLeaves()) {
+        for (LeafParameter leaf : operation.getLeaves()) {
             leaf.remove();
             break;
         }

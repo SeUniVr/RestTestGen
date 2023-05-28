@@ -1,5 +1,6 @@
 package io.resttestgen.core.testing;
 
+import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
 import io.resttestgen.core.helper.Taggable;
@@ -17,7 +18,8 @@ public class TestInteraction extends Taggable {
     private static final Logger logger = LogManager.getLogger(TestInteraction.class);
 
     // Request fields
-    private transient Operation operation;
+    private final transient Operation referenceOperation; // Operation from the specification (typically, read only)
+    private transient Operation fuzzedOperation; // Operation populated by the fuzzer
     private HttpMethod requestMethod;
     private String requestURL;
     private String requestHeaders;
@@ -36,16 +38,26 @@ public class TestInteraction extends Taggable {
     private transient TestStatus testStatus = TestStatus.CREATED;
 
 
-    public TestInteraction(Operation operation) {
-        this.operation = operation;
+    public TestInteraction(Operation referenceOperation, Operation fuzzedOperation) {
+        if (referenceOperation != null && referenceOperation.isReadOnly()) {
+            this.referenceOperation = referenceOperation;
+        } else {
+            this.referenceOperation = null;
+        }
+        this.fuzzedOperation = fuzzedOperation;
     }
 
-    public Operation getOperation() {
-        return operation;
+    public TestInteraction(Operation fuzzedOperation) {
+        this.referenceOperation = Environment.getInstance().getOpenAPI().getReferenceOperationFromFuzzedOperation(fuzzedOperation);
+        this.fuzzedOperation = fuzzedOperation;
+    }
+
+    public Operation getFuzzedOperation() {
+        return fuzzedOperation;
     }
 
     public void setOperation(Operation operation) {
-        this.operation = operation;
+        this.fuzzedOperation = operation;
     }
 
     public void setResponseStatusCode(HttpStatusCode statusCode) {
@@ -185,11 +197,11 @@ public class TestInteraction extends Taggable {
     }
 
     public TestInteraction deepClone() {
-        return new TestInteraction(operation.deepClone());
+        return new TestInteraction(fuzzedOperation.deepClone());
     }
 
     @Override
     public String toString() {
-        return operation.toString();
+        return fuzzedOperation.toString();
     }
 }

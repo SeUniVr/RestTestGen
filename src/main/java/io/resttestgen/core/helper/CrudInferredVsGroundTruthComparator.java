@@ -2,8 +2,8 @@ package io.resttestgen.core.helper;
 
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.Operation;
 
 import java.io.BufferedWriter;
@@ -25,9 +25,9 @@ public class CrudInferredVsGroundTruthComparator {
             stringBuilder.append(operation.getCrudResourceType()).append(",");
             stringBuilder.append(operation.getInferredCrudResourceType()).append(",");
 
-            for (ParameterElement element : operation.getAllRequestParameters()) {
-                if (element instanceof ParameterLeaf) {
-                    if (((ParameterLeaf) element).isResourceIdentifier()) {
+            for (Parameter element : operation.getAllRequestParameters()) {
+                if (element instanceof LeafParameter) {
+                    if (((LeafParameter) element).isResourceIdentifier()) {
                         stringBuilder.append(element.getNormalizedName());
                         break;
                     }
@@ -36,9 +36,9 @@ public class CrudInferredVsGroundTruthComparator {
 
             stringBuilder.append(",");
 
-            for (ParameterElement element : operation.getAllRequestParameters()) {
-                if (element instanceof ParameterLeaf) {
-                    if (((ParameterLeaf) element).isInferredResourceIdentifier()) {
+            for (Parameter element : operation.getAllRequestParameters()) {
+                if (element instanceof LeafParameter) {
+                    if (((LeafParameter) element).isInferredResourceIdentifier()) {
                         stringBuilder.append(element.getNormalizedName());
                         break;
                     }
@@ -47,9 +47,9 @@ public class CrudInferredVsGroundTruthComparator {
 
             stringBuilder.append(",");
 
-            for (ParameterElement element : operation.getOutputParametersSet()) {
-                if (element instanceof ParameterLeaf) {
-                    if (((ParameterLeaf) element).isResourceIdentifier()) {
+            for (Parameter element : operation.getOutputParametersSet()) {
+                if (element instanceof LeafParameter) {
+                    if (((LeafParameter) element).isResourceIdentifier()) {
                         stringBuilder.append(element.getNormalizedName());
                         break;
                     }
@@ -58,9 +58,9 @@ public class CrudInferredVsGroundTruthComparator {
 
             stringBuilder.append(",");
 
-            for (ParameterElement element : operation.getOutputParametersSet()) {
-                if (element instanceof ParameterLeaf) {
-                    if (((ParameterLeaf) element).isInferredResourceIdentifier()) {
+            for (Parameter element : operation.getOutputParametersSet()) {
+                if (element instanceof LeafParameter) {
+                    if (((LeafParameter) element).isInferredResourceIdentifier()) {
                         stringBuilder.append(element.getNormalizedName());
                         break;
                     }

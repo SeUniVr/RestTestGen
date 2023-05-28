@@ -2,7 +2,7 @@ package io.resttestgen.core.helper.graphtestcase;
 
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 
 public class ParameterEdge {
 
@@ -13,7 +13,7 @@ public class ParameterEdge {
     int weight;
     String style;
 
-    public ParameterEdge(ParameterLeaf producedLeaf, ParameterLeaf consumedLeaf) {
+    public ParameterEdge(LeafParameter producedLeaf, LeafParameter consumedLeaf) {
 
         if (producedLeaf.getName().equals(consumedLeaf.getName())) {
             this.parameterName = producedLeaf.getName();

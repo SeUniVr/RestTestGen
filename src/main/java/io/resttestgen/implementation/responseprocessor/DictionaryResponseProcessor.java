@@ -1,15 +1,17 @@
 package io.resttestgen.implementation.responseprocessor;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.NullParameter;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.StructuredParameterElement;
+import io.resttestgen.core.datatype.parameter.leaves.NullParameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.dictionary.DictionaryEntry;
 import io.resttestgen.core.testing.ResponseProcessor;
 import io.resttestgen.core.testing.TestInteraction;
 
 import java.util.Optional;
+
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
 
 public class DictionaryResponseProcessor extends ResponseProcessor {
 
@@ -19,13 +21,13 @@ public class DictionaryResponseProcessor extends ResponseProcessor {
     @Override
     public void process(TestInteraction testInteraction) {
 
-        StructuredParameterElement responseBody = testInteraction.getOperation().getResponseBody();
+        StructuredParameter responseBody = testInteraction.getFuzzedOperation().getResponseBody();
 
         // If the parsed response body is null, try to parse it
         if (responseBody == null) {
             JsonParserResponseProcessor jsonParserResponseProcessor = new JsonParserResponseProcessor();
             jsonParserResponseProcessor.process(testInteraction);
-            responseBody = testInteraction.getOperation().getResponseBody();
+            responseBody = testInteraction.getFuzzedOperation().getResponseBody();
         }
 
         // If the response body is still null, terminate the processing of the response
@@ -34,7 +36,7 @@ public class DictionaryResponseProcessor extends ResponseProcessor {
         }
 
         // Iterate on leaves to store them into the dictionary
-        for (ParameterLeaf leaf : responseBody.getLeaves()) {
+        for (LeafParameter leaf : getLeaves(responseBody)) {
             if (!(leaf instanceof NullParameter)) {
                 DictionaryEntry entry = new DictionaryEntry(leaf);
                 globalDictionary.addEntry(entry);

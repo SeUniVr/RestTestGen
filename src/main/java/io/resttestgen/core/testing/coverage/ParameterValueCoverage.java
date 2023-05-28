@@ -3,9 +3,9 @@ package io.resttestgen.core.testing.coverage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.ParameterType;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
@@ -23,8 +23,8 @@ public class ParameterValueCoverage extends Coverage {
     public ParameterValueCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
             HashMap<ParameterElementWrapper,Set<Object>> newMapParameters = new HashMap<>();
-            for(ParameterElement parameter : operation.getAllRequestParameters()){
-                if(parameter instanceof ParameterLeaf){
+            for(Parameter parameter : operation.getAllRequestParameters()){
+                if(parameter instanceof LeafParameter){
                     ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
                     Set<Object> values = new HashSet<>();
                     if(parameter.getType() == ParameterType.BOOLEAN){
@@ -44,24 +44,24 @@ public class ParameterValueCoverage extends Coverage {
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        Operation operation = testInteraction.getOperation();
+        Operation operation = testInteraction.getFuzzedOperation();
         boolean containsOperation = valuesToTest.containsKey(operation);
-        for(ParameterElement parameter : operation.getAllRequestParameters()) {
-            if(parameter instanceof ParameterLeaf){
+        for(Parameter parameter : operation.getAllRequestParameters()) {
+            if(parameter instanceof LeafParameter){
                 ParameterElementWrapper parameterWrapper = new ParameterElementWrapper(parameter);
                 if(parameter.getType()== ParameterType.BOOLEAN || parameter.isEnum()){
                     if(containsOperation){
                         if(valuesToTest.get(operation).containsKey(parameterWrapper)){
-                            if(valuesToTest.get(operation).get(parameterWrapper).contains(((ParameterLeaf)parameterWrapper.getParameterElement()).getConcreteValue())) {
-                                insertParameterValueToSet(valuesDocumentedTested, operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
+                            if(valuesToTest.get(operation).get(parameterWrapper).contains(((LeafParameter)parameterWrapper.getParameterElement()).getConcreteValue())) {
+                                insertParameterValueToSet(valuesDocumentedTested, operation, parameterWrapper, ((LeafParameter)parameter).getConcreteValue());
                             }else{
-                                insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
+                                insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((LeafParameter)parameter).getConcreteValue());
                             }
                         }else{
-                            insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
+                            insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((LeafParameter)parameter).getConcreteValue());
                         }
                     }else{
-                        insertParameterValueToSet(valuesNotDocumentedTested, operation, parameterWrapper, ((ParameterLeaf)parameter).getConcreteValue());
+                        insertParameterValueToSet(valuesNotDocumentedTested, operation, parameterWrapper, ((LeafParameter)parameter).getConcreteValue());
                     }
                 }
             }

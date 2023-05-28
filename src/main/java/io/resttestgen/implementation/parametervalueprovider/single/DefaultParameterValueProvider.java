@@ -1,14 +1,14 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
 public class DefaultParameterValueProvider extends CountableParameterValueProvider {
 
     @Override
-    public int countAvailableValuesFor(ParameterLeaf parameterLeaf) {
-        if (parameterLeaf.getDefaultValue() != null) {
-            if (!strict || parameterLeaf.isValueCompliant(parameterLeaf.getDefaultValue())) {
+    public int countAvailableValuesFor(LeafParameter leafParameter) {
+        if (leafParameter.getDefaultValue() != null) {
+            if (!strict || leafParameter.isValueCompliant(leafParameter.getDefaultValue())) {
                 return 1;
             }
         }
@@ -16,7 +16,7 @@ public class DefaultParameterValueProvider extends CountableParameterValueProvid
     }
 
     @Override
-    public Object provideValueFor(ParameterLeaf parameterLeaf) {
-        return parameterLeaf.getDefaultValue();
+    public Object provideValueFor(LeafParameter leafParameter) {
+        return leafParameter.getDefaultValue();
     }
 }

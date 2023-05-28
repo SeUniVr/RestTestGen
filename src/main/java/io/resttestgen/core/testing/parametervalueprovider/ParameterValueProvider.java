@@ -1,6 +1,6 @@
 package io.resttestgen.core.testing.parametervalueprovider;
 
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 
 /**
  * Given a parameter, the parameter value provider provides a value for that parameter. Example of parameter value
@@ -10,7 +10,7 @@ public abstract class ParameterValueProvider {
 
     protected boolean strict = false;
 
-    public abstract Object provideValueFor(ParameterLeaf parameterLeaf);
+    public abstract Object provideValueFor(LeafParameter leafParameter);
 
     public boolean isStrict() {
         return strict;

@@ -3,8 +3,8 @@ package io.resttestgen.implementation.parametervalueprovider.single;
 import com.google.gson.Gson;
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.NumberParameter;
-import io.resttestgen.core.datatype.parameter.StringParameter;
+import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
+import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.openapi.CannotParseOpenAPIException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -56,7 +56,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testLongNumberParameter() {
-        NumberParameter numberParameter = new NumberParameter(null, longParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(longParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
             Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
             if (printGeneratedValues) {
@@ -68,7 +68,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testLongNumberParameterWithConstraints() {
-        NumberParameter numberParameter = new NumberParameter(null, longParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(longParameterMap, null);
         double MIN = -50.;
         double MAX = 150.;
         numberParameter.setMinimum(MIN);
@@ -85,7 +85,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testIntegerNumberParameter() {
-        NumberParameter numberParameter = new NumberParameter(null, intParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(intParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
             Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
             if (printGeneratedValues) {
@@ -97,7 +97,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testIntegerNumberParameterWithConstraints() {
-        NumberParameter numberParameter = new NumberParameter(null, intParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(intParameterMap, null);
         double MIN = -50.;
         double MAX = 150.;
         numberParameter.setMinimum(MIN);
@@ -114,7 +114,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testDoubleNumberParameter() {
-        NumberParameter numberParameter = new NumberParameter(null, doubleParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(doubleParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
             Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
             if (printGeneratedValues) {
@@ -126,7 +126,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testDoubleNumberParameterWithConstraints() {
-        NumberParameter numberParameter = new NumberParameter(null, doubleParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(doubleParameterMap, null);
         double MIN = -50.;
         double MAX = 150.;
         numberParameter.setMinimum(MIN);
@@ -143,7 +143,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testFloatNumberParameter() {
-        NumberParameter numberParameter = new NumberParameter(null, floatParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(floatParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
             Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
             if (printGeneratedValues) {
@@ -155,7 +155,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testFloatNumberParameterWithConstraints() {
-        NumberParameter numberParameter = new NumberParameter(null, floatParameterMap, null, null);
+        NumberParameter numberParameter = new NumberParameter(floatParameterMap, null);
         double MIN = -50.;
         double MAX = 150.;
         numberParameter.setMinimum(MIN);
@@ -172,7 +172,7 @@ public class RandomParameterValueProviderTest {
 
     @Test
     public void testStringParameter() {
-        StringParameter stringParameter = new StringParameter(null, stringParameterMap, null, null);
+        StringParameter stringParameter = new StringParameter(stringParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
             Object generated = randomParameterValueProvider.provideValueFor(stringParameter);
             if (printGeneratedValues) {

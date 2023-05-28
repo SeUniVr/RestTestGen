@@ -4,6 +4,12 @@ import io.resttestgen.core.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterStyle;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestSequence;
@@ -125,7 +131,7 @@ public class RestAssuredWriter extends Writer {
         StringBuilder content = new StringBuilder();
 
         // Take operation
-        Operation operation = testInteraction.getOperation();
+        Operation operation = testInteraction.getFuzzedOperation();
         // initialization of operations: take the first operation and generate recursively the operation for build the request
         operationsInitialization(operation);
 
@@ -146,19 +152,19 @@ public class RestAssuredWriter extends Writer {
     }
 
 
-    private void structuredParameterInitialization(StringBuilder content,ParameterElement parameter, String parentName){
-        if(parameter instanceof ParameterArray){
+    private void structuredParameterInitialization(StringBuilder content, Parameter parameter, String parentName){
+        if(parameter instanceof ArrayParameter){
             content.append("\t\tJSONArray ");
             content.append(parentName).append(" = new JSONArray();\n");
             int count = 0;
-            List<ParameterElement> childrenParameters = ((ParameterArray) parameter).getElements();
-            for(ParameterElement childParameter : childrenParameters) {
+            List<Parameter> childrenParameters = ((ArrayParameter) parameter).getElements();
+            for(Parameter childParameter : childrenParameters) {
                 if (childParameter.getParent() == parameter) {
                     String childName = parentName + "_" + childParameter.getName() + count;
-                    if (childParameter instanceof StructuredParameterElement) {
+                    if (childParameter instanceof StructuredParameter) {
                         structuredParameterInitialization(content, childParameter, childName);
                     }
-                    if (childParameter instanceof ParameterLeaf) {
+                    if (childParameter instanceof LeafParameter) {
                         parameterLeafInitialization(content, childParameter, childName);
                     }
                     content.append("\t\t").append(parentName).append(".put(").append(childName).append(");\n");
@@ -166,16 +172,16 @@ public class RestAssuredWriter extends Writer {
                 }
             }
         }
-        if(parameter instanceof ParameterObject){
+        if(parameter instanceof ObjectParameter){
             content.append("\t\tJSONObject ");
             content.append(parentName).append(" = new JSONObject();\n");
-            List<ParameterElement> childrenParameters =((ParameterObject) parameter).getProperties();
-            for(ParameterElement childParameter : childrenParameters){
+            List<Parameter> childrenParameters =((ObjectParameter) parameter).getProperties();
+            for(Parameter childParameter : childrenParameters){
                 String childName =parentName+"_"+childParameter.getName();
-                    if(childParameter instanceof StructuredParameterElement){
+                    if(childParameter instanceof StructuredParameter){
                         structuredParameterInitialization(content, childParameter, childName);
                     }
-                    if(childParameter instanceof ParameterLeaf){
+                    if(childParameter instanceof LeafParameter){
                         parameterLeafInitialization(content,childParameter, childName);
                     }
                     content.append("\t\t").append(parentName).append(".put(\"").append(childParameter.getName()).append("\" , ").append(childName).append(");\n");
@@ -183,13 +189,13 @@ public class RestAssuredWriter extends Writer {
         }
     }
 
-    private void parameterLeafInitialization(StringBuilder content,ParameterElement parameter, String parentName){
+    private void parameterLeafInitialization(StringBuilder content, Parameter parameter, String parentName){
 
         content.append("\t\tObject ").append(parentName).append(" = ");
-        if(parameter.getValue() instanceof ParameterLeaf && !parameter.getTags().contains("mutated")) {
-            ParameterLeaf parameterRef= (ParameterLeaf) parameter.getValue();
+        if(parameter.getValue() instanceof LeafParameter && !parameter.getTags().contains("mutated")) {
+            LeafParameter parameterRef= (LeafParameter) parameter.getValue();
             //check if location of parameterLeaf is not RESPONSE_BODY
-            if(parameterRef.getLocation()!=ParameterLocation.RESPONSE_BODY){
+            if(parameterRef.getLocation()!= ParameterLocation.RESPONSE_BODY){
                 content.append(buildVariableName("request",allOperation.indexOf(parameterRef.getOperation()) + 1,parameterRef.getLocation().toString(),parameterRef.getName()));
             }
             else{
@@ -214,17 +220,17 @@ public class RestAssuredWriter extends Writer {
     }
 
     private void parametersInitialization(Operation operation, StringBuilder content, int numOperation){
-        Set<ParameterElement> parameters = (Set<ParameterElement>) operation.getAllRequestParameters();
+        Set<Parameter> parameters = (Set<Parameter>) operation.getAllRequestParameters();
 
         if (parameters.size() > 0) {
             content.append("\t\t//Parameter initialization\n");
         }
-        for(ParameterElement parameter : parameters){
+        for(Parameter parameter : parameters){
             if(parameter.getParent()==null){
-                if(parameter instanceof StructuredParameterElement){
+                if(parameter instanceof StructuredParameter){
                     structuredParameterInitialization(content,parameter,buildVariableName("request",numOperation,parameter.getLocation().toString(),parameter.getName()));
                 }
-                if(parameter instanceof ParameterLeaf){
+                if(parameter instanceof LeafParameter){
                     parameterLeafInitialization(content,parameter, buildVariableName("request",numOperation,parameter.getLocation().toString(),parameter.getName()));
                 }
             }
@@ -244,7 +250,7 @@ public class RestAssuredWriter extends Writer {
             content.append(".header(\"Authorization\",\"").append(authInfo.getValue()).append("\")");
         }
         content.append(";\n");
-        for(ParameterElement parameter: operation.getLeaves()){
+        for(Parameter parameter: operation.getLeaves()){
             if(parameter.getLocation()!= ParameterLocation.REQUEST_BODY){
                 content.append("\t\t").append(buildVariableName("request",numOperation,null,null));
                 switch (parameter.getLocation()){
@@ -282,10 +288,10 @@ public class RestAssuredWriter extends Writer {
 
     private void operationsInitialization(Operation operation) {
         //for each parameter check if it is a ParameterLeaf
-        Collection<ParameterLeaf> allParameters = operation.getLeaves();
-        for(ParameterLeaf p:allParameters){
-            if(p.getValue() instanceof ParameterLeaf){
-                Operation newOperation = ((ParameterLeaf) p.getValue()).getOperation();
+        Collection<LeafParameter> allParameters = operation.getLeaves();
+        for(LeafParameter p:allParameters){
+            if(p.getValue() instanceof LeafParameter){
+                Operation newOperation = ((LeafParameter) p.getValue()).getOperation();
                 //this avoids the replication of operations
                 allOperation.remove(newOperation);
                 allOperation.add(newOperation);

@@ -2,8 +2,8 @@ package io.resttestgen.core.helper;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.ParameterType;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,7 @@ public class ObjectHelper {
     public static <T> T deepCloneObject(T o) {
         if (o instanceof Number) {
             return o;
-        } else if (o instanceof ParameterLeaf) {
+        } else if (o instanceof LeafParameter) {
             return o;
         } else {
             String json = new Gson().toJson(o);

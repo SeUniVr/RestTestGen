@@ -21,10 +21,10 @@ public class OperationCoverage extends Coverage {
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        if(operationsToTest.contains(testInteraction.getOperation())){
-            operationsDocumentedTested.add(testInteraction.getOperation());
+        if(operationsToTest.contains(testInteraction.getFuzzedOperation())){
+            operationsDocumentedTested.add(testInteraction.getFuzzedOperation());
         }else{
-            operationsNotDocumentedTested.add(testInteraction.getOperation());
+            operationsNotDocumentedTested.add(testInteraction.getFuzzedOperation());
         }
     }
 

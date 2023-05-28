@@ -1,18 +1,18 @@
 package io.resttestgen.core.operationdependencygraph;
 
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import org.jgrapht.graph.DefaultEdge;
 
 public class DependencyEdge extends DefaultEdge {
 
     private DependencyType dependencyType;
     private NormalizedParameterName normalizedName;
-    private ParameterElement producedParameter;
-    private ParameterElement consumedParameter;
+    private Parameter producedParameter;
+    private Parameter consumedParameter;
     private boolean satisfied;
 
-    public DependencyEdge(ParameterElement producedParameter, ParameterElement consumedParameter) {
+    public DependencyEdge(Parameter producedParameter, Parameter consumedParameter) {
         if (producedParameter.getNormalizedName().equals(consumedParameter.getNormalizedName())) {
             this.normalizedName = producedParameter.getNormalizedName();
             this.producedParameter = producedParameter;
@@ -37,19 +37,19 @@ public class DependencyEdge extends DefaultEdge {
         this.normalizedName = normalizedName;
     }
 
-    public ParameterElement getProducedParameter() {
+    public Parameter getProducedParameter() {
         return producedParameter;
     }
 
-    public void setProducedParameter(ParameterElement producedParameter) {
+    public void setProducedParameter(Parameter producedParameter) {
         this.producedParameter = producedParameter;
     }
 
-    public ParameterElement getConsumedParameter() {
+    public Parameter getConsumedParameter() {
         return consumedParameter;
     }
 
-    public void setConsumedParameter(ParameterElement consumedParameter) {
+    public void setConsumedParameter(Parameter consumedParameter) {
         this.consumedParameter = consumedParameter;
     }
 

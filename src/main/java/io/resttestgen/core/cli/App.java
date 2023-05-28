@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class);
-    private static final String toolVersion = "23.02";
+    private static final String toolVersion = "23.05";
     private static final String messageHeader = "RestTestGen Core " + toolVersion;
     private static final String helpMessage = messageHeader + "\n"
             + "Arguments:\n"

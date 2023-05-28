@@ -2,7 +2,7 @@ package io.resttestgen.core.dictionary;
 
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterType;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

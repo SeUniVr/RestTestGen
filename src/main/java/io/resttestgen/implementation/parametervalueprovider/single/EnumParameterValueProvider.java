@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
@@ -10,21 +10,21 @@ import java.util.stream.Collectors;
 public class EnumParameterValueProvider extends CountableParameterValueProvider {
 
     @Override
-    public int countAvailableValuesFor(ParameterLeaf parameterLeaf) {
+    public int countAvailableValuesFor(LeafParameter leafParameter) {
         if (!strict) {
-            return parameterLeaf.getEnumValues().size();
+            return leafParameter.getEnumValues().size();
         } else {
-            return (int) parameterLeaf.getEnumValues().stream().filter(parameterLeaf::isValueCompliant).count();
+            return (int) leafParameter.getEnumValues().stream().filter(leafParameter::isValueCompliant).count();
         }
     }
 
     @Override
-    public Object provideValueFor(ParameterLeaf parameterLeaf) {
+    public Object provideValueFor(LeafParameter leafParameter) {
         ExtendedRandom random = Environment.getInstance().getRandom();
         if (!strict) {
-            return random.nextElement(parameterLeaf.getEnumValues()).orElse(null);
+            return random.nextElement(leafParameter.getEnumValues()).orElse(null);
         } else {
-            return random.nextElement(parameterLeaf.getEnumValues().stream().filter(parameterLeaf::isValueCompliant)
+            return random.nextElement(leafParameter.getEnumValues().stream().filter(leafParameter::isValueCompliant)
                     .collect(Collectors.toSet())).orElse(null);
         }
     }

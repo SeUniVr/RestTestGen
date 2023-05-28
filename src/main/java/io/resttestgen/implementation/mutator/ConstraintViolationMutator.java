@@ -1,10 +1,10 @@
 package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.testing.Mutator;
-import io.resttestgen.core.datatype.parameter.NumberParameter;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.StringParameter;
+import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
+import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
 import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
@@ -21,7 +21,10 @@ public class ConstraintViolationMutator extends Mutator {
     private static final ParameterValueProvider valueProvider = new RandomParameterValueProvider();
 
     @Override
-    public boolean isParameterMutable(ParameterLeaf parameter) {
+    public boolean isParameterMutable(LeafParameter parameter) {
+        if (parameter.getValue() == null) {
+            return false;
+        }
 
         // Check if parameter is an enum
         if (parameter.isEnum() && parameter.getEnumValues().size() > 0) {
@@ -46,7 +49,7 @@ public class ConstraintViolationMutator extends Mutator {
     }
 
     @Override
-    public ParameterLeaf mutate(ParameterLeaf parameter) {
+    public LeafParameter mutate(LeafParameter parameter) {
         if (isParameterMutable(parameter)) {
             if (parameter.isEnum() && parameter.getEnumValues().size() > 0) {
                 mutateEnum(parameter);
@@ -65,7 +68,7 @@ public class ConstraintViolationMutator extends Mutator {
      * Assigns to the parameter a value outside the enum constraints
      * @param parameter the parameter to mutate
      */
-    private void mutateEnum(ParameterLeaf parameter) {
+    private void mutateEnum(LeafParameter parameter) {
         // Set a random value to the parameter (it is very unlikely that the generated value belongs to the enum values
         // FIXME: check that the generated value does not belong to the enum values
         parameter.setValue(valueProvider.provideValueFor(parameter));

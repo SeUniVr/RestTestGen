@@ -1,9 +1,9 @@
 package io.resttestgen.implementation.fuzzer;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterArray;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Fuzzer;
@@ -18,6 +18,9 @@ import org.apache.logging.log4j.Logger;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getArrays;
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.isArrayOfLeaves;
 
 /**
  * The Nominal Fuzzer generates nominal test sequences
@@ -95,20 +98,20 @@ public class NominalFuzzer extends Fuzzer {
         this.parameterValueProvider.setStrict(strict);
     }
 
-    public void setValue(ParameterElement parameter) {
-        if (parameter instanceof ParameterLeaf) {
-            ((ParameterLeaf) parameter).setValue(parameterValueProvider.provideValueFor((ParameterLeaf) parameter));
-        } else if (parameter.isArrayOfLeaves()) {
-            ParameterArray parameterArray = (ParameterArray) parameter;
-            parameterArray.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((ParameterLeaf) parameterArray.getReferenceElement()).toString());
+    public void setValue(Parameter parameter) {
+        if (parameter instanceof LeafParameter) {
+            ((LeafParameter) parameter).setValue(parameterValueProvider.provideValueFor((LeafParameter) parameter));
+        } else if (isArrayOfLeaves(parameter)) {
+            ArrayParameter arrayParameter = (ArrayParameter) parameter;
+            arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
         }
     }
 
-    public void removeValue(ParameterElement parameter) {
-        if (parameter instanceof ParameterLeaf) {
-            ((ParameterLeaf) parameter).removeValue();
-        } else if (parameter.isArrayOfLeaves()) {
-            ((ParameterArray) parameter).getElements().clear();
+    public void removeValue(Parameter parameter) {
+        if (parameter instanceof LeafParameter) {
+            ((LeafParameter) parameter).removeValue();
+        } else if (isArrayOfLeaves(parameter)) {
+            ((ArrayParameter) parameter).clearElements();
         }
     }
 
@@ -124,10 +127,10 @@ public class NominalFuzzer extends Fuzzer {
      * TODO: support uniqueItems: true
      */
     public void populateArrays() {
-        Collection<ParameterArray> arrays = editableOperation.getArrays();
-        LinkedList<ParameterArray> queue = new LinkedList<>(arrays);
+        Collection<ArrayParameter> arrays = editableOperation.getArrays();
+        LinkedList<ArrayParameter> queue = new LinkedList<>(arrays);
         while (!queue.isEmpty()) {
-            ParameterArray array = queue.getFirst();
+            ArrayParameter array = queue.getFirst();
             int n = random.nextShortLength(array.getMinItems(), array.getMaxItems());
 
             // If not required, remove array with a 0.7 probability
@@ -136,9 +139,9 @@ public class NominalFuzzer extends Fuzzer {
             }
 
             for (int i = 0; i < n; i++) {
-                ParameterElement referenceElementCopy = array.getReferenceElement().deepClone();
+                Parameter referenceElementCopy = array.getReferenceElement().deepClone();
                 array.addElement(referenceElementCopy);
-                queue.addAll(referenceElementCopy.getArrays());
+                queue.addAll(getArrays(referenceElementCopy));
             }
             queue.remove(array);
         }
@@ -150,13 +153,13 @@ public class NominalFuzzer extends Fuzzer {
      */
     public void setValueToLeaves() {
         // Assign values to leaves and remove random non-mandatory leaves
-        Collection<ParameterLeaf> leaves = editableOperation.getLeaves();
-        for (ParameterLeaf leaf : leaves) {
+        Collection<LeafParameter> leaves = editableOperation.getLeaves();
+        for (LeafParameter leaf : leaves) {
 
             // If parameter is not mandatory or if it is not part of an array, set value with 25% probability
             // Null parameters will be removed by the request manager
             if (leaf.isRequired() || random.nextInt(100) < PROBABILITY_TO_KEEP_A_NON_REQUIRED_LEAF ||
-                    (leaf.getParent() != null && leaf.getParent() instanceof ParameterArray)) {
+                    (leaf.getParent() != null && leaf.getParent() instanceof ArrayParameter)) {
                 leaf.setValue(parameterValueProvider.provideValueFor(leaf));
             }
         }

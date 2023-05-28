@@ -1,9 +1,9 @@
 package io.resttestgen.core;
 
 import io.resttestgen.core.datatype.HttpMethod;
-import io.resttestgen.core.datatype.parameter.ParameterStyle;
-import io.resttestgen.core.datatype.parameter.ParameterType;
-import io.resttestgen.core.datatype.parameter.ParameterTypeFormat;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterStyle;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterTypeFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,5 @@
 package io.resttestgen.core.helper;
 
-import io.resttestgen.core.datatype.parameter.ParameterType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
@@ -8,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import static io.resttestgen.core.datatype.parameter.ParameterType.*;
+import static io.resttestgen.core.datatype.parameter.attributes.ParameterType.*;
 import static io.resttestgen.core.helper.ObjectHelper.castToParameterValueType;
 import static org.junit.jupiter.api.Assertions.*;
 

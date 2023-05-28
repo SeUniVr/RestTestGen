@@ -1,8 +1,11 @@
 package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.parameter.leaves.BooleanParameter;
+import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.testing.Mutator;
-import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
 import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
@@ -16,17 +19,17 @@ public class WrongTypeMutator extends Mutator {
     private final ParameterValueProvider valueProvider = new RandomParameterValueProvider();
 
     @Override
-    public boolean isParameterMutable(ParameterLeaf parameter) {
+    public boolean isParameterMutable(LeafParameter parameter) {
         return parameter instanceof StringParameter || parameter instanceof NumberParameter ||
                 parameter instanceof BooleanParameter;
     }
 
     @Override
-    public ParameterLeaf mutate(ParameterLeaf parameter) {
+    public LeafParameter mutate(LeafParameter parameter) {
 
         ExtendedRandom random = Environment.getInstance().getRandom();
 
-        ParameterLeaf mutatedParameter;
+        LeafParameter mutatedParameter;
 
         if (parameter instanceof StringParameter) {
             if (random.nextBoolean()) {

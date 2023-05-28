@@ -3,8 +3,8 @@ package io.resttestgen.core.testing.coverage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
@@ -20,8 +20,8 @@ public class ParameterCoverage extends Coverage {
     public ParameterCoverage(){
         for(Operation operation : Environment.getInstance().getOpenAPI().getOperations()){
             Set<ParameterElementWrapper> parameters = new HashSet<>();
-            for(ParameterElement parameter: operation.getAllRequestParameters()){
-                if(parameter instanceof ParameterLeaf){
+            for(Parameter parameter: operation.getAllRequestParameters()){
+                if(parameter instanceof LeafParameter){
                     parameters.add(new ParameterElementWrapper(parameter));
                 }
             }
@@ -30,9 +30,9 @@ public class ParameterCoverage extends Coverage {
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        Operation operation = testInteraction.getOperation();
-        for (ParameterElement parameter : operation.getAllRequestParameters()) {
-            if (parameter instanceof ParameterLeaf) {
+        Operation operation = testInteraction.getFuzzedOperation();
+        for (Parameter parameter : operation.getAllRequestParameters()) {
+            if (parameter instanceof LeafParameter) {
                 ParameterElementWrapper elementWrapper = new ParameterElementWrapper(parameter);
                 if (parametersToTest.containsKey(operation)) {
                     if (parametersToTest.get(operation).contains(elementWrapper)) {

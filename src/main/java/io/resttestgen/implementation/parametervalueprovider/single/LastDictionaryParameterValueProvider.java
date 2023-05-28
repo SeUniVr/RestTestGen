@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.dictionary.DictionaryEntry;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
@@ -16,14 +16,14 @@ public class LastDictionaryParameterValueProvider extends CountableParameterValu
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
 
     @Override
-    public int countAvailableValuesFor(ParameterLeaf parameterLeaf) {
-        return dictionary.getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType()).size();
+    public int countAvailableValuesFor(LeafParameter leafParameter) {
+        return dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()).size();
     }
 
     @Override
-    public Object provideValueFor(ParameterLeaf parameterLeaf) {
+    public Object provideValueFor(LeafParameter leafParameter) {
         List<DictionaryEntry> entries = dictionary
-                .getEntriesByParameterName(parameterLeaf.getName(), parameterLeaf.getType());
+                .getEntriesByParameterName(leafParameter.getName(), leafParameter.getType());
         if (entries.size() > 0) {
             DictionaryEntry lastEntry = entries.get(0);
             for (DictionaryEntry entry : entries) {

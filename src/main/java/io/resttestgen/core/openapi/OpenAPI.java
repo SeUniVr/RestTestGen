@@ -136,6 +136,15 @@ public class OpenAPI {
     }
 
     /**
+     * Returns the reference operation of a fuzzed operation.
+     * @param fuzzedOperation the fuzzed operation.
+     * @return the reference operation.
+     */
+    public Operation getReferenceOperationFromFuzzedOperation(Operation fuzzedOperation) {
+        return operations.stream().filter(o -> o.equals(fuzzedOperation)).findFirst().orElse(null);
+    }
+
+    /**
      * Export the specification to file.
      * @param filename the file name for the specification.
      * @throws IOException in case file IO fails.

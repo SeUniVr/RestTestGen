@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.resttestgen.core.datatype.parameter.NullParameter;
+import io.resttestgen.core.datatype.parameter.leaves.NullParameter;
 
 import java.lang.reflect.Type;
 

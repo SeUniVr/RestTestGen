@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.fuzzer;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.testing.*;
 import io.resttestgen.implementation.mutator.ConstraintViolationMutator;
 import io.resttestgen.implementation.mutator.MissingRequiredMutator;
@@ -48,28 +48,28 @@ public class SubSequenceErrorFuzzer extends Fuzzer {
                 TestInteraction mutableInteraction = currentTestSequence.getLast();
                 mutableInteraction.addTag("mutated");
 
-                String sequenceName = mutableInteraction.getOperation().getOperationId().length() > 0 ?
-                        mutableInteraction.getOperation().getOperationId() :
-                        mutableInteraction.getOperation().getMethod().toString() + "-" +
-                                mutableInteraction.getOperation().getEndpoint();
+                String sequenceName = mutableInteraction.getFuzzedOperation().getOperationId().length() > 0 ?
+                        mutableInteraction.getFuzzedOperation().getOperationId() :
+                        mutableInteraction.getFuzzedOperation().getMethod().toString() + "-" +
+                                mutableInteraction.getFuzzedOperation().getEndpoint();
                 currentTestSequence.setName(sequenceName);
                 currentTestSequence.appendGeneratedAtTimestampToSequenceName();
 
                 // Get set of applicable mutations to this operation
-                Set<Pair<ParameterLeaf, Mutator>> mutableParameters = new HashSet<>();
-                mutableInteraction.getOperation().getLeaves().forEach(leaf -> mutators.forEach(mutator -> {
+                Set<Pair<LeafParameter, Mutator>> mutableParameters = new HashSet<>();
+                mutableInteraction.getFuzzedOperation().getLeaves().forEach(leaf -> mutators.forEach(mutator -> {
                         if (mutator.isParameterMutable(leaf)) {
                             mutableParameters.add(new Pair<>(leaf, mutator));
                         }
                 }));
 
                 // Choose a random mutation pair
-                Optional<Pair<ParameterLeaf, Mutator>> mutable = Environment.getInstance().getRandom().nextElement(mutableParameters);
+                Optional<Pair<LeafParameter, Mutator>> mutable = Environment.getInstance().getRandom().nextElement(mutableParameters);
 
                 if (mutable.isPresent()) {
 
                     // Apply mutation
-                    ParameterLeaf mutated = mutable.get().getSecond().mutate(mutable.get().getFirst());
+                    LeafParameter mutated = mutable.get().getSecond().mutate(mutable.get().getFirst());
                     mutated.addTag("mutated");
 
                     // Replace original parameter with mutated one

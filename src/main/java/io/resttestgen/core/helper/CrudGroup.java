@@ -1,7 +1,7 @@
 package io.resttestgen.core.helper;
 
 import io.resttestgen.core.datatype.OperationSemantics;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.openapi.OpenAPI;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
@@ -92,7 +92,7 @@ public class CrudGroup {
         return this.operations;
     }
 
-    public List<ParameterElement> getReadOnlyParameters() {
+    public List<Parameter> getReadOnlyParameters() {
         return null;
     }
 

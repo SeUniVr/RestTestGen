@@ -2,7 +2,7 @@ package io.resttestgen.core.openapi;
 
 import com.google.gson.Gson;
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,14 +31,14 @@ public class TestOpenAPIParser {
         File specification = new File("build/resources/test/specifications/petstore_vuln.json");
         OpenAPI openAPI = new OpenAPIParser(Paths.get(specification.getAbsolutePath())).parse();
 
-        Set<ParameterElement> params = new HashSet<>();
+        Set<Parameter> params = new HashSet<>();
         for (Operation op : openAPI.getOperations()) {
             params.addAll(op.getReferenceLeaves());
             params.addAll(op.getOutputParametersSet());
         }
 
         Set<NormalizedParameterName> norm = new HashSet<>();
-        for (ParameterElement p : params) {
+        for (Parameter p : params) {
             norm.add(p.getNormalizedName());
         }
 

@@ -3,6 +3,7 @@ package io.resttestgen.core.datatype.parameter;
 
 import io.resttestgen.core.Configuration;
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.CannotParseOpenAPIException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getReferenceLeaves;
 
 /*
 To use this test, set the parameter "specificationFileName" with the openApi "testOpenApi.json".
@@ -64,25 +67,25 @@ public class TestJsonPath {
     public void testGetElementByJsonPath() {
         for (Operation operation : environment.getOpenAPI().getOperations()) {
             System.out.println("OPERATION: " + operation);
-            ParameterElement requestBody = operation.getRequestBody();
-            ParameterElement responseBody = operation.getOutputParameters().get("200");
+            Parameter requestBody = operation.getRequestBody();
+            Parameter responseBody = operation.getOutputParameters().get("200");
 
             System.out.println("REQUEST:");
             if (requestBody != null) {
-                for (ParameterLeaf leaf : requestBody.getReferenceLeaves()) {
+                for (LeafParameter leaf : getReferenceLeaves(requestBody)) {
                     String jsonPath = leaf.getJsonPath();
                     System.out.println(jsonPath);
-                    ParameterElement parameter = requestBody.getParameterFromJsonPath(jsonPath);
+                    Parameter parameter = requestBody.getParameterFromJsonPath(jsonPath);
                     Assertions.assertEquals(leaf, parameter);
                 }
             }
 
             System.out.println("RESPONSE:");
             if (responseBody != null) {
-                for (ParameterLeaf leaf : responseBody.getReferenceLeaves()) {
+                for (LeafParameter leaf : getReferenceLeaves(responseBody)) {
                     String jsonPath = leaf.getJsonPath();
                     System.out.println(jsonPath);
-                    ParameterElement parameter = responseBody.getParameterFromJsonPath(jsonPath);
+                    Parameter parameter = responseBody.getParameterFromJsonPath(jsonPath);
                     Assertions.assertEquals(leaf, parameter);
                 }
             }

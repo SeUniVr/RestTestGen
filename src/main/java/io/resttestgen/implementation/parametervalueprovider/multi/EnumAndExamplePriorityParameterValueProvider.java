@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.parametervalueprovider.multi;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
@@ -17,7 +17,7 @@ public class EnumAndExamplePriorityParameterValueProvider extends ParameterValue
     final ExtendedRandom random = Environment.getInstance().getRandom();
 
     @Override
-    public Object provideValueFor(ParameterLeaf parameterLeaf) {
+    public Object provideValueFor(LeafParameter leafParameter) {
 
         // If the leaf is an enum, return a random enum value
         EnumParameterValueProvider enumParameterValueProvider = new EnumParameterValueProvider();
@@ -25,14 +25,14 @@ public class EnumAndExamplePriorityParameterValueProvider extends ParameterValue
         ExamplesParameterValueProvider examplesParameterValueProvider = new ExamplesParameterValueProvider();
         examplesParameterValueProvider.setStrict(this.strict);
 
-        int numEnums = enumParameterValueProvider.countAvailableValuesFor(parameterLeaf);
-        int numExamples = examplesParameterValueProvider.countAvailableValuesFor(parameterLeaf);
+        int numEnums = enumParameterValueProvider.countAvailableValuesFor(leafParameter);
+        int numExamples = examplesParameterValueProvider.countAvailableValuesFor(leafParameter);
 
         if (numEnums + numExamples > 0 && random.nextInt(1, 10) <= 8) {
             if (random.nextInt(numEnums + numExamples) < numEnums) {
-                return enumParameterValueProvider.provideValueFor(parameterLeaf);
+                return enumParameterValueProvider.provideValueFor(leafParameter);
             } else {
-                return examplesParameterValueProvider.provideValueFor(parameterLeaf);
+                return examplesParameterValueProvider.provideValueFor(leafParameter);
             }
         }
 
@@ -51,12 +51,12 @@ public class EnumAndExamplePriorityParameterValueProvider extends ParameterValue
 
         candidateProviders.forEach(p -> p.setStrict(this.strict));
 
-        providers.addAll(candidateProviders.stream().filter(p -> p.countAvailableValuesFor(parameterLeaf) > 0)
+        providers.addAll(candidateProviders.stream().filter(p -> p.countAvailableValuesFor(leafParameter) > 0)
                 .collect(Collectors.toSet()));
 
         Optional<ParameterValueProvider> chosenProvider = random.nextElement(providers);
         return chosenProvider.map(parameterValueProvider ->
-                parameterValueProvider.provideValueFor(parameterLeaf)).orElse(null);
+                parameterValueProvider.provideValueFor(leafParameter)).orElse(null);
 
     }
 }

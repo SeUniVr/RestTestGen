@@ -3,7 +3,7 @@ package io.resttestgen.implementation.operationssorter;
 import com.google.common.collect.Sets;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.operationdependencygraph.DependencyEdge;
@@ -83,7 +83,7 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
                 .map(DependencyEdge::getNormalizedName)
                 .collect(Collectors.toSet());
         Set<NormalizedParameterName> allParametersInOperation = node.getOperation().getReferenceLeaves().stream()
-                .map(ParameterLeaf::getNormalizedName)
+                .map(LeafParameter::getNormalizedName)
                 .collect(Collectors.toSet());
         Set<NormalizedParameterName> unsatisfiedParameters = Sets.difference(allParametersInOperation, satisfiedParameters);
 
@@ -91,10 +91,10 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
 
         Set<NormalizedParameterName> parametersInDictionary = new HashSet<>();
         for (NormalizedParameterName unsatisfiedParameter : unsatisfiedParameters) {
-            List<ParameterLeaf> foundParameters = node.getOperation().searchReferenceRequestParametersByNormalizedName(unsatisfiedParameter)
-                    .stream().filter(p -> p instanceof ParameterLeaf).map(p -> (ParameterLeaf) p).collect(Collectors.toList());
+            List<LeafParameter> foundParameters = node.getOperation().searchReferenceRequestParametersByNormalizedName(unsatisfiedParameter)
+                    .stream().filter(p -> p instanceof LeafParameter).map(p -> (LeafParameter) p).collect(Collectors.toList());
             if (foundParameters.size() > 0) {
-                ParameterLeaf parameter = foundParameters.get(0);
+                LeafParameter parameter = foundParameters.get(0);
                 if (provider.countAvailableValuesFor(parameter) > 0) {
                     parametersInDictionary.add(unsatisfiedParameter);
                 }

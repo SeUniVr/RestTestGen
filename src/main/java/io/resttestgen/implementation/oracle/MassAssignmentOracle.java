@@ -3,10 +3,11 @@ package io.resttestgen.implementation.oracle;
 import com.google.common.collect.Sets;
 import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.ParameterName;
-import io.resttestgen.core.datatype.parameter.ParameterArray;
-import io.resttestgen.core.datatype.parameter.ParameterElement;
-import io.resttestgen.core.datatype.parameter.ParameterLeaf;
-import io.resttestgen.core.datatype.parameter.ParameterObject;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.ParameterUtils;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Oracle;
 import io.resttestgen.core.testing.TestInteraction;
@@ -21,6 +22,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
 
 /**
  * This oracle determines if a test sequences exposed a mass assignment vulnerability in the REST API.
@@ -47,10 +50,10 @@ public class MassAssignmentOracle extends Oracle {
         // For each interaction in the sequence, search for interactions with injected parameters
         for (TestInteraction interaction : testSequence) {
 
-            Optional<ParameterLeaf> injectedParameter = getInjectedParameter(interaction.getOperation());
+            Optional<LeafParameter> injectedParameter = getInjectedParameter(interaction.getFuzzedOperation());
             if (injectedParameter.isPresent()) {
 
-                Optional<ParameterLeaf> readParameter = getCorrespondingOutputParameter(testSequence,
+                Optional<LeafParameter> readParameter = getCorrespondingOutputParameter(testSequence,
                         testSequence.indexOf(interaction), injectedParameter.get());
                 if (readParameter.isPresent()) {
                     String injParVal = injectedParameter.get().getConcreteValue().toString();
@@ -104,10 +107,10 @@ public class MassAssignmentOracle extends Oracle {
      * @param operation in which to search for the injected parameter.
      * @return the injected parameter leaf, if found.
      */
-    private Optional<ParameterLeaf> getInjectedParameter(Operation operation) {
+    private Optional<LeafParameter> getInjectedParameter(Operation operation) {
 
         // Search for parameter with injected tag and return it
-        for (ParameterLeaf leaf : operation.getLeaves()) {
+        for (LeafParameter leaf : operation.getLeaves()) {
             if (leaf.getTags().contains("injected")) {
                 return Optional.of(leaf);
             }
@@ -117,13 +120,13 @@ public class MassAssignmentOracle extends Oracle {
         return Optional.empty();
     }
 
-    private Optional<ParameterLeaf> getCorrespondingOutputParameter(TestSequence testSequence, int injectedOperationIndex,
-            ParameterLeaf injectedLeaf) {
+    private Optional<LeafParameter> getCorrespondingOutputParameter(TestSequence testSequence, int injectedOperationIndex,
+                                                                    LeafParameter injectedLeaf) {
 
-        Optional<ParameterLeaf> candidateLeaf = Optional.empty();
+        Optional<LeafParameter> candidateLeaf = Optional.empty();
 
-        Operation createOperation = testSequence.get(injectedOperationIndex).getOperation();
-        Operation followingReadOperation = testSequence.get(injectedOperationIndex + 1).getOperation();
+        Operation createOperation = testSequence.get(injectedOperationIndex).getFuzzedOperation();
+        Operation followingReadOperation = testSequence.get(injectedOperationIndex + 1).getFuzzedOperation();
         Operation previousReadOperation = null;
 
 
@@ -132,9 +135,9 @@ public class MassAssignmentOracle extends Oracle {
             if (operationHasOutputWithResourceIdentifier(createOperation)) {
                 resourceIdentifierVal = extractNewlyCreatedResourceIdentifier(createOperation);
             } else {
-                previousReadOperation = testSequence.get(injectedOperationIndex - 1).getOperation();
-                if (getCRUDSemantics(testSequence.get(injectedOperationIndex).getOperation()).equals(OperationSemantics.UPDATE)) {
-                    previousReadOperation = testSequence.get(injectedOperationIndex - 3).getOperation();
+                previousReadOperation = testSequence.get(injectedOperationIndex - 1).getFuzzedOperation();
+                if (getCRUDSemantics(testSequence.get(injectedOperationIndex).getFuzzedOperation()).equals(OperationSemantics.UPDATE)) {
+                    previousReadOperation = testSequence.get(injectedOperationIndex - 3).getFuzzedOperation();
                 }
                 resourceIdentifierVal = extractNewlyCreatedResourceIdentifier(previousReadOperation, followingReadOperation);
             }
@@ -143,7 +146,7 @@ public class MassAssignmentOracle extends Oracle {
 
         if (getCRUDSemantics(followingReadOperation).equals(OperationSemantics.READ) &&
                 followingReadOperation.getResponseBody() != null) {
-            for (ParameterLeaf leaf : followingReadOperation.getResponseBody().getLeaves()) {
+            for (LeafParameter leaf : getLeaves(followingReadOperation.getResponseBody())) {
                 if (leaf.getNormalizedName().equals(injectedLeaf.getNormalizedName())) {
                     candidateLeaf = Optional.of(leaf);
                     break;
@@ -157,10 +160,10 @@ public class MassAssignmentOracle extends Oracle {
                 getCRUDSemantics(previousReadOperation).equals(OperationSemantics.READ_MULTI) &&
                 previousReadOperation.getResponseBody() != null) {
 
-            ParameterElement newObject = extractNewlyCreatedObject(previousReadOperation, followingReadOperation);
+            Parameter newObject = extractNewlyCreatedObject(previousReadOperation, followingReadOperation);
 
             if (newObject != null) {
-                for (ParameterLeaf leaf : newObject.getLeaves()) {
+                for (LeafParameter leaf : getLeaves(newObject)) {
                     if (leaf.getNormalizedName().equals(injectedLeaf.getNormalizedName())) {
                         candidateLeaf = Optional.of(leaf);
                         break;
@@ -173,14 +176,14 @@ public class MassAssignmentOracle extends Oracle {
         } else if (getCRUDSemantics(followingReadOperation).equals(OperationSemantics.READ_MULTI) &&
                 followingReadOperation.getResponseBody() != null && previousReadOperation == null) {
 
-            ParameterElement newObject =
+            Parameter newObject =
                     getElementWithIdentifierEqualTo(
                             getResponseBodyHigherLevelArray(followingReadOperation),
                             getResourceIdentifierName(followingReadOperation),
                             resourceIdentifierVal.toString());
 
             if (newObject != null) {
-                for (ParameterLeaf leaf : newObject.getLeaves()) {
+                for (LeafParameter leaf : getLeaves(newObject)) {
                     if (leaf.getNormalizedName().equals(injectedLeaf.getNormalizedName())) {
                         candidateLeaf = Optional.of(leaf);
                         break;
@@ -195,11 +198,11 @@ public class MassAssignmentOracle extends Oracle {
         return candidateLeaf;
     }
 
-    private ParameterElement extractNewlyCreatedObject(Operation before, Operation after) {
+    private Parameter extractNewlyCreatedObject(Operation before, Operation after) {
 
         ParameterName resourceIdentifierName = getResourceIdentifierName(before);
-        ParameterArray beforeArray = getResponseBodyHigherLevelArray(before);
-        ParameterArray afterArray = getResponseBodyHigherLevelArray(after);
+        ArrayParameter beforeArray = getResponseBodyHigherLevelArray(before);
+        ArrayParameter afterArray = getResponseBodyHigherLevelArray(after);
 
         if (beforeArray != null && afterArray != null && resourceIdentifierName != null &&
                 beforeArray.getElements().size() < afterArray.getElements().size() &&
@@ -222,17 +225,17 @@ public class MassAssignmentOracle extends Oracle {
         return null;
     }
 
-    private ParameterArray getResponseBodyHigherLevelArray(Operation operation) {
+    private ArrayParameter getResponseBodyHigherLevelArray(Operation operation) {
 
-        ParameterElement responseBody = operation.getResponseBody();
+        Parameter responseBody = operation.getResponseBody();
 
         if (responseBody != null) {
-            if (responseBody instanceof ParameterArray) {
-                return (ParameterArray) responseBody;
-            } else if (responseBody instanceof ParameterObject) {
-                for (ParameterElement element : ((ParameterObject) responseBody).getProperties()) {
-                    if (element instanceof ParameterArray) {
-                        return (ParameterArray) element;
+            if (responseBody instanceof ArrayParameter) {
+                return (ArrayParameter) responseBody;
+            } else if (responseBody instanceof ObjectParameter) {
+                for (Parameter element : ((ObjectParameter) responseBody).getProperties()) {
+                    if (element instanceof ArrayParameter) {
+                        return (ArrayParameter) element;
                     }
                 }
             }
@@ -241,7 +244,7 @@ public class MassAssignmentOracle extends Oracle {
     }
 
     private ParameterName getResourceIdentifierName(Operation operation) {
-        for (ParameterLeaf leaf : getSuccessfulOutputReferenceLeaves(operation)) {
+        for (LeafParameter leaf : getSuccessfulOutputReferenceLeaves(operation)) {
             if (isCrudResourceIdentifier(leaf)) {
                 return leaf.getName();
             }
@@ -249,12 +252,12 @@ public class MassAssignmentOracle extends Oracle {
         return null;
     }
 
-    private Set<String> getSetOfIdentifiers(ParameterArray array, ParameterName identifierName) {
+    private Set<String> getSetOfIdentifiers(ArrayParameter array, ParameterName identifierName) {
 
         Set<String> identifiers = new HashSet<>();
 
-        for (ParameterElement element : array.getElements()) {
-            for (ParameterLeaf leaf : element.getLeaves()) {
+        for (Parameter element : array.getElements()) {
+            for (LeafParameter leaf : getLeaves(element)) {
                 if (leaf.getName().equals(identifierName)) {
                     identifiers.add(leaf.getConcreteValue().toString());
                 }
@@ -264,9 +267,9 @@ public class MassAssignmentOracle extends Oracle {
         return identifiers;
     }
 
-    private ParameterElement getElementWithIdentifierEqualTo(ParameterArray array, ParameterName identifierName, String identifierValue) {
-        for (ParameterElement element : array.getElements()) {
-            for (ParameterLeaf leaf : element.getLeaves()) {
+    private Parameter getElementWithIdentifierEqualTo(ArrayParameter array, ParameterName identifierName, String identifierValue) {
+        for (Parameter element : array.getElements()) {
+            for (LeafParameter leaf : getLeaves(element)) {
                 if (leaf.getName().equals(identifierName) && leaf.getValue().toString().equals(identifierValue)) {
                     return element;
                 }
@@ -279,7 +282,7 @@ public class MassAssignmentOracle extends Oracle {
         ParameterName resourceIdentifierName = getResourceIdentifierName(createOperation);
 
         if (createOperation.getResponseBody() != null) {
-            for (ParameterLeaf leaf : createOperation.getResponseBody().getLeaves()) {
+            for (LeafParameter leaf : getLeaves(createOperation.getResponseBody())) {
                 if (leaf.getName().equals(resourceIdentifierName)) {
                     return leaf.getConcreteValue();
                 }
@@ -296,7 +299,7 @@ public class MassAssignmentOracle extends Oracle {
         return operation.getCrudSemantics();
     }
 
-    private boolean isCrudResourceIdentifier(ParameterLeaf leaf) {
+    private boolean isCrudResourceIdentifier(LeafParameter leaf) {
         if (useInferredCRUDInformation) {
             return leaf.isInferredResourceIdentifier();
         }
@@ -308,7 +311,7 @@ public class MassAssignmentOracle extends Oracle {
     }
 
     private boolean operationHasOutputWithResourceIdentifier(Operation operation) {
-        for (ParameterLeaf leaf : getSuccessfulOutputReferenceLeaves(operation)) {
+        for (LeafParameter leaf : getSuccessfulOutputReferenceLeaves(operation)) {
             if (isCrudResourceIdentifier(leaf)) {
                 return true;
             }
@@ -318,8 +321,8 @@ public class MassAssignmentOracle extends Oracle {
 
     public Object extractNewlyCreatedResourceIdentifier(Operation before, Operation after) {
         ParameterName resourceIdentifierName = getResourceIdentifierName(before);
-        ParameterArray beforeArray = getResponseBodyHigherLevelArray(before);
-        ParameterArray afterArray = getResponseBodyHigherLevelArray(after);
+        ArrayParameter beforeArray = getResponseBodyHigherLevelArray(before);
+        ArrayParameter afterArray = getResponseBodyHigherLevelArray(after);
 
         if (beforeArray != null && afterArray != null && resourceIdentifierName != null &&
                 beforeArray.getElements().size() < afterArray.getElements().size() &&
@@ -356,9 +359,9 @@ public class MassAssignmentOracle extends Oracle {
 
 
     @NotNull
-    public Collection<ParameterLeaf> getSuccessfulOutputReferenceLeaves(Operation operation) {
+    public Collection<LeafParameter> getSuccessfulOutputReferenceLeaves(Operation operation) {
         if (operation.getSuccessfulOutputParameters() != null) {
-            return operation.getSuccessfulOutputParameters().getReferenceLeaves();
+            return ParameterUtils.getReferenceLeaves(operation.getSuccessfulOutputParameters());
         }
         return new HashSet<>();
     }

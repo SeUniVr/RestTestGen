@@ -6,6 +6,19 @@ import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.rule.Rule;
+import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.combined.CombinedSchemaParameter;
+import io.resttestgen.core.datatype.parameter.exceptions.ParameterCreationException;
+import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
+import io.resttestgen.core.datatype.parameter.visitor.ArraysVisitor;
+import io.resttestgen.core.datatype.parameter.visitor.CombinedSchemasVisitor;
+import io.resttestgen.core.datatype.parameter.visitor.LeavesVisitor;
+import io.resttestgen.core.datatype.parameter.visitor.Visitor;
+import io.resttestgen.core.helper.RestPathHelper;
 import kotlin.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,12 +29,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Operation {
-
     private final String endpoint;
     private final HttpMethod method;
     private final String operationId;
 
     private final String description;
+    private final String summary;
+    private final HashSet<Rule> rulesToValidate;
 
     private OperationSemantics operationSemantics;
     private OperationSemantics inferredOperationSemantics;
@@ -29,26 +43,26 @@ public class Operation {
     private String crudResourceType;
     private String inferredCrudResourceType;
 
-    private Set<ParameterElement> headerParameters;
-    private Set<ParameterElement> pathParameters;
-    private Set<ParameterElement> queryParameters;
-    private Set<ParameterElement> cookieParameters;
+    private Set<Parameter> headerParameters = new HashSet<>();
+    private Set<Parameter> pathParameters = new HashSet<>();
+    private Set<Parameter> queryParameters = new HashSet<>();
+    private Set<Parameter> cookieParameters = new HashSet<>();
     private String requestContentType;
-    private StructuredParameterElement requestBody;
+    private StructuredParameter requestBody;
     private String requestBodyDescription;
 
-    private final Map<String, StructuredParameterElement> outputParameters;
-    private StructuredParameterElement responseBody;
+    private final Map<String, StructuredParameter> outputParameters = new HashMap<>();
+    private StructuredParameter responseBody;
 
     // Inter-parameter dependencies
-    private final List<Pair<String, String>> requires;
-    private final List<Set<ParameterName>> or;
-    private final List<Set<ParameterName>> onlyOne;
-    private final List<Set<ParameterName>> allOrNone;
-    private final List<Set<ParameterName>> zeroOrOne;
+    private final List<Pair<String, String>> requires = new LinkedList<>();
+    private final List<Set<ParameterName>> or = new LinkedList<>();
+    private final List<Set<ParameterName>> onlyOne = new LinkedList<>();
+    private final List<Set<ParameterName>> allOrNone = new LinkedList<>();
+    private final List<Set<ParameterName>> zeroOrOne = new LinkedList<>();
     // TODO: support arithmetic/relational IPDs
 
-    private boolean isReadOnly; // Field to avoid changes to template operation parsed from specification
+    private boolean isReadOnly = false; // Field to avoid changes to template operation parsed from specification
 
     private static final Logger logger = LogManager.getLogger(Operation.class);
 
@@ -61,18 +75,7 @@ public class Operation {
                 OpenAPIParser.safeGet(operationMap, "x-crudOperationSemantics", String.class));
         this.crudResourceType = OpenAPIParser.safeGet(operationMap, "x-crudResourceType", String.class).trim();
 
-        headerParameters = new HashSet<>();
-        pathParameters = new HashSet<>();
-        queryParameters = new HashSet<>();
-        cookieParameters = new HashSet<>();
-
-        this.outputParameters = new HashMap<>();
-
-        requires = new LinkedList<>();
-        or = new LinkedList<>();
-        onlyOne = new LinkedList<>();
-        allOrNone = new LinkedList<>();
-        zeroOrOne = new LinkedList<>();
+        rulesToValidate = new HashSet<>();
 
         ArrayList<String> interParameterDependencies = OpenAPIParser.safeGet(operationMap, "x-dependencies", ArrayList.class);
         HashMap<String, List<Set<ParameterName>>> ipdTokenSetMapping = new HashMap<>();
@@ -112,38 +115,27 @@ public class Operation {
         logger.debug("Fetching operation " + method + " " + endpoint);
 
         operationId = OpenAPIParser.safeGet(operationMap, "operationId", String.class);
-
         description = OpenAPIParser.safeGet(operationMap, "description", String.class);
+        summary = OpenAPIParser.safeGet(operationMap, "summary", String.class);
 
         // Check for header/path/query parameters
         List<Map<String, Object>> parameters = OpenAPIParser.safeGet(operationMap, "parameters", ArrayList.class);
-        ParameterElement parameterElement;
         for (Map<String, Object> parameter : parameters) {
-            Set<ParameterElement> targetSet;
-            switch ((String) parameter.get("in")) {
-                case "header" :
-                    targetSet = headerParameters;
-                    break;
-                case "path" :
-                    targetSet = pathParameters;
-                    break;
-                case "query":
-                    targetSet = queryParameters;
-                    break;
-                case "cookie":
-                    targetSet = cookieParameters;
-                    break;
-                default :
-                    logger.warn("Skipping parameter \"" + parameter.get("name") + "\" in operation \"" + this +
-                            "\" due to a wrong \"in\" field value (actual value:" + parameter.get("in") + " ).");
-                    continue;
-            }
+            ParameterLocation location = ParameterLocation.getLocationFromString((String) parameter.get("in"));
+            Parameter parameterElement = null;
+
             try {
-                parameterElement = ParameterFactory.getParameterElement(null, parameter, this);
-                targetSet.add(parameterElement);
+                parameterElement = ParameterFactory.getParameterElement(parameter);
             } catch (ParameterCreationException e) {
                 logger.warn("Skipping parameter \"" + parameter.get("name") + "\" in operation \"" + this + "\" due to " +
                         "a ParameterCreationException.");
+            }
+
+            if (parameterElement != null) {
+                if (!addParameter(location, parameterElement)) {
+                    logger.warn("Skipping parameter \"" + parameter.get("name") + "\" in operation \"" + this +
+                            "\" due to a wrong \"in\" field value (actual value:" + parameter.get("in") + " ).");
+                }
             }
         }
 
@@ -171,7 +163,7 @@ public class Operation {
             try {
                 // Set location for Parameter init
                 schema.put("in", "request_body");
-                this.requestBody = ParameterFactory.getStructuredParameter(null, schema, this, "");
+                setRequestBody(ParameterFactory.getStructuredParameter(schema, ""));
             } catch (ParameterCreationException e) {
                 logger.warn("Skipping \"request body\" in operation \"" + this + "\" due to " +
                         "a ParameterCreationException.");
@@ -184,7 +176,6 @@ public class Operation {
         // Check for output parameters (response body)
         Map<String, Object> responses = OpenAPIParser.safeGet(operationMap, "responses", LinkedTreeMap.class);
 
-        StructuredParameterElement structuredParameterElement;
         for (Map.Entry<String, Object> responseMap : responses.entrySet()) {
             Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
             content = OpenAPIParser.safeGet(response, "content", LinkedTreeMap.class);
@@ -201,8 +192,10 @@ public class Operation {
                 try {
                     // Set location for Parameter init
                     schema.put("in", "response_body");
-                    structuredParameterElement = ParameterFactory.getStructuredParameter(null, schema, this, "");
-                    outputParameters.put(responseMap.getKey(), structuredParameterElement);
+                    putOutputParameter(
+                            responseMap.getKey(),
+                            ParameterFactory.getStructuredParameter(schema, "")
+                    );
                 } catch (ParameterCreationException e) {
                     logger.warn("Skipping \"response body\" for status code \"" + responseMap.getKey() + "\" due to " +
                             "a ParameterCreationException.");
@@ -253,39 +246,33 @@ public class Operation {
         method = HttpMethod.getMethod(other.method.toString());
         operationId = other.operationId;
         description = other.description;
+        summary = other.summary;
+        rulesToValidate = new HashSet<>(other.rulesToValidate);
 
         operationSemantics = other.operationSemantics;
         inferredOperationSemantics = other.inferredOperationSemantics;
         crudResourceType = other.crudResourceType;
         inferredCrudResourceType = other.inferredCrudResourceType;
 
-        headerParameters = new HashSet<>();
-        other.headerParameters.forEach(p -> headerParameters.add(p.deepClone(this, null)));
-
-        pathParameters = new HashSet<>();
-        other.pathParameters.forEach(p -> pathParameters.add(p.deepClone(this, null)));
-
-        queryParameters = new HashSet<>();
-        other.queryParameters.forEach(p -> queryParameters.add(p.deepClone(this, null)));
-
-        cookieParameters = new HashSet<>();
-        other.cookieParameters.forEach(p -> cookieParameters.add(p.deepClone(this, null)));
+        other.headerParameters.forEach(p -> addParameter(ParameterLocation.HEADER, p.deepClone()));
+        other.pathParameters.forEach(p -> addParameter(ParameterLocation.PATH, p.deepClone()));
+        other.queryParameters.forEach(p -> addParameter(ParameterLocation.QUERY, p.deepClone()));
+        other.cookieParameters.forEach(p -> addParameter(ParameterLocation.COOKIE, p.deepClone()));
 
         requestContentType = other.requestContentType;
-        requestBody = other.requestBody != null ? other.requestBody.deepClone(this, null) : null;
+
+        setRequestBody(other.requestBody != null ? other.requestBody.deepClone() : null);
         requestBodyDescription = other.requestBodyDescription;
-        responseBody = other.responseBody != null ? other.responseBody.deepClone(this, null) : null;
 
-        outputParameters = new HashMap<>();
+        setResponseBody(other.responseBody != null ? other.responseBody.deepClone() : null);
         other.outputParameters.forEach((key, value) ->
-                outputParameters.put(key, value.deepClone(this, null)));
+                putOutputParameter(key, value.deepClone()));
 
-        requires = other.requires;
-        // FIXME: do sets have to be cloned element by element?
-        or = new LinkedList<>(other.or);
-        onlyOne = new LinkedList<>(other.onlyOne);
-        allOrNone = new LinkedList<>(other.allOrNone);
-        zeroOrOne = new LinkedList<>(other.zeroOrOne);
+        requires.addAll(other.requires);
+        other.or.forEach(s -> or.add(s.stream().map(ParameterName::deepClone).collect(Collectors.toSet())));
+        other.onlyOne.forEach(s -> onlyOne.add(s.stream().map(ParameterName::deepClone).collect(Collectors.toSet())));
+        other.allOrNone.forEach(s -> allOrNone.add(s.stream().map(ParameterName::deepClone).collect(Collectors.toSet())));
+        other.zeroOrOne.forEach(s -> zeroOrOne.add(s.stream().map(ParameterName::deepClone).collect(Collectors.toSet())));
 
         isReadOnly = false;
     }
@@ -306,26 +293,41 @@ public class Operation {
         return description;
     }
 
+    public String getSummary() {
+        return summary;
+    }
+
+    public HashSet<Rule> getRulesToValidate() {
+        return rulesToValidate;
+    }
+
+    public void applyRules(Collection<Rule> rules) {
+        isReadOnly = false;
+        rules.forEach(r -> r.apply(this));
+        rules.clear();
+        isReadOnly = true;
+    }
+
     /**
      * Return all the parameters in the request that are not in the body.,
      * @return all the parameters in the request that are not in the body.,
      */
-    public Collection<ParameterElement> getAllRequestParametersNotInBody() {
-        Set<ParameterElement> parameters = new HashSet<>();
+    public Collection<Parameter> getAllRequestParametersNotInBody() {
+        Set<Parameter> parameters = new HashSet<>();
 
-        for (ParameterElement element : headerParameters) {
+        for (Parameter element : headerParameters) {
             parameters.addAll(element.getAllParameters());
         }
 
-        for (ParameterElement element : pathParameters) {
+        for (Parameter element : pathParameters) {
             parameters.addAll(element.getAllParameters());
         }
 
-        for (ParameterElement element : queryParameters) {
+        for (Parameter element : queryParameters) {
             parameters.addAll(element.getAllParameters());
         }
 
-        for (ParameterElement element : cookieParameters) {
+        for (Parameter element : cookieParameters) {
             parameters.addAll(element.getAllParameters());
         }
 
@@ -336,10 +338,10 @@ public class Operation {
      * Return all the parameter elements in the request.
      * @return all the parameter elements in the request.
      */
-    public Collection<ParameterElement> getAllRequestParameters() {
+    public Collection<Parameter> getAllRequestParameters() {
 
         // Get all request parameters not in body
-        Collection<ParameterElement> parameters = getAllRequestParametersNotInBody();
+        Collection<Parameter> parameters = getAllRequestParametersNotInBody();
 
         // Add the parameters in the body, if any
         if (requestBody != null) {
@@ -349,7 +351,7 @@ public class Operation {
         return parameters;
     }
 
-    public StructuredParameterElement getSuccessfulOutputParameters() {
+    public StructuredParameter getSuccessfulOutputParameters() {
         for (String key : outputParameters.keySet()) {
             if (key.startsWith("2")) {
                 return outputParameters.get(key);
@@ -358,35 +360,35 @@ public class Operation {
         return null;
     }
 
-    public Set<ParameterElement> getHeaderParameters() {
+    public Set<Parameter> getHeaderParameters() {
         if (isReadOnly) {
             return Collections.unmodifiableSet(headerParameters);
         }
         return headerParameters;
     }
 
-    public Set<ParameterElement> getPathParameters() {
+    public Set<Parameter> getPathParameters() {
         if (isReadOnly) {
             return Collections.unmodifiableSet(pathParameters);
         }
         return pathParameters;
     }
 
-    public Set<ParameterElement> getQueryParameters() {
+    public Set<Parameter> getQueryParameters() {
         if (isReadOnly) {
             return Collections.unmodifiableSet(queryParameters);
         }
         return queryParameters;
     }
 
-    public Set<ParameterElement> getCookieParameters() {
+    public Set<Parameter> getCookieParameters() {
         if (isReadOnly) {
             return Collections.unmodifiableSet(cookieParameters);
         }
         return cookieParameters;
     }
 
-    public StructuredParameterElement getRequestBody() {
+    public StructuredParameter getRequestBody() {
         return requestBody;
     }
 
@@ -394,8 +396,12 @@ public class Operation {
         return requestBodyDescription;
     }
 
-    public StructuredParameterElement getResponseBody() {
+    public StructuredParameter getResponseBody() {
         return responseBody;
+    }
+
+    public void addRulesToValidate(HashSet<Rule> rulesToValidate) {
+        this.rulesToValidate.addAll(rulesToValidate);
     }
 
     public List<Pair<String, String>> getRequires() {
@@ -418,156 +424,217 @@ public class Operation {
         return zeroOrOne;
     }
 
-    public Collection<ParameterLeaf> getLeaves() {
+    public Collection<LeafParameter> getLeaves() {
+        return getVisitResult(new LeavesVisitor());
+    }
 
-        Collection<ParameterLeaf> leaves = new LinkedList<>();
-
-        for (ParameterElement element : headerParameters) {
-            leaves.addAll(element.getLeaves());
+    public boolean addParameter(ParameterLocation location, Parameter element) {
+        if (isReadOnly) {
+            throw new EditReadOnlyOperationException(this);
         }
 
-        for (ParameterElement element : pathParameters) {
-            leaves.addAll(element.getLeaves());
+        if (element == null) {
+            return false;
         }
 
-        for (ParameterElement element : queryParameters) {
-            leaves.addAll(element.getLeaves());
+        element.setOperation(this);
+        element.setLocation(location);
+
+        switch (location) {
+            case PATH: return this.pathParameters.add(element);
+            case HEADER: return this.headerParameters.add(element);
+            case QUERY: return this.queryParameters.add(element);
+            case COOKIE: return this.cookieParameters.add(element);
+            default: return false;
+        }
+    }
+
+    public boolean removeParameter(ParameterLocation location, Parameter element) {
+        if (isReadOnly) {
+            throw new EditReadOnlyOperationException(this);
         }
 
-        for (ParameterElement element : cookieParameters) {
-            leaves.addAll(element.getLeaves());
+        if (element == null) {
+            return false;
         }
 
-        if (requestBody != null) {
-            leaves.addAll(requestBody.getLeaves());
+        boolean removed = false;
+
+        switch (location) {
+            case PATH: removed = this.pathParameters.remove(element); break;
+            case HEADER: removed = this.headerParameters.remove(element); break;
+            case QUERY: removed = this.queryParameters.remove(element); break;
+            case COOKIE: removed = this.cookieParameters.remove(element); break;
         }
 
-        return leaves;
+        if (removed) {
+            element.setOperation(null);
+        }
+
+        return removed;
+    }
+
+    public boolean containsParameter(ParameterLocation location, Parameter element) {
+        if (element == null) {
+            return false;
+        }
+
+        switch (location) {
+            case PATH: return this.pathParameters.contains(element);
+            case HEADER: return this.headerParameters.contains(element);
+            case QUERY: return this.queryParameters.contains(element);
+            case COOKIE: return this.cookieParameters.contains(element);
+            default: return false;
+        }
+    }
+
+    public void putOutputParameter(String code, StructuredParameter parameter) {
+        if (parameter != null) {
+            parameter.setOperation(this);
+            parameter.setLocation(ParameterLocation.RESPONSE_BODY);
+            outputParameters.put(code, parameter);
+        }
     }
 
     /**
      * Returns the collection consisting of all the arrays in the parameters of the operation
      * @return the collection of arrays
      */
-    public Collection<ParameterArray> getArrays() {
-        Collection<ParameterArray> arrays = new LinkedList<>();
-
-        for (ParameterElement element : headerParameters) {
-            arrays.addAll(element.getArrays());
-        }
-
-        for (ParameterElement element : pathParameters) {
-            arrays.addAll(element.getArrays());
-        }
-
-        for (ParameterElement element : queryParameters) {
-            arrays.addAll(element.getArrays());
-        }
-
-        for (ParameterElement element : cookieParameters) {
-            arrays.addAll(element.getArrays());
-        }
-
-        if (requestBody != null) {
-            arrays.addAll(requestBody.getArrays());
-        }
-
-        return arrays;
+    public Collection<ArrayParameter> getArrays() {
+        return getVisitResult(new ArraysVisitor());
     }
 
     public Collection<CombinedSchemaParameter> getCombinedSchemas() {
-        Collection<CombinedSchemaParameter> combinedSchemas = new LinkedList<>();
+        return getVisitResult(new CombinedSchemasVisitor());
+    }
 
-        for (ParameterElement element : headerParameters) {
-            combinedSchemas.addAll(element.getCombinedSchemas());
+    protected <T> Collection<T> getVisitResult(Visitor<Collection<T>> visitor) {
+        Collection<T> result = new LinkedList<>();
+
+        for (Parameter element : headerParameters) {
+            result.addAll(element.accept(visitor));
         }
 
-        for (ParameterElement element : pathParameters) {
-            combinedSchemas.addAll(element.getCombinedSchemas());
+        for (Parameter element : pathParameters) {
+            result.addAll(element.accept(visitor));
         }
 
-        for (ParameterElement element : queryParameters) {
-            combinedSchemas.addAll(element.getCombinedSchemas());
+        for (Parameter element : queryParameters) {
+            result.addAll(element.accept(visitor));
         }
 
-        for (ParameterElement element : cookieParameters) {
-            combinedSchemas.addAll(element.getCombinedSchemas());
+        for (Parameter element : cookieParameters) {
+            result.addAll(element.accept(visitor));
         }
 
         if (requestBody != null) {
-            combinedSchemas.addAll(requestBody.getCombinedSchemas());
+            result.addAll(requestBody.accept(visitor));
         }
 
-        return combinedSchemas;
+        return result;
     }
 
-    public void setHeaderParameters(Set<ParameterElement> headerParameters) {
+    public void setHeaderParameters(Set<Parameter> headerParameters) {
         if (isReadOnly) {
             throw new EditReadOnlyOperationException(this);
         }
+
         this.headerParameters = headerParameters;
+
+        if (this.headerParameters != null) {
+            this.headerParameters.forEach(p -> p.setOperation(this));
+        }
     }
 
-    public void setPathParameters(Set<ParameterElement> pathParameters) {
+    public void setPathParameters(Set<Parameter> pathParameters) {
         if (isReadOnly) {
             throw new EditReadOnlyOperationException(this);
         }
+
         this.pathParameters = pathParameters;
+
+        if (this.pathParameters != null) {
+            this.pathParameters.forEach(p -> p.setOperation(this));
+        }
     }
 
-    public void setQueryParameters(Set<ParameterElement> queryParameters) {
+    public void setQueryParameters(Set<Parameter> queryParameters) {
         if (isReadOnly) {
             throw new EditReadOnlyOperationException(this);
         }
+
         this.queryParameters = queryParameters;
+
+        if (this.queryParameters != null) {
+            this.queryParameters.forEach(p -> p.setOperation(this));
+        }
     }
 
-    public void setCookieParameters(Set<ParameterElement> cookieParameters) {
+    public void setCookieParameters(Set<Parameter> cookieParameters) {
         if (isReadOnly) {
             throw new EditReadOnlyOperationException(this);
         }
+
         this.cookieParameters = cookieParameters;
+
+        if (this.cookieParameters != null) {
+            this.cookieParameters.forEach(p -> p.setOperation(this));
+        }
     }
 
-    public void setRequestBody(StructuredParameterElement requestBody) {
+    public void setRequestBody(StructuredParameter requestBody) {
         if (isReadOnly) {
             throw new EditReadOnlyOperationException(this);
         }
+
         this.requestBody = requestBody;
+
+        if (this.requestBody != null) {
+            this.requestBody.setOperation(this);
+            this.requestBody.setLocation(ParameterLocation.REQUEST_BODY);
+        }
     }
 
-    public void setResponseBody(StructuredParameterElement responseBody) {
+    public void setResponseBody(StructuredParameter responseBody) {
+        if (isReadOnly) {
+            throw new EditReadOnlyOperationException(this);
+        }
+
         this.responseBody = responseBody;
+
+        if (this.responseBody != null) {
+            this.responseBody.setOperation(this);
+        }
     }
 
     // TODO: add getFuzzableParameterSet (exclude not fuzzable params, e.g., auth)?
     // FIXME: add combined parameter management
     // The commented part is the old implementation. Newer implementation should work better
-    public List<ParameterLeaf> getReferenceLeaves() {
+    public List<LeafParameter> getReferenceLeaves() {
 
-        List<ParameterLeaf> parameters = new LinkedList<>();
+        List<LeafParameter> parameters = new LinkedList<>();
 
-        pathParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
-        headerParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
-        queryParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
-        cookieParameters.forEach(p -> parameters.addAll(p.getReferenceLeaves()));
+        pathParameters.forEach(p -> parameters.addAll(ParameterUtils.getReferenceLeaves(p)));
+        headerParameters.forEach(p -> parameters.addAll(ParameterUtils.getReferenceLeaves(p)));
+        queryParameters.forEach(p -> parameters.addAll(ParameterUtils.getReferenceLeaves(p)));
+        cookieParameters.forEach(p -> parameters.addAll(ParameterUtils.getReferenceLeaves(p)));
 
         if (requestBody != null) {
-            parameters.addAll(requestBody.getReferenceLeaves());
+            parameters.addAll(ParameterUtils.getReferenceLeaves(requestBody));
         }
 
         return parameters;
     }
 
-    public Map<String, StructuredParameterElement> getOutputParameters() {
+    public Map<String, StructuredParameter> getOutputParameters() {
         if (isReadOnly) {
             return Collections.unmodifiableMap(outputParameters);
         }
         return outputParameters;
     }
 
-    public Collection<ParameterElement> getFirstLevelRequestParametersNotInBody() {
-        Collection<ParameterElement> parameters = new HashSet<>();
+    public Collection<Parameter> getFirstLevelRequestParametersNotInBody() {
+        Collection<Parameter> parameters = new HashSet<>();
         parameters.addAll(headerParameters);
         parameters.addAll(pathParameters);
         parameters.addAll(queryParameters);
@@ -575,34 +642,34 @@ public class Operation {
         return parameters;
     }
 
-    public Collection<ParameterElement> getFirstLevelRequestParameters() {
-        Collection<ParameterElement> parameters = getFirstLevelRequestParametersNotInBody();
+    public Collection<Parameter> getFirstLevelRequestParameters() {
+        Collection<Parameter> parameters = getFirstLevelRequestParametersNotInBody();
         parameters.addAll(getFirstLevelParameters(requestBody));
         return parameters;
     }
 
-    public Set<ParameterElement> getFirstLevelOutputParameters() {
-        Set<ParameterElement> firstLevelOutputParameters = new HashSet<>();
+    public Set<Parameter> getFirstLevelOutputParameters() {
+        Set<Parameter> firstLevelOutputParameters = new HashSet<>();
         outputParameters.values().forEach(p -> firstLevelOutputParameters.addAll(getFirstLevelParameters(p)));
         return firstLevelOutputParameters;
     }
 
-    private Set<ParameterElement> getFirstLevelParameters(ParameterElement element) {
-        Set<ParameterElement> firstLevelParameters = new HashSet<>();
-        if (element instanceof ParameterObject) {
-            firstLevelParameters.addAll(((ParameterObject) element).getProperties());
-        } else if (element instanceof ParameterArray) {
-            firstLevelParameters.addAll(getFirstLevelParameters(((ParameterArray) element).getReferenceElement()));
-        } else if (element instanceof ParameterLeaf) {
+    private Set<Parameter> getFirstLevelParameters(Parameter element) {
+        Set<Parameter> firstLevelParameters = new HashSet<>();
+        if (element instanceof ObjectParameter) {
+            firstLevelParameters.addAll(((ObjectParameter) element).getProperties());
+        } else if (element instanceof ArrayParameter) {
+            firstLevelParameters.addAll(getFirstLevelParameters(((ArrayParameter) element).getReferenceElement()));
+        } else if (element instanceof LeafParameter) {
             firstLevelParameters.add(element);
         }
         return firstLevelParameters;
     }
 
-    public Set<ParameterElement> getOutputParametersSet() {
-        Set<ParameterElement> outParams = new HashSet<>();
-        for (StructuredParameterElement responseBody : outputParameters.values()) {
-            outParams.addAll(responseBody.getReferenceLeaves());
+    public Set<Parameter> getOutputParametersSet() {
+        Set<Parameter> outParams = new HashSet<>();
+        for (StructuredParameter responseBody : outputParameters.values()) {
+            outParams.addAll(ParameterUtils.getReferenceLeaves(responseBody));
         }
         return outParams;
     }
@@ -612,6 +679,10 @@ public class Operation {
     }
 
     public void setCrudSemantics(OperationSemantics operationSemantics) {
+        if (isReadOnly) {
+            throw new EditReadOnlyOperationException(this);
+        }
+
         this.operationSemantics = operationSemantics;
     }
 
@@ -620,6 +691,10 @@ public class Operation {
     }
 
     public void setCrudResourceType(String crudResourceType) {
+        if (isReadOnly) {
+            throw new EditReadOnlyOperationException(this);
+        }
+
         this.crudResourceType = crudResourceType;
     }
 
@@ -639,12 +714,12 @@ public class Operation {
         this.inferredCrudResourceType = inferredCrudResourceType;
     }
 
-    public List<ParameterElement> searchRequestParametersByName(ParameterName parameterName) {
+    public List<Parameter> searchRequestParametersByName(ParameterName parameterName) {
         return getAllRequestParameters().stream().filter(p -> p.getName().equals(parameterName)).collect(Collectors.toList());
     }
 
-    public List<ParameterElement> searchResponseParametersByName(ParameterName parameterName) {
-        List<ParameterElement> foundParameters = new LinkedList<>();
+    public List<Parameter> searchResponseParametersByName(ParameterName parameterName) {
+        List<Parameter> foundParameters = new LinkedList<>();
         getOutputParametersSet().forEach(p -> {
             if (p.getName().equals(parameterName)) {
                 foundParameters.add(p);
@@ -654,12 +729,12 @@ public class Operation {
     }
 
     // FIXME: check if all parameters can be used, rather than only reference leaves
-    public List<ParameterElement> searchReferenceRequestParametersByNormalizedName(NormalizedParameterName normalizedParameterName) {
+    public List<Parameter> searchReferenceRequestParametersByNormalizedName(NormalizedParameterName normalizedParameterName) {
         return getReferenceLeaves().stream().filter(p -> p.getNormalizedName().equals(normalizedParameterName)).collect(Collectors.toList());
     }
 
-    public List<ParameterElement> searchResponseParametersByNormalizedName(NormalizedParameterName normalizedParameterName) {
-        List<ParameterElement> foundParameters = new LinkedList<>();
+    public List<Parameter> searchResponseParametersByNormalizedName(NormalizedParameterName normalizedParameterName) {
+        List<Parameter> foundParameters = new LinkedList<>();
         getOutputParametersSet().forEach(p -> {
             if (p.getNormalizedName().equals(normalizedParameterName)) {
                 foundParameters.add(p);
@@ -686,6 +761,15 @@ public class Operation {
 
     public void setRequestContentType(String requestContentType) {
         this.requestContentType = requestContentType;
+    }
+
+    /**
+     * Returns a parameter by its REST path.
+     * @param restPath the REST path of the wanted parameter.
+     * @return the parameter corresponding to the provided REST path, or null if no parameter matches the REST path.
+     */
+    public Parameter getParameterByRestPath(String restPath) {
+        return RestPathHelper.getParameterElementByRestPath(this, restPath);
     }
 
     @Override
