@@ -1,0 +1,195 @@
+{
+  "openapi":"3.1.0",
+  "info": {
+    "title":"Mocked Server",
+    "description":"Mocked Server for testing parameterElement.getJsonPath ",
+    "version":"1.0"},
+  "servers": [{
+    "url":"http://localhost:4010",
+    "description":"Mocked Server"}],
+  "paths": {
+    "/leaf": {
+      "get": {
+        "operationId":"leaf",
+        "responses": {
+          "200":{
+            "description":"OK",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/leaf"
+                },
+                "example": {
+                  "$ref": "#/components/examples/leafExample"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objectWithoutName": {
+      "get": {
+        "operationId":"objectWithoutName",
+        "responses": {
+          "200":{
+            "description":"OK",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/objectWithoutName"
+                },
+                "example": {
+                  "$ref": "#/components/examples/objectWithoutNameExample"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objectWithName": {
+      "get": {
+        "operationId":"objectWithName",
+        "responses": {
+          "200":{
+            "description":"OK",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/objectWithName"
+                },
+                "example": {
+                  "$ref": "#/components/examples/objectWithNameExample"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/arrayOfObjectWithoutName":{
+      "get":{
+        "operationId":"arrayOfObjectWithoutName",
+        "responses":{
+          "200":{
+            "description":"OK",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/arrayOfObjectWithoutName"
+                },
+                "example": [{
+                  "$ref":"#/components/examples/objectWithoutNameExample"
+                },
+                  {
+                    "id": 2,
+                    "name": "name2"
+                  }]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/arrayWithNameOfObject":{
+      "get":{
+        "operationId":"arrayWithNameOfObject",
+        "responses":{
+          "200":{
+            "description":"OK",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref": "#/components/schemas/arrayWithNameOfObject"
+                },
+                "example": {
+                  "data":[{
+                    "id": 1,
+                    "name": "name1"
+                  },
+                    {
+                      "id": 2,
+                      "name": "name2"
+                    }]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+
+  "components": {
+    "schemas": {
+      "leaf": {
+        "type": "object",
+        "properties": {
+          "message":{
+            "type": "string"
+          }
+        }
+      },
+      "objectWithoutName": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "objectWithName": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/objectWithoutName"
+          }
+        }
+      },
+      "arrayOfObjectWithoutName": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/objectWithoutName"
+        }
+      },
+      "arrayWithNameOfObject": {
+        "type": "object",
+        "data":{
+          "type": "array",
+          "items": {
+            "properties": {
+              "id": {
+                "type": "int"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+
+        }
+      }
+    },
+
+    "examples": {
+      "leafExample": {
+        "message": "message"
+      },
+      "objectWithoutNameExample": {
+        "id": 1,
+        "name": "name1"
+      },
+      "objectWithNameExample": {
+        "data": {
+          "$ref": "#/components/examples/objectWithoutNameExample"
+        }
+      }
+    }
+  }
+}

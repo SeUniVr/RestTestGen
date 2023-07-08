@@ -19,7 +19,7 @@ public class ParameterFactory {
 
     private static final Logger logger = LogManager.getLogger(ParameterFactory.class);
 
-    public static Parameter getParameterElement(Map<String, Object> elementMap, String name) {
+    public static Parameter getParameter(Map<String, Object> elementMap, String name) {
 
         checkUnsupportedFeature(elementMap, name);
 
@@ -69,11 +69,11 @@ public class ParameterFactory {
         }
     }
 
-    public static Parameter getParameterElement(Map<String, Object> elementMap) {
-        return getParameterElement(elementMap, null);
+    public static Parameter getParameter(Map<String, Object> elementMap) {
+        return getParameter(elementMap, null);
     }
 
-    public static Parameter getParameterElement(JsonElement jsonElement, String name) {
+    public static Parameter getParameter(JsonElement jsonElement, String name) {
         if (jsonElement instanceof JsonObject) {
             return new ObjectParameter((JsonObject) jsonElement, name);
         } else if (jsonElement instanceof JsonArray) {
@@ -107,7 +107,7 @@ public class ParameterFactory {
     }
 
     public static StructuredParameter getStructuredParameter (Map<String, Object> elementMap, String name) {
-        Parameter parameter = getParameterElement(elementMap, name);
+        Parameter parameter = getParameter(elementMap, name);
         try {
             return (StructuredParameter) parameter;
         } catch (ClassCastException e) {

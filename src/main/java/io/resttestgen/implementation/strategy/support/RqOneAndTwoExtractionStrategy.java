@@ -28,9 +28,9 @@ public class RqOneAndTwoExtractionStrategy extends Strategy {
             }
 
             // For each parameter in the specification, if it has description, add it
-            for (Parameter parameterElement : operation.getAllRequestParameters()) {
-                if (parameterElement.getDescription() != null && parameterElement.getDescription().length() > 3) {
-                    addDescriptionToMap(operation.toString(), parameterElement.getName().toString(), parameterElement.getDescription());
+            for (Parameter parameter : operation.getAllRequestParameters()) {
+                if (parameter.getDescription() != null && parameter.getDescription().length() > 3) {
+                    addDescriptionToMap(operation.toString(), parameter.getName().toString(), parameter.getDescription());
                 }
             }
         }

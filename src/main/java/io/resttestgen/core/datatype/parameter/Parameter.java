@@ -14,7 +14,7 @@ import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.helper.RestPathHelper;
 import io.resttestgen.core.helper.Taggable;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
-import io.resttestgen.core.openapi.OpenAPIParser;
+import io.resttestgen.core.openapi.OpenApiParser;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,12 +94,12 @@ public abstract class Parameter extends Taggable {
         this.type = ParameterType.getTypeFromString((String) sourceMap.get("type"));
         this.format = ParameterTypeFormat.getFormatFromString((String) sourceMap.get("format"));
 
-        this.description = OpenAPIParser.safeGet(parameterMap, "description", String.class);
+        this.description = OpenApiParser.safeGet(parameterMap, "description", String.class);
 
         setDefaultValue(sourceMap.get("default"));
 
         @SuppressWarnings("unchecked")
-        List<Object> values = OpenAPIParser.safeGet(sourceMap, "enum", ArrayList.class);
+        List<Object> values = OpenApiParser.safeGet(sourceMap, "enum", ArrayList.class);
         values.forEach(value -> {
             if (isObjectTypeCompliant(value)) {
                 enumValues.add(value);
@@ -122,17 +122,15 @@ public abstract class Parameter extends Taggable {
             } else {
                 try {
                     examples.add(ObjectHelper.castToParameterValueType(exampleValue, type));
-                    logger.warn("Example value " + exampleValue + " was not compliant to parameter type, but it has been " +
-                            "cast to fit the right type.");
+                    logger.warn("Example value '" + exampleValue + castedWarn);
                 } catch (ClassCastException e) {
-                    logger.warn("Example value " + exampleValue + " is not compliant to parameter type. " +
-                            "The value will be discarded.");
+                    logger.warn("Example value '" + exampleValue + discardedWarn);
                 }
             }
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, Map<String, Object>> examples = OpenAPIParser.safeGet(parameterMap, "examples", LinkedTreeMap.class);
+        Map<String, Map<String, Object>> examples = OpenApiParser.safeGet(parameterMap, "examples", LinkedTreeMap.class);
         examples.values().forEach(example -> {
             if (example.containsKey("value")) {
                 Object value = example.get("value");
@@ -266,7 +264,7 @@ public abstract class Parameter extends Taggable {
 
     /**
      * Function to check whether the object passed as parameter is compliant to the Parameter type.
-     * Each ParameterElement subclass implements it checking the type against the one that it expects for its
+     * Each Parameter subclass implements it checking the type against the one that it expects for its
      * values/enum values/examples/etc.
      * @param o The object to be checked for compliance
      * @return True if o is compliant to the Parameter; false otherwise
@@ -300,7 +298,7 @@ public abstract class Parameter extends Taggable {
     }
 
     public Parameter getParameterByRestPath(String restPath) {
-        return RestPathHelper.getParameterElementByRestPath(this, restPath);
+        return RestPathHelper.getParameterByRestPath(this, restPath);
     }
 
     /**
@@ -366,11 +364,13 @@ public abstract class Parameter extends Taggable {
         if (this.isObjectTypeCompliant(defaultValue)) {
             this.defaultValue = defaultValue;
         } else {
-            try {
-                this.defaultValue = ObjectHelper.castToParameterValueType(defaultValue, getType());
-                logger.warn("Example value '" + defaultValue + castedWarn);
-            } catch (ClassCastException e) {
-                logger.warn("Example value '" + defaultValue + discardedWarn);
+            if (defaultValue != null) {
+                try {
+                    this.defaultValue = ObjectHelper.castToParameterValueType(defaultValue, getType());
+                    logger.warn("Default value '" + defaultValue + castedWarn);
+                } catch (ClassCastException e) {
+                    logger.warn("Default value '" + defaultValue + discardedWarn);
+                }
             }
         }
     }

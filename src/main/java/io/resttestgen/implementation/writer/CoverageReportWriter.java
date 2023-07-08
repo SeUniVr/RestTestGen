@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.writer;
 
 import com.google.gson.JsonObject;
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.coverage.CoverageManager;

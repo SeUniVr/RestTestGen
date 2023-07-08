@@ -1,11 +1,12 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
 import com.google.gson.Gson;
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.ApiUnderTest;
+import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
-import io.resttestgen.core.openapi.CannotParseOpenAPIException;
+import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class RandomParameterValueProviderTest {
 
-    private static final Environment environment = Environment.getInstance();
+    private static Environment environment = Environment.getInstance();
     private static RandomParameterValueProvider randomParameterValueProvider;
     private static final int NUM_TESTS = 1000;
     private static final boolean printGeneratedValues = false;
@@ -41,9 +42,8 @@ public class RandomParameterValueProviderTest {
 
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenAPIException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Configuration configuration = new Configuration(true);
-        environment.setUp(configuration);
+    public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
         randomParameterValueProvider = new RandomParameterValueProvider();
         Gson gson = new Gson();
         longParameterMap = gson.fromJson(longParameterJSON, Map.class);

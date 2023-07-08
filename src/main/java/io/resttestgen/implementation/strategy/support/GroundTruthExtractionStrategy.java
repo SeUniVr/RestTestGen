@@ -31,9 +31,9 @@ public class GroundTruthExtractionStrategy extends Strategy {
             }
 
             // For each parameter in the specification, if it has description, add it
-            for (Parameter parameterElement : operation.getAllRequestParameters()) {
-                if (parameterElement.getDescription() != null && parameterElement.getDescription().length() > 3) {
-                    addDescriptionToMap(parameterElement.getName().toString(), parameterElement.getDescription());
+            for (Parameter parameter : operation.getAllRequestParameters()) {
+                if (parameter.getDescription() != null && parameter.getDescription().length() > 3) {
+                    addDescriptionToMap(parameter.getName().toString(), parameter.getDescription());
                 }
             }
         }

@@ -149,16 +149,16 @@ public abstract class Rule {
 
     @NotNull
     public List<Parameter> getParametersInOperation(Operation operation) {
-        List<Parameter> parameterElements = new LinkedList<>();
+        List<Parameter> parameters = new LinkedList<>();
         for (ParameterName parameterName : parameterNames) {
             for (Parameter element : operation.getAllRequestParameters().stream().filter(p -> !(p.getParent() instanceof ArrayParameter)).collect(Collectors.toList())) {
                 if (element.getName().equals(parameterName)) {
-                    parameterElements.add(element);
+                    parameters.add(element);
                     break;
                 }
             }
         }
-        return parameterElements;
+        return parameters;
     }
 
     protected boolean executeFineValidationTestSequence(TestSequence fineValidationTestSequence) {

@@ -1,8 +1,9 @@
 package io.resttestgen.core.testing;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.ApiUnderTest;
+import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.openapi.CannotParseOpenAPIException;
+import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,19 +14,16 @@ import java.lang.reflect.InvocationTargetException;
 
 public class TestTestSequence {
 
-    private static final Environment e = Environment.getInstance();
+    private static Environment environment;
     static TestSequence testSequence;
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenAPIException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-
-        Configuration configuration = new Configuration(true);
-        e.setUp(configuration);
-
+    public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
         testSequence = new TestSequence();
 
         for (int i = 0; i < 10; i++) {
-            Operation randomOperation = e.getRandom().nextElement(e.getOpenAPI().getOperations()).get();
+            Operation randomOperation = environment.getRandom().nextElement(environment.getOpenAPI().getOperations()).get();
             TestInteraction interaction = new TestInteraction(randomOperation);
             interaction.addTag("count=" + i);
             testSequence.add(interaction);

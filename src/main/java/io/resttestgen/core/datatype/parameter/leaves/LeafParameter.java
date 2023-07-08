@@ -4,11 +4,10 @@ import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterStyle;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
-import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.datatype.parameter.visitor.Visitor;
 import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
-import io.resttestgen.core.openapi.OpenAPIParser;
+import io.resttestgen.core.openapi.OpenApiParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +25,7 @@ public abstract class LeafParameter extends Parameter {
     public LeafParameter(Map<String, Object> parameterMap, String name) {
         super(parameterMap, name);
         if (parameterMap.containsKey("x-crudResourceIdentifier")) {
-            this.resourceIdentifier = OpenAPIParser.safeGet(parameterMap, "x-crudResourceIdentifier", Boolean.class);
+            this.resourceIdentifier = OpenApiParser.safeGet(parameterMap, "x-crudResourceIdentifier", Boolean.class);
         }
     }
 

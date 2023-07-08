@@ -1,6 +1,6 @@
 package io.resttestgen.core.helper;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;

@@ -1,6 +1,6 @@
 package io.resttestgen.core.testing;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 
 import java.io.IOException;

@@ -1,0 +1,2 @@
+apiUnderTest: bookstore
+strategyClassName: NominalAndErrorStrategy

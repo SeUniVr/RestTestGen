@@ -2,12 +2,11 @@ package io.resttestgen.core.datatype.parameter.combined;
 
 import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterStyle;
-import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 import io.resttestgen.core.datatype.parameter.exceptions.ParameterCreationException;
 import io.resttestgen.core.datatype.parameter.leaves.NullParameter;
 import io.resttestgen.core.datatype.parameter.visitor.Visitor;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
-import io.resttestgen.core.openapi.OpenAPIParser;
+import io.resttestgen.core.openapi.OpenApiParser;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,12 +82,12 @@ public abstract class CombinedSchemaParameter extends Parameter {
 
     private void setupFields(Map<String, Object> parameterMap) {
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> schemas = OpenAPIParser.safeGet(parameterMap, getKeyFiledName(), ArrayList.class);
+        List<Map<String, Object>> schemas = OpenApiParser.safeGet(parameterMap, getKeyFiledName(), ArrayList.class);
         schemas.forEach(p -> {
             // Propagate location value to defined schemas
             p.put("in", getLocation().toString());
             try {
-                Parameter parameter = ParameterFactory.getParameterElement(p, "");
+                Parameter parameter = ParameterFactory.getParameter(p, "");
                 addToParameterSchema(parameter);
             } catch (ParameterCreationException e) {
                 logger.warn("Discarding schema in '" + getKeyFiledName() + "' field of '" + getName() + "'.");

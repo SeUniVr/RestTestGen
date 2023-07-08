@@ -4,7 +4,7 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
-import io.resttestgen.core.openapi.OpenAPI;
+import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.Operation;
 import weka.clusterers.EM;
 import weka.core.Attribute;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class CrudInformationExtractor {
 
-    OpenAPI openAPI = Environment.getInstance().getOpenAPI();
+    OpenApi openAPI = Environment.getInstance().getOpenAPI();
     Map<Integer, Operation> operationIndexes = new HashMap<>();
     List<NormalizedParameterName> parameterNames;
     Instances dataset;
@@ -180,9 +180,9 @@ public class CrudInformationExtractor {
                     Set<ParameterElement> foundParameters = operation.getInputParametersSet();
                     foundParameters.addAll(operation.getOutputParametersSet());
 
-                    for (ParameterElement element : foundParameters) {
-                        if (element instanceof ParameterLeaf && element.getNormalizedName().equals(resourceIdentifierName)) {
-                            ((ParameterLeaf) element).setInferredResourceIdentifier(true);
+                    for (Parameter parameter : foundParameters) {
+                        if (element instanceof LeafParameter && parameter.getNormalizedName().equals(resourceIdentifierName)) {
+                            ((LeafParameter) parameter).setInferredResourceIdentifier(true);
                         }
                     }
                 }

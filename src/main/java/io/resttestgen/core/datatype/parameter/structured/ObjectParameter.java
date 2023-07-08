@@ -11,8 +11,7 @@ import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.datatype.parameter.visitor.Visitor;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
-import io.resttestgen.core.openapi.OpenAPIParser;
-import io.resttestgen.core.openapi.Operation;
+import io.resttestgen.core.openapi.OpenApiParser;
 import io.resttestgen.core.openapi.UnsupportedSpecificationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,10 +36,10 @@ public class ObjectParameter extends StructuredParameter {
     public ObjectParameter(Map<String, Object> schema, String name)  {
         super(schema, name);
 
-        Map<String, Object> properties = OpenAPIParser.safeGet(schema, "properties", LinkedTreeMap.class);
+        Map<String, Object> properties = OpenApiParser.safeGet(schema, "properties", LinkedTreeMap.class);
         if (properties.isEmpty()) {
-            schema = OpenAPIParser.safeGet(schema, "schema", LinkedTreeMap.class);
-            properties = OpenAPIParser.safeGet(schema, "properties", LinkedTreeMap.class);
+            schema = OpenApiParser.safeGet(schema, "schema", LinkedTreeMap.class);
+            properties = OpenApiParser.safeGet(schema, "properties", LinkedTreeMap.class);
         }
 
         Parameter parameter;
@@ -49,7 +48,7 @@ public class ObjectParameter extends StructuredParameter {
                 Map<String, Object> map = (Map<String, Object>) propertyMap.getValue();
                 // Propagate location value to children
                 map.put("in", getLocation().toString());
-                parameter = ParameterFactory.getParameterElement(map, propertyMap.getKey());
+                parameter = ParameterFactory.getParameter(map, propertyMap.getKey());
                 addChild(parameter);
 
                 // Propagate example values to children
@@ -133,7 +132,7 @@ public class ObjectParameter extends StructuredParameter {
 
         for (String entryName : jsonObject.keySet()) {
             Parameter p =
-                    ParameterFactory.getParameterElement(jsonObject.get(entryName), entryName);
+                    ParameterFactory.getParameter(jsonObject.get(entryName), entryName);
             if (p != null) {
                 addChild(p);
             }
@@ -233,12 +232,11 @@ public class ObjectParameter extends StructuredParameter {
         }
 
         // Propagate example values to children
+        @SuppressWarnings("unchecked")
         Map<String, Object> exampleMap = (Map<String, Object>) o;
         for (Map.Entry<String, Object> example : exampleMap.entrySet()) {
                 properties.stream().filter(p -> p.getName().toString().equals(example.getKey()))
-                        .findFirst().ifPresent(
-                                parameterElement -> parameterElement.addExample(example.getValue())
-                        );
+                        .findFirst().ifPresent(parameter -> parameter.addExample(example.getValue()));
         }
 
         return true;

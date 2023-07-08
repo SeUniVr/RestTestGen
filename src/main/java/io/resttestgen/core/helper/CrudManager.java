@@ -1,6 +1,6 @@
 package io.resttestgen.core.helper;
 
-import io.resttestgen.core.openapi.OpenAPI;
+import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.Operation;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class CrudManager {
     private final Set<String> inferredResourceTypes;
     private Map<String, CrudGroup> inferredGroups;
 
-    public CrudManager(OpenAPI openAPI) {
+    public CrudManager(OpenApi openAPI) {
         this.groups = new HashMap<>();
         this.resourceTypes = collectResourceTypes(openAPI);
         for (String resourceType : resourceTypes) {
@@ -52,7 +52,7 @@ public class CrudManager {
     }
 
     // Collect in a set all the target object IDs of operations
-    public static Set<String> collectResourceTypes(OpenAPI openAPI) {
+    public static Set<String> collectResourceTypes(OpenApi openAPI) {
         Set<String> resourceTypes = new HashSet<>();
         for (Operation operation : openAPI.getOperations()) {
             if (operation.getCrudResourceType() != null && !operation.getCrudResourceType().equals("")) {
@@ -62,7 +62,7 @@ public class CrudManager {
         return resourceTypes;
     }
 
-    public static Set<String> collectInferredResourceTypes(OpenAPI openAPI) {
+    public static Set<String> collectInferredResourceTypes(OpenApi openAPI) {
         Set<String> inferredResourceTypes = new HashSet<>();
         for (Operation operation : openAPI.getOperations()) {
             if (operation.getInferredCrudResourceType() != null && !operation.getInferredCrudResourceType().equals("")) {

@@ -52,7 +52,7 @@ public class ParameterValueCoverage extends Coverage {
                 if(parameter.getType()== ParameterType.BOOLEAN || parameter.isEnum()){
                     if(containsOperation){
                         if(valuesToTest.get(operation).containsKey(parameterWrapper)){
-                            if(valuesToTest.get(operation).get(parameterWrapper).contains(((LeafParameter)parameterWrapper.getParameterElement()).getConcreteValue())) {
+                            if(valuesToTest.get(operation).get(parameterWrapper).contains(((LeafParameter)parameterWrapper.getParameter()).getConcreteValue())) {
                                 insertParameterValueToSet(valuesDocumentedTested, operation, parameterWrapper, ((LeafParameter)parameter).getConcreteValue());
                             }else{
                                 insertParameterValueToSet(valuesNotDocumentedTested,operation, parameterWrapper, ((LeafParameter)parameter).getConcreteValue());

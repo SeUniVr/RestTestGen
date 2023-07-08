@@ -1,6 +1,6 @@
 package io.resttestgen.implementation.writer;
 
-import io.resttestgen.core.AuthenticationInfo;
+import io.resttestgen.boot.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.*;
@@ -245,7 +245,7 @@ public class RestAssuredWriter extends Writer {
     private void buildRequest(StringBuilder content,Operation operation,int numOperation ){
         content.append("\t\t//Build request\n ");
         content.append("\t\tRequestSpecification ").append(buildVariableName("request",numOperation,null,null)).append(" = RestAssured.given()");
-        AuthenticationInfo authInfo = environment.getAuthenticationInfo(0);
+        AuthenticationInfo authInfo = environment.getApiUnderTest().getDefaultAuthenticationInfo();
         if(authInfo != null){
             content.append(".header(\"Authorization\",\"").append(authInfo.getValue()).append("\")");
         }

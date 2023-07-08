@@ -1,7 +1,7 @@
 package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
-import io.resttestgen.core.openapi.OpenAPI;
+import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.Operation;
 
 import java.lang.reflect.Type;
@@ -14,10 +14,10 @@ import java.util.Map;
 /**
  * Used by Gson to write out the Java representation of an OpenAPI, as JSON OpenAPI specification.
  */
-public class OpenApiSerializer implements JsonSerializer<OpenAPI> {
+public class OpenApiSerializer implements JsonSerializer<OpenApi> {
 
     @Override
-    public JsonElement serialize(OpenAPI src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(OpenApi src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject result = new JsonObject();
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Operation.class, new OperationSerializer())
@@ -30,7 +30,7 @@ public class OpenApiSerializer implements JsonSerializer<OpenAPI> {
         return result;
     }
 
-    private List<Server> getServers(OpenAPI openAPI) {
+    private List<Server> getServers(OpenApi openAPI) {
         List<Server> servers = new LinkedList<>();
 
         for (URL url : openAPI.getServers()) {
@@ -40,7 +40,7 @@ public class OpenApiSerializer implements JsonSerializer<OpenAPI> {
         return servers;
     }
 
-    private Map<String, Path> getPaths(OpenAPI openAPI) {
+    private Map<String, Path> getPaths(OpenApi openAPI) {
         Map<String, Path> pathMap = new HashMap<>();
 
         // Initialize map
@@ -78,7 +78,7 @@ public class OpenApiSerializer implements JsonSerializer<OpenAPI> {
         private final License license;
         private final String version;
 
-        public Info(OpenAPI openAPI) {
+        public Info(OpenApi openAPI) {
             this.title = openAPI.getTitle().equals("") ? null : openAPI.getTitle();
             this.summary = openAPI.getSummary().equals("") ? null : openAPI.getSummary();
             this.description = openAPI.getDescription().equals("") ? null : openAPI.getDescription();
@@ -103,7 +103,7 @@ public class OpenApiSerializer implements JsonSerializer<OpenAPI> {
         private String url;
         private String email;
 
-        public Contact(OpenAPI openAPI) {
+        public Contact(OpenApi openAPI) {
             this.name = openAPI.getContactName().equals("") ? null : openAPI.getContactName();
             this.url = openAPI.getContactUrl().equals("") ? null : openAPI.getContactUrl();
             this.email = openAPI.getContactEmail().equals("") ? null : openAPI.getContactEmail();
@@ -115,7 +115,7 @@ public class OpenApiSerializer implements JsonSerializer<OpenAPI> {
         private String name;
         private String url;
 
-        public License(OpenAPI openAPI) {
+        public License(OpenApi openAPI) {
             this.name = openAPI.getLicenseName().equals("") ? null : openAPI.getLicenseName();
             this.url = openAPI.getLicenseUrl().equals("") ? null : openAPI.getLicenseUrl();
         }

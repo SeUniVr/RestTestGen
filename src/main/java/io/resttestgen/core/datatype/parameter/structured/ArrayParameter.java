@@ -11,7 +11,7 @@ import io.resttestgen.core.datatype.parameter.exceptions.ParameterCreationExcept
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.datatype.parameter.visitor.Visitor;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
-import io.resttestgen.core.openapi.OpenAPIParser;
+import io.resttestgen.core.openapi.OpenApiParser;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.openapi.UnsupportedSpecificationFeature;
 import org.apache.logging.log4j.LogManager;
@@ -38,13 +38,13 @@ public class ArrayParameter extends StructuredParameter {
         super(schema, name);
 
         minItems = schema.containsKey("minItems") ?
-                OpenAPIParser.safeGet(schema, "minItems", Double.class).intValue() :
+                OpenApiParser.safeGet(schema, "minItems", Double.class).intValue() :
                 null;
         maxItems = schema.containsKey("maxItems") ?
-                OpenAPIParser.safeGet(schema, "maxItems", Double.class).intValue() :
+                OpenApiParser.safeGet(schema, "maxItems", Double.class).intValue() :
                 null;
         uniqueItems = schema.containsKey("uniqueItems") ?
-                OpenAPIParser.safeGet(schema, "uniqueItems", Boolean.class) :
+                OpenApiParser.safeGet(schema, "uniqueItems", Boolean.class) :
                 false;
 
         // Catch the difference between leaf and structured parameters
@@ -56,7 +56,7 @@ public class ArrayParameter extends StructuredParameter {
             Map<String, Object> items = (Map<String, Object>) targetSource.get("items");
             try {
                 items.put("in", getLocation().toString());
-                setReferenceElement(ParameterFactory.getParameterElement(items, this.name.toString()));
+                setReferenceElement(ParameterFactory.getParameter(items, this.name.toString()));
 
                 // Propagate example values to children
                 for (Object example : super.examples) {
@@ -144,7 +144,7 @@ public class ArrayParameter extends StructuredParameter {
 
         for (JsonElement jsonElement : jsonArray) {
             Parameter p =
-                    ParameterFactory.getParameterElement(jsonElement, this.name.toString());
+                    ParameterFactory.getParameter(jsonElement, this.name.toString());
             if (p != null) {
                 addElement(p);
             }
@@ -306,7 +306,7 @@ public class ArrayParameter extends StructuredParameter {
     /**
      * Adds the given element to the instance element list. Can throw a EditReadOnlyOperationException if the
      * instance is in read-only mode.
-     * @param element The ParameterElement to be added to the elements list
+     * @param element The Parameter to be added to the elements list
      */
     public void addElement(Parameter element) {
         if (getOperation() != null && getOperation().isReadOnly()) {
@@ -350,6 +350,7 @@ public class ArrayParameter extends StructuredParameter {
             return false;
         }
 
+        @SuppressWarnings("unchecked")
         List<Object> exampleItems = (List<Object>) o;
         // Propagate example values to children
         exampleItems.forEach(item -> referenceElement.addExample(item));

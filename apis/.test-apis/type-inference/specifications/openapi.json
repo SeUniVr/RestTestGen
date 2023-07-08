@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "postRoot",
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "simpleS": {
+                    "$ref": "#/components/schemas/SimpleString"
+                  },
+                  "simpleN": {
+                    "$ref": "#/components/schemas/SimpleNumber"
+                  },
+                  "simpleSP": {
+                    "$ref": "#/components/schemas/SimpleStringPattern"
+                  },
+                  "simpleO": {
+                    "$ref": "#/components/schemas/SimpleObject"
+                  },
+                  "simpleA": {
+                    "$ref": "#/components/schemas/SimpleArray"
+                  },
+                  "simpleOne": {
+                    "$ref": "#/components/schemas/OneOfMaxString"
+                  },
+                  "simpleAny": {
+                    "$ref": "#/components/schemas/AnyOfNumber"
+                  },
+                  "simpleAll": {
+                    "$ref": "#/components/schemas/AllOfNumber"
+                  },
+                  "simpleNot": {
+                    "$ref": "#/components/schemas/NotMaxString"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Default response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimpleString": {
+        "maxLength": 10
+      },
+      "SimpleNumber": {
+        "maximum": 20
+      },
+      "SimpleStringPattern": {
+        "pattern": ".*"
+      },
+      "SimpleObject": {
+        "properties": {
+          "First": {
+            "$ref": "#/components/schemas/SimpleString"
+          }
+        }
+      },
+      "SimpleArray": {
+        "items": {
+            "$ref": "#/components/schemas/SimpleString"
+        }
+      },
+      "OneOfMaxString": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SimpleString"
+          },
+          {
+            "minLength": 10
+          }
+        ]
+      },
+      "AnyOfNumber": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/SimpleNumber"
+          },
+          {
+            "minimum": 5
+          },
+          {
+            "multipleOf": 1
+          }
+        ]
+      },
+      "AllOfNumber": {
+        "type": "number",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SimpleNumber"
+          },
+          {
+            "minimum": 5
+          },
+          {
+            "multipleOf": 1
+          }
+        ]
+      },
+      "NotMaxString": {
+        "not": {
+          "maxLength": 30
+        }
+      }
+    }
+  }
+}

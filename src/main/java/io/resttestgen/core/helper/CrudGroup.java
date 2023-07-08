@@ -2,7 +2,7 @@ package io.resttestgen.core.helper;
 
 import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.parameter.Parameter;
-import io.resttestgen.core.openapi.OpenAPI;
+import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +18,7 @@ public class CrudGroup {
 
     private static final Logger logger = LogManager.getLogger(CrudGroup.class);
 
-    public CrudGroup(OpenAPI openAPI, String resourceType, boolean isInferred) {
+    public CrudGroup(OpenApi openAPI, String resourceType, boolean isInferred) {
         this.isInferred = isInferred;
         this.resourceType = resourceType;
         this.operations = new HashSet<>();

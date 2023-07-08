@@ -91,9 +91,6 @@ public abstract class StructuredParameter extends Parameter {
         }
     }
 
-    // TODO: remove
-    //public abstract ParameterElement getElementByJsonPath(String jsonPath);
-
     @Override
     public boolean remove() {
         if (getOperation() != null && getOperation().isReadOnly()) {

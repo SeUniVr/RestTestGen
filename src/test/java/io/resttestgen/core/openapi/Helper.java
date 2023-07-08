@@ -24,14 +24,14 @@ public class Helper {
         return operationMap;
     }
 
-    public static Map<String, Object> getParserMap(OpenAPIParser parser) throws NoSuchFieldException, IllegalAccessException {
-        Field openAPIMapField = OpenAPIParser.class.getDeclaredField("openAPIMap");
+    public static Map<String, Object> getParserMap(OpenApiParser parser) throws NoSuchFieldException, IllegalAccessException {
+        Field openAPIMapField = OpenApiParser.class.getDeclaredField("openAPIMap");
         openAPIMapField.setAccessible(true);
         return (Map<String, Object>) openAPIMapField.get(parser);
     }
 
-    public static void invokeParserMethod(OpenAPIParser parser, String methodName) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Method method = OpenAPIParser.class.getDeclaredMethod(methodName);
+    public static void invokeParserMethod(OpenApiParser parser, String methodName) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Method method = OpenApiParser.class.getDeclaredMethod(methodName);
         method.setAccessible(true);
         method.invoke(parser);
     }

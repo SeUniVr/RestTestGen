@@ -7,6 +7,7 @@ import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.openapi.Operation;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -62,12 +63,12 @@ public class RestPathHelper {
     }
 
     /**
-     * Retrieves a ParameterElement from the provided Operation based in the parameter's REST path.
+     * Retrieves a Parameter from the provided Operation based in the parameter's REST path.
      * @param operation the Operation in which the parameter is searched.
      * @param restPath the REST path of the desired parameter.
      * @return the identified parameter, or null if no parameter matches the provided REST path.
      */
-    public static Parameter getParameterElementByRestPath(Operation operation, String restPath) {
+    public static Parameter getParameterByRestPath(Operation operation, String restPath) {
 
         String editableRestPath = restPath;
 
@@ -121,11 +122,11 @@ public class RestPathHelper {
         return null;
     }
 
-    public static Parameter getParameterElementByRestPath(Parameter parameter, String restPath) {
+    public static Parameter getParameterByRestPath(Parameter parameter, String restPath) {
 
         // If the current REST path starts with $ (root), the process is like an operation REST path
         if (restPath.startsWith("$")) {
-            return getParameterElementByRestPath(parameter.getOperation(), restPath);
+            return getParameterByRestPath(parameter.getOperation(), restPath);
         }
 
         String editableRestPath = restPath;
@@ -171,11 +172,11 @@ public class RestPathHelper {
         return null;
     }
 
-    private static String getRestPathPrefixForRootElement(Parameter parameterElement) {
+    private static String getRestPathPrefixForRootElement(Parameter parameter) {
 
         // Proceed only in case of a root element
-        if (parameterElement.getParent() == null) {
-            switch (parameterElement.getLocation()) {
+        if (parameter.getParent() == null) {
+            switch (parameter.getLocation()) {
                 case PATH:
                     return request + path;
                 case QUERY:
@@ -187,11 +188,11 @@ public class RestPathHelper {
                 case REQUEST_BODY:
                     return request + body;
                 case RESPONSE_BODY:
-                    if (parameterElement == parameterElement.getOperation().getResponseBody()) {
+                    if (parameter == parameter.getOperation().getResponseBody()) {
                         return response + actual + body;
                     }
-                    for (Map.Entry<String, StructuredParameter> entry : parameterElement.getOperation().getOutputParameters().entrySet()) {
-                        if (entry.getValue().equals(parameterElement)) {
+                    for (Map.Entry<String, StructuredParameter> entry : parameter.getOperation().getOutputParameters().entrySet()) {
+                        if (entry.getValue().equals(parameter)) {
                             return response + encapsulate(entry.getKey())  + body;
                         }
                     }
@@ -254,7 +255,7 @@ public class RestPathHelper {
      * Given a collection of parameters, returns the first parameter matching the provided name.
      * @param parameters collection of parameters.
      * @param name parameter name to match.
-     * @return the matching ParameterElement.
+     * @return the matching Parameter.
      */
     private static Parameter findParameterByName(Collection<Parameter> parameters, ParameterName name) {
         for (Parameter parameter : parameters) {
@@ -265,8 +266,8 @@ public class RestPathHelper {
         return null;
     }
 
-    private static String getLocationData(Parameter parameterElement) {
-        switch (parameterElement.getLocation()) {
+    private static String getLocationData(@NotNull Parameter parameter) {
+        switch (parameter.getLocation()) {
             case HEADER:
                 return header;
             case PATH:

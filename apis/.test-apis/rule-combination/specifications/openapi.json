@@ -1,0 +1,170 @@
+{
+  "openapi": "3.0.1",
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "info": {
+    "title": "Bookstore",
+    "version": "1.0",
+    "description": "This API enables the management of a bookstore. You can add, update, and remove the books in the store.",
+    "contact": {
+      "name": "Davide Corradini",
+      "email": "davide.corradini@univr.it"
+    }
+  },
+  "tags": [
+    {
+      "description": "Management of the books in the bookstore",
+      "name": "Book"
+    }
+  ],
+  "paths": {
+    "/book/{bookId}": {
+      "get": {
+        "tags": [
+          "Book"
+        ],
+        "operationId": "getBookById",
+        "parameters": [
+          {
+            "name": "bookId",
+            "description": "The unique identifier of the book in the system.",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "a",
+            "description": "The unique identifier of the book in the system.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "b",
+            "description": "The unique identifier of the book in the system.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "c",
+            "description": "The unique identifier of the book in the system.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "d",
+            "description": "The unique identifier of the book in the system.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "e",
+            "description": "The unique identifier of the book in the system.",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadBook"
+                }
+              }
+            },
+            "description": "The book has been successfully retrieved."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Book": {
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the book in the system.",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "description": "The title of the book.",
+            "type": "string",
+            "example": "Software Engineering, Vol. 1"
+          },
+          "author": {
+            "description": "The author of the book.",
+            "type": "string",
+            "example": "Mariano Ceccato"
+          },
+          "price": {
+            "description": "The price of the book.",
+            "type": "number",
+            "format": "float",
+            "example": 16.5
+          }
+        },
+        "type": "object"
+      },
+      "ReadBook": {
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the book in the system.",
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "title": {
+            "description": "The title of the book.",
+            "type": "string",
+            "example": "Software Engineering, Vol. 1"
+          },
+          "author": {
+            "description": "The author of the book.",
+            "type": "string",
+            "example": "Mariano Ceccato"
+          },
+          "price": {
+            "description": "The price of the book.",
+            "type": "number",
+            "format": "float",
+            "example": 16.5
+          },
+          "copiesSold": {
+            "description": "The number of copies sold of the book.",
+            "type": "integer",
+            "example": 10
+          }
+        },
+        "type": "object"
+      }
+    }
+  }
+}

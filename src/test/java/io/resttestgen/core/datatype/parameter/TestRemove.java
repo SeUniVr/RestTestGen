@@ -1,10 +1,11 @@
 package io.resttestgen.core.datatype.parameter;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.ApiUnderTest;
+import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
-import io.resttestgen.core.openapi.CannotParseOpenAPIException;
+import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,12 +17,11 @@ import java.util.stream.Collectors;
 
 public class TestRemove {
 
-    private static final Environment environment = Environment.getInstance();
+    private static Environment environment;
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenAPIException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Configuration configuration = new Configuration(true);
-        environment.setUp(configuration);
+    public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
     }
 
     @Test

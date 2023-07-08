@@ -1,6 +1,6 @@
 package io.resttestgen.core.testing;
 
-import io.resttestgen.core.AuthenticationInfo;
+import io.resttestgen.boot.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Executes a test sequence by issuing all the requests of the test interactions composing the test sequence.
@@ -44,7 +42,7 @@ public class TestRunner {
     private final List<ResponseProcessor> responseProcessors = new LinkedList<>();
     private final Set<HttpStatusCode> invalidStatusCodes = new HashSet<>();
     private static final int MAX_ATTEMPTS = 10;
-    private AuthenticationInfo authenticationInfo = Environment.getInstance().getAuthenticationInfo(0);
+    private AuthenticationInfo authenticationInfo = Environment.getInstance().getApiUnderTest().getDefaultAuthenticationInfo();
     private final CoverageManager coverage = new CoverageManager();
 
     /**
@@ -168,9 +166,7 @@ public class TestRunner {
         }
 
         // Process response if the interaction could be executed correctly
-        if (testInteraction.getTestStatus() == TestStatus.EXECUTED) {
-             processResponse(testInteraction);
-        }
+        processResponse(testInteraction);
     }
 
     /**
@@ -209,21 +205,20 @@ public class TestRunner {
                     new Timestamp(response.receivedResponseAtMillis()));
             testInteraction.setTestStatus(TestStatus.EXECUTED);
             coverage.updateCoverage(testInteraction);
+            logger.info("Executed test interaction: " + testInteraction.getFuzzedOperation() + " [" + testInteraction.getResponseStatusCode() + "]");
         } catch (IOException e) {
             logger.warn("Request execution failed: connectivity problem or timeout.");
             call.cancel();
             testInteraction.setTestStatus(TestStatus.ERROR);
         }
 
-        // FIXME: process only valid responses (move outside this method)
-        processResponse(testInteraction);
-
-        // FIXME: remove
+        // Append executed interaction to global test sequence for debug
         globalTestSequenceForDebug.append(testInteraction);
     }
 
     /**
      * Process responses with response processors, only if the test interaction is marked as executed.
+     * FIXME: put char limit in JSON response processor
      * @param testInteraction the test interaction containing the response to process.
      */
     private void processResponse(TestInteraction testInteraction) {
@@ -238,6 +233,14 @@ public class TestRunner {
 
     public void removeResponseProcessor(ResponseProcessor responseProcessor) {
         responseProcessors.remove(responseProcessor);
+    }
+
+    public List<ResponseProcessor> getResponseProcessors() {
+        return Collections.unmodifiableList(responseProcessors);
+    }
+
+    public List<ResponseProcessor> getResponseProcessorsByType(Class<? extends ResponseProcessor> responseProcessorClass) {
+        return responseProcessors.stream().filter(responseProcessorClass::isInstance).collect(Collectors.toList());
     }
 
     public void addInvalidStatusCode(HttpStatusCode statusCode) {

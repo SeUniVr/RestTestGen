@@ -1,7 +1,7 @@
 package io.resttestgen.implementation.strategy;
 
 import com.google.common.collect.Sets;
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.rule.Rule;
 import io.resttestgen.core.helper.RuleExtractorProxy;

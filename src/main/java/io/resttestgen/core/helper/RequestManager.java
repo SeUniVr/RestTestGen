@@ -1,6 +1,6 @@
 package io.resttestgen.core.helper;
 
-import io.resttestgen.core.AuthenticationInfo;
+import io.resttestgen.boot.AuthenticationInfo;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.ParameterName;
@@ -35,8 +35,7 @@ public class RequestManager {
 
     private static final Logger logger = LogManager.getLogger(RequestManager.class);
 
-    private AuthenticationInfo authenticationInfo = Environment.getInstance().getAuthenticationInfo(0);
-
+    private AuthenticationInfo authenticationInfo = Environment.getInstance().getApiUnderTest().getDefaultAuthenticationInfo();
     public RequestManager(Operation operation) {
         this.source = operation;
         this.operation = operation.deepClone();
@@ -118,8 +117,7 @@ public class RequestManager {
                     endpoint = endpoint.replaceFirst("\\{" + parameterName + "\\}",
                             pathParameter.get().getValueAsFormattedString());
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.warn("Could not apply path parameter");
+                    logger.warn("Could not apply path parameter. Could not find parameter with matching name.");
                 }
             }
         }
@@ -172,35 +170,40 @@ public class RequestManager {
         // Apply authorization
         if (authenticationInfo != null) {
 
-            if (!asFuzzed) {
+            authenticationInfo.authenticateIfNot();
 
-                if (dropAuth) {
-                    switch (authenticationInfo.getIn()) {
-                        case HEADER:
-                            requestBuilder.removeHeader(authenticationInfo.getName().toString());
-                            break;
-                        case QUERY:
-                            queryParametersMap.remove(authenticationInfo.getName().toString());
-                            break;
-                        case COOKIE:
-                            logger.warn("Cookie parameters are not already supported.");
-                            break;
-                    }
-                } else {
-                    String authToken = authenticationInfo.getValue();
-                    if (token != null) {
-                        authToken = token;
-                    }
-                    switch (authenticationInfo.getIn()) {
-                        case HEADER:
-                            requestBuilder.header(authenticationInfo.getName().toString(), authToken);
-                            break;
-                        case QUERY:
-                            queryParametersMap.put(authenticationInfo.getName().toString(), authenticationInfo.getName().toString() + "=" + authToken);
-                            break;
-                        case COOKIE:
-                            logger.warn("Cookie parameters are not already supported.");
-                            break;
+            if (authenticationInfo.isAuthenticated()) {
+
+                if (!asFuzzed) {
+
+                    if (dropAuth) {
+                        switch (authenticationInfo.getIn()) {
+                            case HEADER:
+                                requestBuilder.removeHeader(authenticationInfo.getParameterName().toString());
+                                break;
+                            case QUERY:
+                                queryParametersMap.remove(authenticationInfo.getParameterName().toString());
+                                break;
+                            case COOKIE:
+                                logger.warn("Cookie parameters are not already supported.");
+                                break;
+                        }
+                    } else {
+                        String authToken = authenticationInfo.getValue();
+                        if (token != null) {
+                            authToken = token;
+                        }
+                        switch (authenticationInfo.getIn()) {
+                            case HEADER:
+                                requestBuilder.header(authenticationInfo.getParameterName().toString(), authToken);
+                                break;
+                            case QUERY:
+                                queryParametersMap.put(authenticationInfo.getParameterName().toString(), authenticationInfo.getParameterName().toString() + "=" + authToken);
+                                break;
+                            case COOKIE:
+                                logger.warn("Cookie parameters are not supported.");
+                                break;
+                        }
                     }
                 }
             }

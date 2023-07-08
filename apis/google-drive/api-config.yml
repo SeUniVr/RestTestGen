@@ -1,0 +1,4 @@
+name: Google Drive
+specificationFileName: drive.json
+authenticationCommands:
+  default: python3 apis/google-drive/scripts/drive-auth.py

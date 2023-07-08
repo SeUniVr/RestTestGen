@@ -32,7 +32,7 @@ public class TestOperation {
     }
 
     @Test
-    public void testReadOnly() throws IOException, InvalidOpenAPIException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void testReadOnly() throws IOException, InvalidOpenApiException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         logger.info("Test parsing read-only properties of Operation and its associated Parameters");
 
         String endpoint = "/pets";

@@ -1,11 +1,12 @@
 package io.resttestgen.core.operationdependencygraph;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.ApiUnderTest;
+import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.parameter.Parameter;
-import io.resttestgen.core.openapi.CannotParseOpenAPIException;
-import io.resttestgen.core.openapi.InvalidOpenAPIException;
+import io.resttestgen.core.openapi.CannotParseOpenApiException;
+import io.resttestgen.core.openapi.InvalidOpenApiException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,13 +23,8 @@ public class  OperationDependencyGraphTest {
     private static Environment environment;
 
     @BeforeAll
-    public static void setUp() throws InvalidOpenAPIException, CannotParseOpenAPIException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        /*environment = TestingEnvironmentGenerator.getTestingEnvironment();
-        openAPI = environment.getOpenAPI();
-        operationDependencyGraph = environment.getOperationDependencyGraph();*/
-        Configuration configuration = new Configuration(true);
-        environment = Environment.getInstance();
-        environment.setUp(configuration);
+    public static void setUp() throws InvalidOpenApiException, CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
     }
 
     @Test

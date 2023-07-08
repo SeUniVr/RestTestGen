@@ -23,10 +23,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverRecursion() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverRecursion() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for recursive schema");
         File specification = new File("build/resources/test/specifications/recursive_ref.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -41,10 +41,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverSafe() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverSafe() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution (easy)");
         File specification = new File("build/resources/test/specifications/safeRef.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -60,10 +60,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverArray() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverArray() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution schemas defining arrays");
         File specification = new File("build/resources/test/specifications/nested_array_ref.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -78,10 +78,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverItems() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverItems() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for items");
         File specification = new File("build/resources/test/specifications/itemsRef.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -96,10 +96,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverRequestBodies() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverRequestBodies() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for request bodies");
         File specification = new File("build/resources/test/specifications/requestBodiesRef.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -114,10 +114,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverParameters() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverParameters() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for parameters");
         File specification = new File("build/resources/test/specifications/parametersRef.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -132,10 +132,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverResponse() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverResponse() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for responses");
         File specification = new File("build/resources/test/specifications/responseRef.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -150,10 +150,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverNested() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverNested() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for responses");
         File specification = new File("build/resources/test/specifications/nestedObjectsAndItems.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -168,10 +168,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverCombined() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverCombined() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for combined schemas (oneOf, anyOf, allOf, not)");
         File specification = new File("build/resources/test/specifications/combined_schemas_ref.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -186,10 +186,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverDeep() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverDeep() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for combined schemas (oneOf, anyOf, allOf, not)");
         File specification = new File("build/resources/test/specifications/deep_ref.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -204,10 +204,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverPet() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverPet() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for petstore");
         File specification = new File("build/resources/test/specifications/petstore_vuln.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -223,10 +223,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverAuthentiq() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverAuthentiq() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for autentiq");
         File specification = new File("build/resources/test/specifications/authentiq.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -241,10 +241,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverAEM() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverAEM() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for AEM");
         File specification = new File("build/resources/test/specifications/aem.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 
@@ -259,10 +259,10 @@ public class TestRefSolver {
     }
 
     @Test
-    public void testRefSolverAWSMigrationHub() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenAPIException, InvocationTargetException, NoSuchMethodException {
+    public void testRefSolverAWSMigrationHub() throws IOException, NoSuchFieldException, IllegalAccessException, CannotParseOpenApiException, InvocationTargetException, NoSuchMethodException {
         logger.info("Test specification ref resolution for AWS Migration Hub");
         File specification = new File("build/resources/test/specifications/awsMigrationHub.json");
-        OpenAPIParser openAPIParser = new OpenAPIParser(Paths.get(specification.getAbsolutePath()));
+        OpenApiParser openAPIParser = new OpenApiParser(Paths.get(specification.getAbsolutePath()));
         Helper.invokeParserMethod(openAPIParser, "addSchemasNames");
         openAPIParser.solveOpenAPIrefs();
 

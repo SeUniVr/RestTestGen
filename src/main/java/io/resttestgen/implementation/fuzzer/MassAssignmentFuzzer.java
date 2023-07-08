@@ -2,7 +2,7 @@ package io.resttestgen.implementation.fuzzer;
 
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;

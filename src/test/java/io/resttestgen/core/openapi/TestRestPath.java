@@ -1,6 +1,7 @@
 package io.resttestgen.core.openapi;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.ApiUnderTest;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
@@ -15,9 +16,9 @@ public class TestRestPath {
     @BeforeAll
     public static void setUp() {
         try {
-            Configuration configuration = new Configuration(true);
+            Configuration configuration = Configuration.fromFile();
             e = Environment.getInstance();
-            e.setUp(configuration);
+            e.setUp(configuration, new ApiUnderTest("petstore"));
         } catch (Exception ignored) {}
     }
 

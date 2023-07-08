@@ -67,17 +67,17 @@ public class Operation {
     private static final Logger logger = LogManager.getLogger(Operation.class);
 
     @SuppressWarnings("unchecked")
-    public Operation(String endpoint, HttpMethod method, Map<String, Object> operationMap) throws InvalidOpenAPIException {
+    public Operation(String endpoint, HttpMethod method, Map<String, Object> operationMap) throws InvalidOpenApiException {
         this.endpoint = endpoint;
         this.method = method;
 
         this.operationSemantics = OperationSemantics.parseSemantics(
-                OpenAPIParser.safeGet(operationMap, "x-crudOperationSemantics", String.class));
-        this.crudResourceType = OpenAPIParser.safeGet(operationMap, "x-crudResourceType", String.class).trim();
+                OpenApiParser.safeGet(operationMap, "x-crudOperationSemantics", String.class));
+        this.crudResourceType = OpenApiParser.safeGet(operationMap, "x-crudResourceType", String.class).trim();
 
         rulesToValidate = new HashSet<>();
 
-        ArrayList<String> interParameterDependencies = OpenAPIParser.safeGet(operationMap, "x-dependencies", ArrayList.class);
+        ArrayList<String> interParameterDependencies = OpenApiParser.safeGet(operationMap, "x-dependencies", ArrayList.class);
         HashMap<String, List<Set<ParameterName>>> ipdTokenSetMapping = new HashMap<>();
         ipdTokenSetMapping.put("Or", or);
         ipdTokenSetMapping.put("OnlyOne", onlyOne);
@@ -114,50 +114,50 @@ public class Operation {
 
         logger.debug("Fetching operation " + method + " " + endpoint);
 
-        operationId = OpenAPIParser.safeGet(operationMap, "operationId", String.class);
-        description = OpenAPIParser.safeGet(operationMap, "description", String.class);
-        summary = OpenAPIParser.safeGet(operationMap, "summary", String.class);
+        operationId = OpenApiParser.safeGet(operationMap, "operationId", String.class);
+        description = OpenApiParser.safeGet(operationMap, "description", String.class);
+        summary = OpenApiParser.safeGet(operationMap, "summary", String.class);
 
         // Check for header/path/query parameters
-        List<Map<String, Object>> parameters = OpenAPIParser.safeGet(operationMap, "parameters", ArrayList.class);
-        for (Map<String, Object> parameter : parameters) {
-            ParameterLocation location = ParameterLocation.getLocationFromString((String) parameter.get("in"));
-            Parameter parameterElement = null;
+        List<Map<String, Object>> params = OpenApiParser.safeGet(operationMap, "parameters", ArrayList.class);
+        for (Map<String, Object> param : params) {
+            ParameterLocation location = ParameterLocation.getLocationFromString((String) param.get("in"));
+            Parameter parameter = null;
 
             try {
-                parameterElement = ParameterFactory.getParameterElement(parameter);
+                parameter = ParameterFactory.getParameter(param);
             } catch (ParameterCreationException e) {
-                logger.warn("Skipping parameter \"" + parameter.get("name") + "\" in operation \"" + this + "\" due to " +
+                logger.warn("Skipping parameter \"" + param.get("name") + "\" in operation \"" + this + "\" due to " +
                         "a ParameterCreationException.");
             }
 
-            if (parameterElement != null) {
-                if (!addParameter(location, parameterElement)) {
-                    logger.warn("Skipping parameter \"" + parameter.get("name") + "\" in operation \"" + this +
-                            "\" due to a wrong \"in\" field value (actual value:" + parameter.get("in") + " ).");
+            if (parameter != null) {
+                if (!addParameter(location, parameter)) {
+                    logger.warn("Skipping parameter \"" + param.get("name") + "\" in operation \"" + this +
+                            "\" due to a wrong \"in\" field value (actual value:" + param.get("in") + " ).");
                 }
             }
         }
 
         // Check for body parameters
-        Map<String, Object> requestBody = OpenAPIParser.safeGet(operationMap, "requestBody", LinkedTreeMap.class);
-        this.requestBodyDescription = OpenAPIParser.safeGet(requestBody, "description", String.class);
-        Map<String, Object> content = OpenAPIParser.safeGet(requestBody, "content", LinkedTreeMap.class);
-        Map<String, Object> jsonContent = OpenAPIParser.safeGet(content, "application/json", LinkedTreeMap.class);
+        Map<String, Object> requestBody = OpenApiParser.safeGet(operationMap, "requestBody", LinkedTreeMap.class);
+        this.requestBodyDescription = OpenApiParser.safeGet(requestBody, "description", String.class);
+        Map<String, Object> content = OpenApiParser.safeGet(requestBody, "content", LinkedTreeMap.class);
+        Map<String, Object> jsonContent = OpenApiParser.safeGet(content, "application/json", LinkedTreeMap.class);
         if (!jsonContent.isEmpty()) {
             this.requestContentType = "application/json";
         } else {
-            jsonContent = OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+            jsonContent = OpenApiParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
             if (!jsonContent.isEmpty()) {
                 this.requestContentType = "application/x-www-form-urlencoded";
             } else {
-                jsonContent = OpenAPIParser.safeGet(content, "*/*", LinkedTreeMap.class);
+                jsonContent = OpenApiParser.safeGet(content, "*/*", LinkedTreeMap.class);
                 if (!jsonContent.isEmpty()) {
                     this.requestContentType = "application/json";
                 }
             }
         }
-        Map<String, Object> schema = OpenAPIParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
+        Map<String, Object> schema = OpenApiParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
         if (!schema.isEmpty()) {
             try {
@@ -174,19 +174,19 @@ public class Operation {
         }
 
         // Check for output parameters (response body)
-        Map<String, Object> responses = OpenAPIParser.safeGet(operationMap, "responses", LinkedTreeMap.class);
+        Map<String, Object> responses = OpenApiParser.safeGet(operationMap, "responses", LinkedTreeMap.class);
 
         for (Map.Entry<String, Object> responseMap : responses.entrySet()) {
             Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
-            content = OpenAPIParser.safeGet(response, "content", LinkedTreeMap.class);
-            jsonContent = OpenAPIParser.safeGet(content, "application/json", LinkedTreeMap.class);
+            content = OpenApiParser.safeGet(response, "content", LinkedTreeMap.class);
+            jsonContent = OpenApiParser.safeGet(content, "application/json", LinkedTreeMap.class);
             if (jsonContent.isEmpty()) {
-                jsonContent = OpenAPIParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                jsonContent = OpenApiParser.safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
                 if (jsonContent.isEmpty()) {
-                    jsonContent = OpenAPIParser.safeGet(content, "*/*", LinkedTreeMap.class);
+                    jsonContent = OpenApiParser.safeGet(content, "*/*", LinkedTreeMap.class);
                 }
             }
-            schema = OpenAPIParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
+            schema = OpenApiParser.safeGet(jsonContent, "schema", LinkedTreeMap.class);
 
             if (!schema.isEmpty()) {
                 try {
@@ -769,7 +769,7 @@ public class Operation {
      * @return the parameter corresponding to the provided REST path, or null if no parameter matches the REST path.
      */
     public Parameter getParameterByRestPath(String restPath) {
-        return RestPathHelper.getParameterElementByRestPath(this, restPath);
+        return RestPathHelper.getParameterByRestPath(this, restPath);
     }
 
     @Override

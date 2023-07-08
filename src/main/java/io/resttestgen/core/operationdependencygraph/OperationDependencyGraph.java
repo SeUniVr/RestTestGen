@@ -1,10 +1,10 @@
 package io.resttestgen.core.operationdependencygraph;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.parameter.Parameter;
-import io.resttestgen.core.openapi.OpenAPI;
+import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +40,7 @@ public class OperationDependencyGraph {
      * Constructor that builds the Operation Dependency Graph from the provided parsed OpenAPI specification
      * @param openAPI the parsed, valid OpenAPI specification
      */
-    public OperationDependencyGraph(OpenAPI openAPI) {
+    public OperationDependencyGraph(OpenApi openAPI) {
 
         // Get operations from specification and add them to the graph as vertices
         logger.debug("Collecting operations from OpenAPI specification.");
@@ -73,7 +73,7 @@ public class OperationDependencyGraph {
     }
 
 
-    private void extractDataDependencies(OpenAPI openAPI) {
+    private void extractDataDependencies(OpenApi openAPI) {
 
         // Get all the documented operations that have output parameters
         Set<Operation> sourceOperations = openAPI.getOperations().stream()

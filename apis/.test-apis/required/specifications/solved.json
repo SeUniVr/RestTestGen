@@ -1,0 +1,486 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "operationId": "postRoot",
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "first": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "required": true
+                          }
+                        },
+                        "x-schemaName": "baseObject"
+                      },
+                      "x-schemaName": "baseArray"
+                    },
+                    "second": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "required": true
+                          }
+                        },
+                        "x-schemaName": "baseObject"
+                      },
+                      "x-schemaName": "baseArray",
+                      "required": true
+                    }
+                  },
+                  "x-schemaName": "objectWithNestedArray"
+                },
+                "x-schemaName": "topLevelArray"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "first": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "id": {
+                              "type": "integer",
+                              "required": true
+                            }
+                          },
+                          "x-schemaName": "baseObject"
+                        },
+                        "x-schemaName": "baseArray"
+                      },
+                      "second": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "id": {
+                              "type": "integer",
+                              "required": true
+                            }
+                          },
+                          "x-schemaName": "baseObject"
+                        },
+                        "x-schemaName": "baseArray",
+                        "required": true
+                      }
+                    },
+                    "x-schemaName": "objectWithNestedArray"
+                  },
+                  "x-schemaName": "topLevelArray",
+                  "required": true
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "first": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "required": true
+                          }
+                        },
+                        "x-schemaName": "baseObject"
+                      },
+                      "x-schemaName": "baseArray"
+                    },
+                    "second": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "required": true
+                          }
+                        },
+                        "x-schemaName": "baseObject"
+                      },
+                      "x-schemaName": "baseArray",
+                      "required": true
+                    }
+                  },
+                  "x-schemaName": "objectWithNestedArray",
+                  "required": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putRoot",
+        "parameters": [
+          {
+            "name": "statusObj",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "available": {
+                  "type": "boolean",
+                  "required": true
+                },
+                "pending": {
+                  "type": "boolean"
+                },
+                "sold": {
+                  "type": "boolean",
+                  "required": true
+                }
+              }
+            }
+          },
+          {
+            "name": "idsList",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "serial": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request body description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "first": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "integer",
+                          "required": true
+                        }
+                      },
+                      "x-schemaName": "baseObject"
+                    },
+                    "x-schemaName": "baseArray"
+                  },
+                  "second": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "integer",
+                          "required": true
+                        }
+                      },
+                      "x-schemaName": "baseObject"
+                    },
+                    "x-schemaName": "baseArray",
+                    "required": true
+                  }
+                },
+                "x-schemaName": "objectWithNestedArray"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Response description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "a": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "integer",
+                          "required": true
+                        }
+                      },
+                      "x-schemaName": "baseObject"
+                    },
+                    "b": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "integer",
+                          "required": true
+                        }
+                      },
+                      "x-schemaName": "baseObject",
+                      "required": true
+                    }
+                  },
+                  "x-schemaName": "composedObject",
+                  "required": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "baseObject": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          }
+        },
+        "x-schemaName": "baseObject"
+      },
+      "baseArray": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "id": {
+              "type": "integer"
+            }
+          },
+          "x-schemaName": "baseObject"
+        },
+        "x-schemaName": "baseArray"
+      },
+      "objectWithNestedArray": {
+        "type": "object",
+        "required": [
+          "second"
+        ],
+        "properties": {
+          "first": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                }
+              },
+              "x-schemaName": "baseObject"
+            },
+            "x-schemaName": "baseArray"
+          },
+          "second": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                }
+              },
+              "x-schemaName": "baseObject"
+            },
+            "x-schemaName": "baseArray"
+          }
+        },
+        "x-schemaName": "objectWithNestedArray"
+      },
+      "topLevelArray": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "second"
+          ],
+          "properties": {
+            "first": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "integer"
+                  }
+                },
+                "x-schemaName": "baseObject"
+              },
+              "x-schemaName": "baseArray"
+            },
+            "second": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "integer"
+                  }
+                },
+                "x-schemaName": "baseObject"
+              },
+              "x-schemaName": "baseArray"
+            }
+          },
+          "x-schemaName": "objectWithNestedArray"
+        },
+        "x-schemaName": "topLevelArray"
+      },
+      "composedObject": {
+        "type": "object",
+        "required": [
+          "b"
+        ],
+        "properties": {
+          "a": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              }
+            },
+            "x-schemaName": "baseObject"
+          },
+          "b": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              }
+            },
+            "x-schemaName": "baseObject"
+          }
+        },
+        "x-schemaName": "composedObject"
+      }
+    }
+  }
+}

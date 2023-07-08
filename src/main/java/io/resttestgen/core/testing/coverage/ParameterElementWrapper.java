@@ -12,7 +12,7 @@ public class ParameterElementWrapper {
         this.parameter = parameter;
     }
 
-    public Parameter getParameterElement() {
+    public Parameter getParameter() {
         return parameter;
     }
 

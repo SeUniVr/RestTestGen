@@ -1,5 +1,15 @@
 # RestTestGen Changelog
 
+### v23.07
+- New way to configure and launch the tool, including individual configuration for each API.
+    - YAML OpenAPI specifications now natively supported (automatic conversion to JSON on first launch).
+    - Added support for reset script, allowing to reset the state of API under test.
+- Improved authentication support: multiple users; token is now refreshed when expired.
+- Added Dockerfile to quickly build and run RestTestGen in a Docker container.
+- Renamed classes and variables to match new implementation.
+- Improved messages in logs.
+- Updated Gradle to version 7.6.2.
+
 ### v23.05
 - Included new strategy (`NlpStrategy`) to enhance specifications with NLP techniques (constraints and example values are automatically extracted from text descriptions and added to the specification). To use this strategy make sure you have the Rule Extractor service running at `http://localhost:4000`. You can download the Rule Extractor from [https://github.com/codingsoo/nlp2rest/](https://github.com/codingsoo/nlp2rest/). Deployment with Docker container is suggested.
 - Major refactoring of `Operation` and `Parameter` classes (including sub-classes). Introduced safe setters for hierarchical parameters, renamed several classes.

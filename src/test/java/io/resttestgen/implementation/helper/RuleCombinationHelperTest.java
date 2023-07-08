@@ -1,10 +1,11 @@
 package io.resttestgen.implementation.helper;
 
-import io.resttestgen.core.Configuration;
+import io.resttestgen.boot.ApiUnderTest;
+import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.rule.*;
-import io.resttestgen.core.openapi.CannotParseOpenAPIException;
+import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,10 +20,8 @@ public class RuleCombinationHelperTest {
     private static Environment environment;
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenAPIException, IOException {
-        Configuration configuration = new Configuration(true);
-        environment = Environment.getInstance();
-        environment.setUp(configuration);
+    public static void setUp() throws CannotParseOpenApiException, IOException {
+        environment = Starter.initEnvironment(ApiUnderTest.loadTestApiFromFile("rule-combination"));
     }
 
     /**
@@ -32,7 +31,7 @@ public class RuleCombinationHelperTest {
     public void testCountOfValidCombinations() {
 
         // Get the first operation from the specification
-        Operation operation = Environment.getInstance().getOpenAPI().getOperations().stream().findFirst().get();
+        Operation operation = environment.getOpenAPI().getOperations().stream().findFirst().get().deepClone();
 
         // Get set of rules of the operation
         HashSet<Rule> rules = operation.getRulesToValidate();
@@ -68,7 +67,7 @@ public class RuleCombinationHelperTest {
     public void testValidation() {
 
         // Get the first operation from the specification
-        Operation operation = Environment.getInstance().getOpenAPI().getOperations().stream().findFirst().get();
+        Operation operation = environment.getOpenAPI().getOperations().stream().findFirst().get().deepClone();
 
         // Get set of rules of the operation
         HashSet<Rule> rules = operation.getRulesToValidate();

@@ -30,7 +30,7 @@ public class JsonParserResponseProcessor extends ResponseProcessor {
         try {
             JsonElement parsedJSON = gson.fromJson(testInteraction.getResponseBody(), JsonElement.class);
             StructuredParameter responseBody = (StructuredParameter)
-                    ParameterFactory.getParameterElement(parsedJSON, null);
+                    ParameterFactory.getParameter(parsedJSON, null);
             testInteraction.getFuzzedOperation().setResponseBody(responseBody);
         } catch (JsonSyntaxException | ClassCastException e) {
             logger.warn("GSON could not parse the response body of this interaction.");

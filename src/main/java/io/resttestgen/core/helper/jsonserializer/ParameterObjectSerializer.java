@@ -6,7 +6,7 @@ import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
-import io.resttestgen.core.openapi.OpenAPI;
+import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.Operation;
 
 import java.lang.reflect.Type;
@@ -18,7 +18,7 @@ public class ParameterObjectSerializer implements JsonSerializer<ObjectParameter
     @Override
     public JsonElement serialize(ObjectParameter src, Type typeOfSrc, JsonSerializationContext context) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(OpenAPI.class, new OpenApiSerializer())
+                .registerTypeAdapter(OpenApi.class, new OpenApiSerializer())
                 .registerTypeAdapter(Operation.class, new OperationSerializer())
                 .registerTypeAdapter(ObjectParameter.class, new ParameterObjectSerializer())
                 .registerTypeAdapter(ArrayParameter.class, new ParameterArraySerializer())
