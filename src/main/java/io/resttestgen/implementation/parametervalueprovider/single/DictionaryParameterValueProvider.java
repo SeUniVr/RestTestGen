@@ -4,10 +4,11 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.dictionary.DictionaryEntry;
-import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DictionaryParameterValueProvider extends CountableParameterValueProvider {
@@ -15,27 +16,19 @@ public class DictionaryParameterValueProvider extends CountableParameterValuePro
     // Get values from global dictionary by default
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
 
-    @Override
-    public int countAvailableValuesFor(LeafParameter leafParameter) {
-        if (strict) {
-            return dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()).size();
-        } else {
-            return (int) dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType())
-                    .stream().filter(e -> leafParameter.isValueCompliant(e.getValue())).count();
-        }
+    // Remove duplicates by default
+    private boolean removeDuplicates = true;
+
+    public DictionaryParameterValueProvider() {
+        setSameNormalizedNameValueSourceClass();
     }
 
     @Override
-    public Object provideValueFor(LeafParameter leafParameter) {
-        ExtendedRandom random = Environment.getInstance().getRandom();
-        Optional<DictionaryEntry> entry;
-        if (!strict) {
-            entry = random.nextElement(dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
-        } else {
-            entry = random.nextElement(dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType())
-                    .stream().filter(e -> leafParameter.isValueCompliant(e.getValue())).collect(Collectors.toSet()));
-        }
-        return entry.map(DictionaryEntry::getSource).orElse(null);
+    protected Collection<Object> collectValuesFor(LeafParameter leafParameter) {
+        Set<DictionaryEntry> entries = new HashSet<>(dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
+        entries.addAll(dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType()));
+        Set<Object> values = entries.stream().map(DictionaryEntry::getSource).collect(Collectors.toSet());
+        return strict ? filterNonCompliantValues(values, leafParameter) : values;
     }
 
     /**
@@ -44,5 +37,13 @@ public class DictionaryParameterValueProvider extends CountableParameterValuePro
      */
     public void setDictionary(Dictionary dictionary) {
         this.dictionary = dictionary;
+    }
+
+    public boolean isRemoveDuplicates() {
+        return removeDuplicates;
+    }
+
+    public void setRemoveDuplicates(boolean removeDuplicates) {
+        this.removeDuplicates = removeDuplicates;
     }
 }

@@ -64,25 +64,25 @@ public class TestOperation {
         Set<Parameter> headerParameters = o.getHeaderParameters();
         StringParameter apiKey = (StringParameter) headerParameters.stream().findAny().get();
         assertThrows(EditReadOnlyOperationException.class, () -> apiKey.addExample(new Object()));
-        assertThrows(EditReadOnlyOperationException.class, () -> apiKey.setValue(new Object()));
+        assertThrows(EditReadOnlyOperationException.class, () -> apiKey.setValueManually(new Object()));
         assertThrows(UnsupportedOperationException.class, () -> apiKey.getExamples().add(new Object()));
         assertThrows(UnsupportedOperationException.class, () -> apiKey.getEnumValues().add(new Object()));
         // Test not read-only clone
         Set<Parameter> cloneHeaderParameters = oClone.getHeaderParameters();
         StringParameter cloneApiKey = (StringParameter) cloneHeaderParameters.stream().findAny().get();
         assertDoesNotThrow(() -> cloneApiKey.addExample(new Object()));
-        assertDoesNotThrow(() -> cloneApiKey.setValue(new Object()));
+        assertDoesNotThrow(() -> cloneApiKey.setValueManually(new Object()));
         assertDoesNotThrow(() -> cloneHeaderParameters.add(null));
 
         Set<Parameter> queryParameters = o.getQueryParameters();
         NumberParameter paramNumber = (NumberParameter) queryParameters.stream().findAny().get();
         assertThrows(EditReadOnlyOperationException.class, () -> paramNumber.addExample(new Object()));
-        assertThrows(EditReadOnlyOperationException.class, () -> paramNumber.setValue(new Object()));
+        assertThrows(EditReadOnlyOperationException.class, () -> paramNumber.setValueManually(new Object()));
         // Test not read-only clone
         Set<Parameter> cloneQueryParameters = oClone.getQueryParameters();
         NumberParameter cloneParamNumber = (NumberParameter) cloneQueryParameters.stream().findAny().get();
         assertDoesNotThrow(() -> cloneParamNumber.addExample(new Object()));
-        assertDoesNotThrow(() -> cloneParamNumber.setValue(new Object()));
+        assertDoesNotThrow(() -> cloneParamNumber.setValueManually(new Object()));
         assertDoesNotThrow(() -> cloneQueryParameters.add(null));
 
         ObjectParameter body = (ObjectParameter) o.getRequestBody();

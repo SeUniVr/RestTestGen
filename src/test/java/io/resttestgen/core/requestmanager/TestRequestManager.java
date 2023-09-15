@@ -45,7 +45,7 @@ public class TestRequestManager {
         logger.debug("Testing " + findPetsByStatus);
         RequestManager rm = new RequestManager(findPetsByStatus);
         StringParameter status = (StringParameter) ((ArrayParameter) rm.getOperation().getQueryParameters().stream().findAny().get()).getReferenceElement();
-        status.setValue("available");
+        status.setValueManually("available");
         logger.debug("Status: " + status.getValueAsFormattedString());
         try {
             //logger.debug(rm.run());
@@ -69,7 +69,7 @@ public class TestRequestManager {
             Field style = Parameter.class.getDeclaredField("style");
             style.setAccessible(true);
             style.set(key, ParameterStyle.SIMPLE);
-            key.setValue("AnotherSpecialToken");
+            key.setValueManually("AnotherSpecialToken");
             rm.addParameter(key);
             r = rm.buildRequestAsFuzzed();
             //logger.debug(rm.run(r));
@@ -78,7 +78,7 @@ public class TestRequestManager {
         } catch (/*IOException | */NoSuchFieldException | IllegalAccessException ex) {
             ex.printStackTrace();
         }
-        status.setValue("not encoded value?!");
+        status.setValueManually("not encoded value?!");
         logger.debug("Status: " + status.getValueAsFormattedString());
         // TODO: check the following
         //assertEquals("not+encoded+value%3F%21", status.getValueAsFormattedString(ParameterStyle.SIMPLE));
@@ -95,7 +95,7 @@ public class TestRequestManager {
         ArrayParameter tags = (ArrayParameter) rm.getOperation().getQueryParameters().stream().findAny().get();
         for (int i = 1; i < 3; ++i) {
             StringParameter tag = new StringParameter((LeafParameter) tags.getReferenceElement());
-            tag.setValue("tag" + i);
+            tag.setValueManually("tag" + i);
             tags.addElement(tag);
         }
         /*try {
@@ -111,7 +111,7 @@ public class TestRequestManager {
         logger.debug("Testing " + petId);
         rm = new RequestManager(petId);
         NumberParameter parameterPetId = (NumberParameter) rm.getOperation().getPathParameters().stream().findAny().get();
-        parameterPetId.setValue(10);
+        parameterPetId.setValueManually(10);
         /*try {
             //logger.debug(rm.run());
         } catch (IOException ex) {

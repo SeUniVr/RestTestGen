@@ -2,6 +2,9 @@ package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
 import io.resttestgen.core.datatype.ParameterName;
+import io.resttestgen.core.datatype.parameter.Parameter;
+import io.resttestgen.core.datatype.parameter.ParameterUtils;
+import io.resttestgen.core.datatype.parameter.combined.OneOfParameter;
 import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
@@ -11,6 +14,7 @@ import kotlin.Pair;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class OperationSerializer implements JsonSerializer<Operation> {
 
@@ -28,12 +32,18 @@ public class OperationSerializer implements JsonSerializer<Operation> {
                 .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())
                 .registerTypeAdapter(NullParameter.class, new NullParameterSerializer())
                 .registerTypeAdapter(GenericParameter.class, new GenericParameterSerializer())
+                .registerTypeAdapter(OneOfParameter.class, new OneOfParameterSerializer())
                 .setPrettyPrinting()
                 .create();
 
         // Compute responses map
         for (String responseKey : src.getOutputParameters().keySet()) {
             responses.put(responseKey, new Response(src.getOutputParameters().get(responseKey)));
+        }
+
+        // Add mandatory empty response in case no responses are not defined in the specification
+        if (responses.size() == 0) {
+            responses.put("default", new Response());
         }
 
         // Build up components of OpenAPI operation object
@@ -43,7 +53,13 @@ public class OperationSerializer implements JsonSerializer<Operation> {
         result.add("description", gson.toJsonTree(src.getDescription().equals("") ? null : src.getDescription()));
         result.add("externalDocs", null);
         result.add("operationId", gson.toJsonTree(src.getOperationId().equals("") ? null : src.getOperationId()));
-        result.add("parameters", gson.toJsonTree(src.getFirstLevelRequestParametersNotInBody()));
+
+        // Remove objects from parameters (not supported outside body at the moment)
+        // FIXME: investigate how to support objects in parameters
+        List<Parameter> params = src.getFirstLevelRequestParametersNotInBody().stream()
+                .filter(p -> !ParameterUtils.isObject(p)).collect(Collectors.toList());
+
+        result.add("parameters", gson.toJsonTree(params));
         if (src.getRequestBody() != null) {
             result.add("requestBody", gson.toJsonTree(new RequestBody(src)));
         }
@@ -52,7 +68,14 @@ public class OperationSerializer implements JsonSerializer<Operation> {
         result.add("deprecated", null);
         result.add("security", null);
         result.add("servers", null);
-        result.add("x-dependencies", gson.toJsonTree(renderIPDs(src)));
+
+        // Compute IPDs
+        List<String> idps = renderIPDs(src);
+
+        // Export IDPs only if at least one exists
+        if (idps.size() > 0) {
+            result.add("x-dependencies", gson.toJsonTree(idps));
+        }
         return result;
     }
 
@@ -131,6 +154,10 @@ public class OperationSerializer implements JsonSerializer<Operation> {
             Map<String, StructuredParameter> schema = new HashMap<>();
             schema.put("schema", responseBody);
             content.put("application/json", schema);
+        }
+
+        public Response() {
+            description = "No response information provided for this operation.";
         }
     }
 }

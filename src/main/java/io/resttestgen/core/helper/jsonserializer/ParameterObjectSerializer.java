@@ -3,6 +3,7 @@ package io.resttestgen.core.helper.jsonserializer;
 import com.google.gson.*;
 import io.resttestgen.core.datatype.parameter.*;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.combined.OneOfParameter;
 import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
@@ -27,6 +28,7 @@ public class ParameterObjectSerializer implements JsonSerializer<ObjectParameter
                 .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())
                 .registerTypeAdapter(NullParameter.class, new NullParameterSerializer())
                 .registerTypeAdapter(GenericParameter.class, new GenericParameterSerializer())
+                .registerTypeAdapter(OneOfParameter.class, new OneOfParameterSerializer())
                 .setPrettyPrinting()
                 .create();
 

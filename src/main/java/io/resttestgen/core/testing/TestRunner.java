@@ -115,9 +115,9 @@ public class TestRunner {
 
         int attempts = 0;
         long retryAfter = 0;
-        HttpStatusCode obtainedStatusCode = new HttpStatusCode(429);
+        HttpStatusCode obtainedStatusCode = null;
 
-        while (attempts < MAX_ATTEMPTS && invalidStatusCodes.contains(obtainedStatusCode)) {
+        while (attempts < MAX_ATTEMPTS && (attempts == 0 || invalidStatusCodes.contains(obtainedStatusCode))) {
 
             // Resets the information about the HTTP request and response (they could be filled with data from a
             // previous execution)
@@ -138,8 +138,9 @@ public class TestRunner {
             // Execute test interaction
             executeTestInteraction(testInteraction);
 
-            // Only if the interaction is executed successfully
-            if (testInteraction.getTestStatus() == TestStatus.EXECUTED) {
+            // Only if the interaction is executed successfully and status code 429 is set as invalid status code
+            if (testInteraction.getTestStatus() == TestStatus.EXECUTED &&
+                    invalidStatusCodes.contains(new HttpStatusCode(429))) {
 
                 // Check for status code 429 and set retryAfter accordingly
                 obtainedStatusCode = testInteraction.getResponseStatusCode();
@@ -161,7 +162,7 @@ public class TestRunner {
             attempts++;
 
             if (attempts == MAX_ATTEMPTS) {
-                logger.warn("Execution aborted after " + MAX_ATTEMPTS + " attempts.");
+                logger.warn("Execution of test interaction aborted after " + MAX_ATTEMPTS + " attempts.");
             }
         }
 
@@ -218,11 +219,10 @@ public class TestRunner {
 
     /**
      * Process responses with response processors, only if the test interaction is marked as executed.
-     * FIXME: put char limit in JSON response processor
      * @param testInteraction the test interaction containing the response to process.
      */
     private void processResponse(TestInteraction testInteraction) {
-        if (testInteraction.getTestStatus() == TestStatus.EXECUTED && testInteraction.getResponseBody().length() < 1000000) {
+        if (testInteraction.getTestStatus() == TestStatus.EXECUTED) {
             responseProcessors.forEach(responseProcessor -> responseProcessor.process(testInteraction));
         }
     }

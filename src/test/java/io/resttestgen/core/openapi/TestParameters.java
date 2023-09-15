@@ -1011,13 +1011,13 @@ public class TestParameters {
         NumberParameter petId = (NumberParameter) operation.getPathParameters().stream()
                 .filter(p -> p.getName().equals(new ParameterName("petId")))
                 .findAny().get();
-        petId.setValue(5);
+        petId.setValueManually(5);
         assertEquals("5", petId.getValueAsFormattedString());
 
         NumberParameter anotherId = (NumberParameter) operation.getPathParameters().stream()
                 .filter(p -> p.getName().equals(new ParameterName("anotherId")))
                 .findAny().get();
-        anotherId.setValue(8);
+        anotherId.setValueManually(8);
         assertEquals(".8", anotherId.getValueAsFormattedString());
         assertEquals("8", anotherId.getValueAsFormattedString(ParameterStyle.SIMPLE));
 
@@ -1025,9 +1025,9 @@ public class TestParameters {
                 .filter(p -> p.getName().equals(new ParameterName("anObject")))
                 .findAny().get();
         ((StringParameter) anObject.getProperties().stream()
-                .filter(p -> p.getName().equals(new ParameterName("first"))).findFirst().get()).setValue("test");
+                .filter(p -> p.getName().equals(new ParameterName("first"))).findFirst().get()).setValueManually("test");
         ((NumberParameter) anObject.getProperties().stream()
-                .filter(p -> p.getName().equals(new ParameterName("second"))).findFirst().get()).setValue(12);
+                .filter(p -> p.getName().equals(new ParameterName("second"))).findFirst().get()).setValueManually(12);
         assertEquals("first=test&second=12", anObject.getValueAsFormattedString());
         assertEquals("anObject=first,test,second,12", anObject.getValueAsFormattedString(ParameterStyle.FORM, false));
         assertEquals(";first=test;second=12", anObject.getValueAsFormattedString(ParameterStyle.MATRIX, true));
@@ -1054,7 +1054,7 @@ public class TestParameters {
         anArray.clearElements();
         for (int i = 0; i < 3; ++i) {
             StringParameter sp = (StringParameter) anArray.getReferenceElement().deepClone();
-            sp.setValue("val" + i);
+            sp.setValueManually("val" + i);
             anArray.addElement(sp);
         }
         assertEquals("val0|val1|val2", anArray.getValueAsFormattedString());

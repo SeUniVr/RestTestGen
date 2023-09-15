@@ -9,6 +9,7 @@ import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ValueNotAvailableException;
 import kotlin.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -257,7 +258,7 @@ public class InterParameterDependenciesHelper {
                             // If the value is not already complying, apply the complying value
                             if (leafParameter.getConcreteValue() == null || !leafParameter.getConcreteValue().toString().equals(parameterValue)) {
                                 Object castedValue = ObjectHelper.castToParameterValueType(parameterValue, leafParameter.getType());
-                                leafParameter.setValue(castedValue);
+                                leafParameter.setValueManually(castedValue);
                             }
                         } catch (ClassCastException e) {
                             logger.warn("Could not cast value from IPD.");
@@ -288,7 +289,7 @@ public class InterParameterDependenciesHelper {
 
                     // Add value only if leaf has no value already
                     if (leafParameter.getConcreteValue() == null) {
-                        leafParameter.setValue(parameterValueProvider.provideValueFor((LeafParameter) parameter));
+                        leafParameter.setValueWithProvider(parameterValueProvider);
                     }
                 } else if (isArrayOfLeaves(parameter)) {
                     ArrayParameter arrayParameter = (ArrayParameter) parameter;
@@ -304,7 +305,7 @@ public class InterParameterDependenciesHelper {
 
                         for (int i = 0; i < n; i++) {
                             LeafParameter newLeaf = (LeafParameter) arrayParameter.getReferenceElement().deepClone();
-                            newLeaf.setValue(parameterValueProvider.provideValueFor(newLeaf));
+                            newLeaf.setValueWithProvider(parameterValueProvider);
                             arrayParameter.addElement(newLeaf);
                         }
                     }
@@ -344,11 +345,15 @@ public class InterParameterDependenciesHelper {
 
                                 // Generate a new value, different from the one in the statement (100 attempts)
                                 for (int i = 0; i < 100 || newValue.equals(parameterValue); i++) {
-                                    newValue = parameterValueProvider.provideValueFor(leafParameter).toString();
+                                    try {
+                                        newValue = parameterValueProvider.provideValueFor(leafParameter).toString();
+                                    } catch (ValueNotAvailableException e) {
+                                        logger.warn("Could not retrieve a value for parameter " + leafParameter);
+                                    }
                                 }
 
                                 Object castedValue = ObjectHelper.castToParameterValueType(parameterValue, leafParameter.getType());
-                                leafParameter.setValue(castedValue);
+                                leafParameter.setValueManually(castedValue);
                             }
                         } catch (ClassCastException e) {
                             logger.warn("Could not cast value from IPD.");
@@ -416,11 +421,15 @@ public class InterParameterDependenciesHelper {
     }
 
     public void setValue(Parameter parameter) {
-        if (parameter instanceof LeafParameter) {
-            ((LeafParameter) parameter).setValue(parameterValueProvider.provideValueFor((LeafParameter) parameter));
-        } else if (isArrayOfLeaves(parameter)) {
-            ArrayParameter arrayParameter = (ArrayParameter) parameter;
-            arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
+        try {
+            if (parameter instanceof LeafParameter) {
+                ((LeafParameter) parameter).setValueWithProvider(parameterValueProvider);
+            } else if (isArrayOfLeaves(parameter)) {
+                ArrayParameter arrayParameter = (ArrayParameter) parameter;
+                arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
+            }
+        } catch (ValueNotAvailableException e) {
+            logger.warn("Could not retrieve a value for parameter " + parameter);
         }
     }
 

@@ -2,13 +2,14 @@ package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.BooleanParameter;
-import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
+import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
-import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.helper.ExtendedRandom;
+import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
-import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,7 @@ public class WrongTypeMutator extends Mutator {
 
     private static final Logger logger = LogManager.getLogger(WrongTypeMutator.class);
 
-    private final ParameterValueProvider valueProvider = new RandomParameterValueProvider();
+    private final ParameterValueProvider valueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
 
     @Override
     public boolean isParameterMutable(LeafParameter parameter) {
@@ -37,7 +38,7 @@ public class WrongTypeMutator extends Mutator {
             } else {
                 mutatedParameter = new BooleanParameter(parameter);
             }
-            mutatedParameter.setValue(valueProvider.provideValueFor(mutatedParameter));
+            mutatedParameter.setValueWithProvider(valueProvider);
             return mutatedParameter;
         } else if (parameter instanceof NumberParameter) {
             if (random.nextBoolean()) {
@@ -45,7 +46,7 @@ public class WrongTypeMutator extends Mutator {
             } else {
                 mutatedParameter = new BooleanParameter(parameter);
             }
-            mutatedParameter.setValue(valueProvider.provideValueFor(mutatedParameter));
+            mutatedParameter.setValueWithProvider(valueProvider);
             return mutatedParameter;
         } else if (parameter instanceof BooleanParameter) {
             if (random.nextBoolean()) {
@@ -53,7 +54,7 @@ public class WrongTypeMutator extends Mutator {
             } else {
                 mutatedParameter = new NumberParameter(parameter);
             }
-            mutatedParameter.setValue(valueProvider.provideValueFor(mutatedParameter));
+            mutatedParameter.setValueWithProvider(valueProvider);
             return mutatedParameter;
         } else {
             logger.warn("Could not apply mutation. This parameter is not of a mutable type.");

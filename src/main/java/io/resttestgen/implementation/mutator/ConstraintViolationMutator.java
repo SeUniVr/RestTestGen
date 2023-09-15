@@ -2,12 +2,13 @@ package io.resttestgen.implementation.mutator;
 
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
-import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
+import io.resttestgen.core.testing.Mutator;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
-import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +19,8 @@ import java.util.Optional;
 public class ConstraintViolationMutator extends Mutator {
 
     private static final Logger logger = LogManager.getLogger(ConstraintViolationMutator.class);
-    private static final ParameterValueProvider valueProvider = new RandomParameterValueProvider();
+    private static final ParameterValueProvider valueProvider =
+            ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
 
     @Override
     public boolean isParameterMutable(LeafParameter parameter) {
@@ -27,7 +29,7 @@ public class ConstraintViolationMutator extends Mutator {
         }
 
         // Check if parameter is an enum
-        if (parameter.isEnum() && parameter.getEnumValues().size() > 0) {
+        if (parameter.isEnum() && !parameter.getEnumValues().isEmpty()) {
             return true;
         }
 
@@ -51,7 +53,7 @@ public class ConstraintViolationMutator extends Mutator {
     @Override
     public LeafParameter mutate(LeafParameter parameter) {
         if (isParameterMutable(parameter)) {
-            if (parameter.isEnum() && parameter.getEnumValues().size() > 0) {
+            if (parameter.isEnum() && !parameter.getEnumValues().isEmpty()) {
                 mutateEnum(parameter);
             } else if (parameter instanceof StringParameter) {
                 mutateString((StringParameter) parameter);
@@ -69,12 +71,9 @@ public class ConstraintViolationMutator extends Mutator {
      * @param parameter the parameter to mutate
      */
     private void mutateEnum(LeafParameter parameter) {
-        // Set a random value to the parameter (it is very unlikely that the generated value belongs to the enum values
+        // Set a random value to the parameter (it is very unlikely that the generated value belongs to the enum values)
         // FIXME: check that the generated value does not belong to the enum values
-        parameter.setValue(valueProvider.provideValueFor(parameter));
-
-        //TODO: remove: it is replaced by RandomValueProvider
-        //parameter.setValue(parameter.generateCompliantValue());
+        parameter.setValueWithProvider(valueProvider);
     }
 
     /**
@@ -98,14 +97,14 @@ public class ConstraintViolationMutator extends Mutator {
         Optional<Integer> chosenLength = random.nextElement(lengths);
 
         // If the current value is longer, just cut the string
-        if (chosenLength.isPresent() && ((String) parameter.getValue()).length() > chosenLength.get()) {
-            parameter.setValue(((String) parameter.getValue()).substring(0, chosenLength.get()));
+        if (chosenLength.isPresent() && ((String) parameter.getConcreteValue()).length() > chosenLength.get()) {
+            parameter.setValueManually(((String) parameter.getConcreteValue()).substring(0, chosenLength.get()));
         }
 
         // If the current value is shorter, add random characters
-        else if (chosenLength.isPresent() && ((String) parameter.getValue()).length() < chosenLength.get()) {
-            parameter.setValue(parameter.getValue() +
-                    random.nextRandomString(chosenLength.get() - ((String) parameter.getValue()).length()));
+        else if (chosenLength.isPresent() && ((String) parameter.getConcreteValue()).length() < chosenLength.get()) {
+            parameter.setValueManually(parameter.getConcreteValue() +
+                    random.nextRandomString(chosenLength.get() - ((String) parameter.getConcreteValue()).length()));
         }
     }
 
@@ -127,6 +126,6 @@ public class ConstraintViolationMutator extends Mutator {
         }
 
         Optional<Double> chosenValue = random.nextElement(values);
-        chosenValue.ifPresent(parameter::setValue);
+        chosenValue.ifPresent(parameter::setValueManually);
     }
  }

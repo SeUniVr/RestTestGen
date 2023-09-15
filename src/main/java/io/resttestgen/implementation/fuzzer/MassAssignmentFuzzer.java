@@ -4,8 +4,8 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.NormalizedParameterName;
+import io.resttestgen.core.datatype.OperationSemantics;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.ParameterUtils;
@@ -18,6 +18,8 @@ import io.resttestgen.core.testing.Fuzzer;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestRunner;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import io.resttestgen.implementation.parametervalueprovider.multi.KeepLastIdParameterValueProvider;
 import io.resttestgen.implementation.parametervalueprovider.multi.RandomProviderParameterValueProvider;
 import org.apache.logging.log4j.LogManager;
@@ -58,7 +60,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
 
 
-    private Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+    private final Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
     public MassAssignmentFuzzer(CrudGroup crudGroup) {
 
@@ -140,7 +142,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         List<TestSequence> testSequences = new LinkedList<>();
 
         // If create operations are not available, skip
-        if (createOperations.size() == 0) {
+        if (createOperations.isEmpty()) {
             return testSequences;
         }
 
@@ -241,7 +243,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         List<TestSequence> testSequences = new LinkedList<>();
 
         // If create operations or update operations are not available, skip
-        if (createOperations.size() == 0 || updateOperations.size() == 0) {
+        if (createOperations.isEmpty() || updateOperations.isEmpty()) {
             return testSequences;
         }
 
@@ -359,13 +361,13 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
 
     public boolean isApplicable() {
-        return readOnlyParameterNames.size() > 0;
+        return !readOnlyParameterNames.isEmpty();
     }
 
     private TestSequence appendDeleteAndReadOperations(TestSequence testSequence, Operation chosenReadOperation) {
         for (Operation operation : deleteOperations) {
             NominalFuzzer nominalFuzzer = new NominalFuzzer(operation);
-            nominalFuzzer.setParameterValueProvider(new KeepLastIdParameterValueProvider());
+            nominalFuzzer.setParameterValueProvider(ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.KEEP_LAST_ID));
             nominalFuzzer.generateTestSequences(1);
         }
 
@@ -402,7 +404,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
     private TestSequence fuzzUntilSuccessful(Operation operation, Object identifierValue) throws RuntimeException {
         for (int i = 0; i < MAX_FUZZING_ATTEMPTS; i++) {
             NominalFuzzer nominalFuzzer = new NominalFuzzer(operation.deepClone());
-            KeepLastIdParameterValueProvider keepLastIdParameterValueProvider = new KeepLastIdParameterValueProvider();
+            KeepLastIdParameterValueProvider keepLastIdParameterValueProvider = (KeepLastIdParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.KEEP_LAST_ID);
             keepLastIdParameterValueProvider.setUseInferredCrudSemantics(true);
             keepLastIdParameterValueProvider.setCurrentIdValue(identifierValue);
             nominalFuzzer.setParameterValueProvider(keepLastIdParameterValueProvider);
@@ -477,27 +479,26 @@ public class MassAssignmentFuzzer extends Fuzzer {
         TestSequence changedTestSequence = testSequence.deepClone();
         for (TestInteraction interaction : changedTestSequence) {
             for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
-                if (leaf.getTags().size() > 0 && leaf.getTags().contains("injected")) {
+                if (!leaf.getTags().isEmpty() && leaf.getTags().contains("injected")) {
                     if (leaf.getConcreteValue() instanceof Boolean) {
-                        leaf.setValue(!((Boolean) leaf.getConcreteValue()));
+                        leaf.setValueManually(!((Boolean) leaf.getConcreteValue()));
                     } else if (leaf.isEnum()) {
                         Set<Object> possibleValues = leaf.getEnumValues();
                         possibleValues.remove(leaf.getConcreteValue());
                         Optional<Object> selectedValue =
                                 Environment.getInstance().getRandom().nextElement(possibleValues);
                         if (selectedValue.isPresent()) {
-                            leaf.setValue(selectedValue.get());
+                            leaf.setValueManually(selectedValue.get());
                         } else {
                             logger.warn("Could not change value of enum parameters because only one enum value is " +
                                     "provided and it is already in use.");
                         }
                     } else {
-                        RandomProviderParameterValueProvider valueProvider = new RandomProviderParameterValueProvider();
-                        Object newValue = valueProvider.provideValueFor(leaf);
-                        while (newValue.toString().equals(leaf.getConcreteValue().toString())) {
-                            newValue = valueProvider.provideValueFor(leaf);
+                        RandomProviderParameterValueProvider valueProvider = (RandomProviderParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM_PROVIDER);
+                        leaf.setValueWithProvider(valueProvider);
+                        while (leaf.getConcreteValue().toString().equals(leaf.getConcreteValue().toString())) {
+                            leaf.setValueWithProvider(valueProvider);
                         }
-                        leaf.setValue(newValue);
                     }
                 }
             }
@@ -528,7 +529,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         }
 
         // Set tag
-        if (testSequence.getTags().size() > 0) {
+        if (!testSequence.getTags().isEmpty()) {
             testSequence.addTag(testSequence.getTags().toArray()[0] + "-replay");
         } else {
             testSequence.addTag("replay");
@@ -542,8 +543,8 @@ public class MassAssignmentFuzzer extends Fuzzer {
                     if (isCrudResourceIdentifier(leaf) || leaf.getNormalizedName().toString().toLowerCase().endsWith("id") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("nam") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("name")) {
-                        KeepLastIdParameterValueProvider parameterValueProvider = new KeepLastIdParameterValueProvider();
-                        leaf.setValue(parameterValueProvider.provideValueFor(leaf));
+                        KeepLastIdParameterValueProvider parameterValueProvider = (KeepLastIdParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.KEEP_LAST_ID);
+                        leaf.setValueWithProvider(parameterValueProvider);
                     }
                 }
             }
@@ -552,8 +553,8 @@ public class MassAssignmentFuzzer extends Fuzzer {
                     if (!isCrudResourceIdentifier(leaf)  && (leaf.getNormalizedName().toString().toLowerCase().endsWith("id") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("nam") ||
                             leaf.getNormalizedName().toString().toLowerCase().endsWith("name"))) {
-                        KeepLastIdParameterValueProvider parameterValueProvider = new KeepLastIdParameterValueProvider();
-                        leaf.setValue(parameterValueProvider.provideValueFor(leaf));
+                        KeepLastIdParameterValueProvider parameterValueProvider = (KeepLastIdParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.KEEP_LAST_ID);
+                        leaf.setValueWithProvider(parameterValueProvider);
                     }
                 }
             }
@@ -580,7 +581,7 @@ public class MassAssignmentFuzzer extends Fuzzer {
         for (TestInteraction interaction : secondPart) {
             for (LeafParameter leaf : interaction.getFuzzedOperation().getLeaves()) {
                 if (isCrudResourceIdentifier(leaf) && leaf.getConcreteValue().toString().equals(currentIdValue.toString())) {
-                    leaf.setValue(newIdentifierValue);
+                    leaf.setValueManually(newIdentifierValue);
                 }
             }
         }

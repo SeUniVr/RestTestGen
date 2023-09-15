@@ -1,31 +1,38 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
-import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
-import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ExamplesParameterValueProvider extends CountableParameterValueProvider {
 
-    @Override
-    public int countAvailableValuesFor(LeafParameter leafParameter) {
-        if (!strict) {
-            return leafParameter.getExamples().size();
-        } else {
-            return (int) leafParameter.getExamples().stream().filter(leafParameter::isValueCompliant).count();
-        }
+    public ExamplesParameterValueProvider() {
+        setSelfValueSourceClass();
     }
 
     @Override
-    public Object provideValueFor(LeafParameter leafParameter) {
-        ExtendedRandom random = Environment.getInstance().getRandom();
-        if (!strict) {
-            return random.nextElement(leafParameter.getExamples()).orElse(null);
-        } else {
-            return random.nextElement(leafParameter.getExamples().stream().filter(leafParameter::isValueCompliant)
-                    .collect(Collectors.toSet())).orElse(null);
+    protected Collection<Object> collectValuesFor(LeafParameter leafParameter) {
+        Set<Object> values;
+        switch (getValueSourceClass()) {
+            case SAME_NAME:
+                values = collectParametersWithSameName(leafParameter.getName()).stream()
+                        .map(Parameter::getExamples)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet());
+                break;
+            case SAME_NORMALIZED_NAME:
+                values = collectParametersWithSameNormalizedName(leafParameter.getNormalizedName()).stream()
+                        .map(Parameter::getExamples)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet());
+                break;
+            default:
+                values = leafParameter.getExamples();
         }
+        return strict ? filterNonCompliantValues(values, leafParameter) : values;
     }
 }

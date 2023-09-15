@@ -10,8 +10,10 @@ import io.resttestgen.core.testing.Fuzzer;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.core.testing.parametervalueprovider.ValueNotAvailableException;
 import io.resttestgen.implementation.helper.InterParameterDependenciesHelper;
-import io.resttestgen.implementation.parametervalueprovider.multi.EnumAndExamplePriorityParameterValueProvider;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +34,7 @@ public class NominalFuzzer extends Fuzzer {
 
     private final Operation operation;
     private Operation editableOperation;
-    private ParameterValueProvider parameterValueProvider = new EnumAndExamplePriorityParameterValueProvider();
+    private ParameterValueProvider parameterValueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM_AND_EXAMPLE_PRIORITY);
     private boolean strict = false;
 
     public final int PROBABILITY_TO_KEEP_A_NON_REQUIRED_LEAF = 10;
@@ -99,11 +101,15 @@ public class NominalFuzzer extends Fuzzer {
     }
 
     public void setValue(Parameter parameter) {
-        if (parameter instanceof LeafParameter) {
-            ((LeafParameter) parameter).setValue(parameterValueProvider.provideValueFor((LeafParameter) parameter));
-        } else if (isArrayOfLeaves(parameter)) {
-            ArrayParameter arrayParameter = (ArrayParameter) parameter;
-            arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
+        try {
+            if (parameter instanceof LeafParameter) {
+                ((LeafParameter) parameter).setValueWithProvider(parameterValueProvider);
+            } else if (isArrayOfLeaves(parameter)) {
+                ArrayParameter arrayParameter = (ArrayParameter) parameter;
+                arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
+            }
+        } catch (ValueNotAvailableException e) {
+            logger.warn("Parameter value provider could not find a value for parameter: " + parameter);
         }
     }
 
@@ -160,7 +166,7 @@ public class NominalFuzzer extends Fuzzer {
             // Null parameters will be removed by the request manager
             if (leaf.isRequired() || random.nextInt(100) < PROBABILITY_TO_KEEP_A_NON_REQUIRED_LEAF ||
                     (leaf.getParent() != null && leaf.getParent() instanceof ArrayParameter)) {
-                leaf.setValue(parameterValueProvider.provideValueFor(leaf));
+                leaf.setValueWithProvider(parameterValueProvider);
             }
         }
     }

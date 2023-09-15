@@ -3,25 +3,26 @@ package io.resttestgen.core.datatype.rule;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.ParameterFactory;
-import io.resttestgen.core.datatype.parameter.ParameterUtils;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
-import io.resttestgen.core.datatype.parameter.leaves.BooleanParameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
-import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
-import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestSequence;
-import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class TypeRule extends Rule {
 
     private final ParameterType parameterType;
-    private final RandomParameterValueProvider valueProvider = new RandomParameterValueProvider();
+    private final ParameterValueProvider valueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
 
     public TypeRule(ParameterName parameterName, ParameterType parameterType) {
         super(RuleType.TYPE, parameterName);
@@ -45,6 +46,12 @@ public class TypeRule extends Rule {
     // TODO: test this method
     @Override
     public void apply(Operation operation) {
+
+        // "type: object" is not applicable, because we don't have information about object's properties
+        if (parameterType == ParameterType.OBJECT) {
+            return;
+        }
+
         if (getParametersInOperation(operation).size() > 0) {
             Parameter parameter = getParametersInOperation(operation).get(0);
 
@@ -98,6 +105,12 @@ public class TypeRule extends Rule {
         if (parameters.size() > 0) {
             Parameter parameter = parameters.get(0);
 
+            // Object type can be only applied to objects
+            // FIXME: move this in coarse static validation
+            if (parameter.getType() != ParameterType.OBJECT && parameterType == ParameterType.OBJECT) {
+                return Set.of();
+            }
+
             if (parameter.getType() == parameterType) {
                 return Set.of(this);
             }
@@ -110,8 +123,7 @@ public class TypeRule extends Rule {
             thisTypeParameter.setName(parameter.getName());
             // support for leaves only at the moment
             if (thisTypeParameter instanceof LeafParameter) {
-                ((LeafParameter) thisTypeParameter)
-                        .setValue(valueProvider.provideValueFor((LeafParameter) thisTypeParameter));
+                ((LeafParameter) thisTypeParameter).setValueWithProvider(valueProvider);
                 parameter.replace(thisTypeParameter);
 
                 if (playSequence(clonedSequence).isPass()) {

@@ -117,14 +117,14 @@ public class DefaultRule extends Rule {
             if (parameter instanceof LeafParameter) {
                 try {
                     Object castedValue = ObjectHelper.castToParameterValueType(defaultValue, parameter.getType());
-                    ((LeafParameter) parameter).setValue(castedValue);
+                    ((LeafParameter) parameter).setValueManually(castedValue);
                     fineValidationData.add(new Pair<>(fineValidationTestSequence, true));
                 } catch (ClassCastException ignored) {}
             } else if (ParameterUtils.isArrayOfLeaves(parameter)) {
                 try {
                     LeafParameter newElement = (LeafParameter) ((ArrayParameter) parameter).getReferenceElement();
                     Object castedValue = ObjectHelper.castToParameterValueType(defaultValue, newElement.getType());
-                    newElement.setValue(castedValue);
+                    newElement.setValueManually(castedValue);
                     ((ArrayParameter) parameter).clearElements();
                     ((ArrayParameter) parameter).addElement(newElement);
                     fineValidationData.add(new Pair<>(fineValidationTestSequence, true));

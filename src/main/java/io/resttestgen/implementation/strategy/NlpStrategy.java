@@ -9,7 +9,6 @@ import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Strategy;
 import io.resttestgen.core.testing.TestRunner;
 import io.resttestgen.core.testing.TestSequence;
-import io.resttestgen.core.testing.operationsorter.OperationsSorter;
 import io.resttestgen.implementation.fuzzer.NominalFuzzer;
 import io.resttestgen.implementation.helper.RulesCombinationHelper;
 import io.resttestgen.implementation.operationssorter.GraphBasedOperationsSorter;
@@ -48,7 +47,7 @@ public class NlpStrategy extends Strategy {
 
         // Check if the rule generator is online
         if (!RuleExtractorProxy.isOnline()) {
-            logger.warn("Rule generator is not reachable. Make sure you ran it and it is reachable at the URL specified in the RuleGenerator class.");
+            logger.error("Rule Extractor is not reachable. Make sure you ran the Rule Extractor, and it is reachable at the URL specified in the RuleExtractorProxy class.");
             return;
         }
 
@@ -64,7 +63,8 @@ public class NlpStrategy extends Strategy {
         logger.info("NLP finished. Starting validation.");
 
         // Validate operations according to the order provided by the ODG-based strategy
-        OperationsSorter sorter = new GraphBasedOperationsSorter();
+        GraphBasedOperationsSorter sorter = new GraphBasedOperationsSorter();
+        sorter.setMaximumAttempts(2);
 
         while (!sorter.isEmpty()) {
 

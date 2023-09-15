@@ -48,7 +48,7 @@ public class ErrorFuzzer extends Fuzzer {
                 TestInteraction mutableInteraction = currentTestSequence.getLast();
                 mutableInteraction.addTag("mutated");
 
-                String sequenceName = mutableInteraction.getFuzzedOperation().getOperationId().length() > 0 ?
+                String sequenceName = !mutableInteraction.getFuzzedOperation().getOperationId().isEmpty() ?
                         mutableInteraction.getFuzzedOperation().getOperationId() :
                         mutableInteraction.getFuzzedOperation().getMethod().toString() + "-" +
                                 mutableInteraction.getFuzzedOperation().getEndpoint();
@@ -66,6 +66,7 @@ public class ErrorFuzzer extends Fuzzer {
                 // Choose a random mutation pair
                 Optional<Pair<LeafParameter, Mutator>> mutable = Environment.getInstance().getRandom().nextElement(mutableParameters);
                 mutable.ifPresent(parameterMutatorPair -> {
+
                     // Apply mutation
                     LeafParameter parameterToMutate = parameterMutatorPair.getFirst();
                     Mutator mutator = parameterMutatorPair.getSecond();
@@ -76,7 +77,7 @@ public class ErrorFuzzer extends Fuzzer {
                     if (mutable.get().getFirst().replace(mutated)) {
                         logger.debug("Mutation applied correctly.");
                     } else {
-                        logger.warn("Could not apply mutation.");
+                        logger.warn("Could not apply mutation: replacement of parameter with mutated one failed. This is a known issue.");
                     }
 
                     // Execute test sequence

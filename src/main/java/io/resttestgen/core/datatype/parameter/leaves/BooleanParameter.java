@@ -40,7 +40,7 @@ public class BooleanParameter extends LeafParameter {
 
     public BooleanParameter(JsonPrimitive jsonPrimitive, String name) {
         super();
-        setValue(jsonPrimitive.getAsBoolean());
+        setValueManually(jsonPrimitive.getAsBoolean());
 
         this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
     }

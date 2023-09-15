@@ -75,7 +75,7 @@ public class StringParameter extends LeafParameter {
     public StringParameter(JsonPrimitive jsonPrimitive, String name) {
         super();
         this.type = ParameterType.STRING;
-        setValue(jsonPrimitive.getAsString());
+        setValueManually(jsonPrimitive.getAsString());
 
         this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
     }

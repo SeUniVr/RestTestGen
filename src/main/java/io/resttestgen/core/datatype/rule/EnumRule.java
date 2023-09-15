@@ -99,14 +99,14 @@ public class EnumRule extends Rule {
             if (parameter instanceof LeafParameter) {
                 try {
                     Object castedValue = ObjectHelper.castToParameterValueType(enumValue, parameter.getType());
-                    ((LeafParameter) parameter).setValue(castedValue);
+                    ((LeafParameter) parameter).setValueManually(castedValue);
                     fineValidationData.add(new Pair<>(fineValidationTestSequence, true));
                 } catch (ClassCastException ignored) {}
             } else if (ParameterUtils.isArrayOfLeaves(parameter)) {
                 try {
                     LeafParameter newElement = (LeafParameter) ((ArrayParameter) parameter).getReferenceElement();
                     Object castedValue = ObjectHelper.castToParameterValueType(enumValue, newElement.getType());
-                    newElement.setValue(castedValue);
+                    newElement.setValueManually(castedValue);
                     ((ArrayParameter) parameter).clearElements();
                     ((ArrayParameter) parameter).addElement(newElement);
                     fineValidationData.add(new Pair<>(fineValidationTestSequence, true));
@@ -130,13 +130,13 @@ public class EnumRule extends Rule {
             if (parameter instanceof LeafParameter) {
                 try {
                     Object castedValue = ObjectHelper.castToParameterValueType(enumValue, parameter.getType());
-                    ((LeafParameter) parameter).setValue(castedValue);
+                    ((LeafParameter) parameter).setValueManually(castedValue);
                 } catch (ClassCastException ignored) {}
             } else if (ParameterUtils.isArrayOfLeaves(parameter)) {
                 try {
                     LeafParameter newElement = (LeafParameter) ((ArrayParameter) parameter).getReferenceElement();
                     Object castedValue = ObjectHelper.castToParameterValueType(enumValue, newElement.getType());
-                    newElement.setValue(castedValue);
+                    newElement.setValueManually(castedValue);
                     ((ArrayParameter) parameter).clearElements();
                     ((ArrayParameter) parameter).addElement(newElement);
                 } catch (ClassCastException ignored) {}

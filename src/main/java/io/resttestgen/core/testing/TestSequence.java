@@ -285,7 +285,7 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
                         for (LeafParameter requestLeaf : getLeaves(responseBody)) {
                             if (requestLeaf.getName().equals(responseLeaf.getName()) &&
                                     requestLeaf.getValue().toString().equals(responseLeaf.getValue().toString())) {
-                                requestLeaf.setValue(responseLeaf);
+                                requestLeaf.setValueManually(responseLeaf);
                                 found = true;
                                 break;
                             }

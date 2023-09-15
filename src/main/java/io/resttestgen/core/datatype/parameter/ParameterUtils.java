@@ -1,19 +1,15 @@
 package io.resttestgen.core.datatype.parameter;
 
-import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import io.resttestgen.core.datatype.parameter.combined.CombinedSchemaParameter;
 import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
-import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.datatype.parameter.visitor.ArraysVisitor;
 import io.resttestgen.core.datatype.parameter.visitor.CombinedSchemasVisitor;
 import io.resttestgen.core.datatype.parameter.visitor.LeavesVisitor;
 import io.resttestgen.core.datatype.parameter.visitor.ObjectsVisitor;
-import io.resttestgen.core.openapi.Operation;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Collection of static helper methods for the parameter classes

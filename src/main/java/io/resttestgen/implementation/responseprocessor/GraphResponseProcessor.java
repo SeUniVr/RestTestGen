@@ -27,13 +27,6 @@ public class GraphResponseProcessor extends ResponseProcessor {
 
         StructuredParameter responseBody = testInteraction.getFuzzedOperation().getResponseBody();
 
-        // If the parsed response body is null, try to parse it
-        if (responseBody == null) {
-            JsonParserResponseProcessor jsonParserResponseProcessor = new JsonParserResponseProcessor();
-            jsonParserResponseProcessor.process(testInteraction);
-            responseBody = testInteraction.getFuzzedOperation().getResponseBody();
-        }
-
         // If the response body is still null, terminate the processing of the response
         if (responseBody == null) {
             return;

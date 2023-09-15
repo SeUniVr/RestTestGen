@@ -9,13 +9,18 @@ import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
-import io.resttestgen.implementation.parametervalueprovider.multi.EnumAndExamplePriorityParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import kotlin.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class OrRule extends Rule {
+
+    private final static Logger logger = LogManager.getLogger(OrRule.class);
 
     public OrRule(HashSet<ParameterName> parameterNames) {
         super(RuleType.OR, parameterNames);
@@ -75,24 +80,24 @@ public class OrRule extends Rule {
             List<Parameter> parameters = getParametersInOperation(fineValidationOperationAB);
             Parameter a = parameters.get(0);
             Parameter b = parameters.get(parameters.size() - 1);
-            ParameterValueProvider parameterValueProvider = new EnumAndExamplePriorityParameterValueProvider();
+            ParameterValueProvider parameterValueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM_AND_EXAMPLE_PRIORITY);
             if (!a.isSet()) {
                 if (a instanceof LeafParameter) {
-                    ((LeafParameter) a).setValue(parameterValueProvider.provideValueFor((LeafParameter) a));
+                    ((LeafParameter) a).setValueWithProvider(parameterValueProvider);
                 } else if (ParameterUtils.isArrayOfLeaves(a)) {
                     ArrayParameter array = (ArrayParameter) a;
                     LeafParameter newElement = (LeafParameter) array.getReferenceElement().deepClone();
-                    newElement.setValue(parameterValueProvider.provideValueFor(newElement));
+                    newElement.setValueWithProvider(parameterValueProvider);
                     array.addElement(newElement);
                 }
             }
             if (!b.isSet()) {
                 if (b instanceof LeafParameter) {
-                    ((LeafParameter) b).setValue(parameterValueProvider.provideValueFor((LeafParameter) b));
+                    ((LeafParameter) b).setValueWithProvider(parameterValueProvider);
                 } else if (ParameterUtils.isArrayOfLeaves(b)) {
                     ArrayParameter array = (ArrayParameter) b;
                     LeafParameter newElement = (LeafParameter) array.getReferenceElement().deepClone();
-                    newElement.setValue(parameterValueProvider.provideValueFor(newElement));
+                    newElement.setValueWithProvider(parameterValueProvider);
                     array.addElement(newElement);
                 }
             }

@@ -23,7 +23,7 @@ public class OpenApiSerializer implements JsonSerializer<OpenApi> {
                 .registerTypeAdapter(Operation.class, new OperationSerializer())
                 .setPrettyPrinting()
                 .create();
-        result.add("openapi", gson.toJsonTree("3.1.0"));
+        result.add("openapi", gson.toJsonTree("3.0.1"));
         result.add("info", gson.toJsonTree(new Info(src)));
         result.add("servers", gson.toJsonTree(getServers(src)));
         result.add("paths", gson.toJsonTree(getPaths(src)));

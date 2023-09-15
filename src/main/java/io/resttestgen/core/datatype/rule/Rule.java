@@ -118,14 +118,14 @@ public abstract class Rule {
     @NotNull
     public final Set<Rule> fineValidate(TestSequence sequence, Set<Rule> removedRules) {
         if (!playSequence(sequence).isPass()) {
-            logger.warn("sequence did not pass pre run tests");
+            logger.warn("Sequence did not pass pre-run tests.");
             return Set.of();
         }
 
         Set<Rule> matchedRules = performFineValidationRoutine(sequence, removedRules);
 
         if (!playSequence(sequence).isPass()) {
-            logger.warn("sequence did not pass post run tests");
+            logger.warn("Sequence did not pass post-run tests.");
             return Set.of();
         }
 

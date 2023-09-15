@@ -18,7 +18,7 @@ import java.util.*;
 
 public class SubSequenceErrorFuzzer extends Fuzzer {
 
-    private static final Logger logger = LogManager.getLogger(Environment.class);
+    private static final Logger logger = LogManager.getLogger(SubSequenceErrorFuzzer.class);
 
     private final TestSequence testSequenceToMutate;
     private final Set<Mutator> mutators;

@@ -308,7 +308,7 @@ public class RequestManager {
                     + "'. It will be valued with its name.");*/
             newPathParameters.remove(p);
             StringParameter sp = new StringParameter(p);
-            sp.setValue(sp.getName().toString());
+            sp.setValueManually(sp.getName().toString());
             newPathParameters.add(sp);
         });
         this.operation.setPathParameters(newPathParameters);

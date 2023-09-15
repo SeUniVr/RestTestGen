@@ -1,6 +1,7 @@
 package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
+import io.resttestgen.core.datatype.parameter.ParameterUtils;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterTypeFormat;
 import io.resttestgen.core.datatype.parameter.leaves.*;
@@ -73,18 +74,32 @@ public class StringParameterSerializer implements JsonSerializer<StringParameter
             }
         } else {
 
-            // Add parameter name
-            result.addProperty("name", src.getName().toString());
+            // Add parameter name, if not a reference element
+            if (!ParameterUtils.isReferenceElement(src)) {
+                result.addProperty("name", src.getName().toString());
+
+                // Add required
+                if (src.isRequired() || src.getLocation() == ParameterLocation.PATH) {
+                    result.addProperty("required", true);
+                }
+            }
 
             // Add description, if not empty
             if (!src.getDescription().trim().equals("")) {
                 result.addProperty("description", src.getDescription());
             }
 
-            // Add location
-            result.addProperty("in", src.getLocation().toString().toLowerCase());
+            // Add location, if root element
+            if (src.getParent() == null) {
+                result.addProperty("in", src.getLocation().toString().toLowerCase());
+            }
 
             JsonObject schema = new JsonObject();
+
+            // Type and constraints are places differently if parameter is a reference element
+            if (ParameterUtils.isReferenceElement(src)) {
+                schema = result;
+            }
 
             // Add type
             schema.addProperty("type", src.getType().toString().toLowerCase());
@@ -114,15 +129,14 @@ public class StringParameterSerializer implements JsonSerializer<StringParameter
             }
 
             // Add examples, if examples are provided
-            // FIXME: export all examples, not just the first one
+            // FIXME: check if export format is correct
             if (src.getExamples().stream().findFirst().isPresent()) {
-                result.add("example", gson.toJsonTree(src.getExamples().stream().findFirst().get()));
+                result.add("example", gson.toJsonTree(src.getExamples()));
             }
 
-            result.add("schema", schema);
-
-            if (src.isRequired() || src.getLocation() == ParameterLocation.PATH) {
-                result.addProperty("required", true);
+            // Type and constraints are places differently if parameter is a reference element
+            if (!ParameterUtils.isReferenceElement(src)) {
+                result.add("schema", schema);
             }
         }
 

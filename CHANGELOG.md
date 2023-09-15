@@ -1,5 +1,19 @@
 # RestTestGen Changelog
 
+### v23.09
+- Fixed export of OpenAPI specifications, which caused some specifications to be invalid.
+- Added support for export of combined schemas (e.g., `allOf`, `oneOf`, etc.) in exported specifications.
+- Parameter value providers can be configured with a so-called "source class", allowing to specify the source of parameter values (this feature is working but not 100% precise in the current version):
+  - `SELF`: values are sourced from the particular instance of the parameter.
+  - `SAME_NAME`: values are sourced from all the parameters with the same name in the API. For instance, example values are source from all the parameters with the same name, potentially increasing the amount of valid values for the parameter.
+  - `SAME_NORMALIZED_NAME`: values are sourced from all the parameters with the same normalized name (according to RestTestGen's normalization algorithm) in the API.
+- New method to set values to parameter with providers, that stores the provider with which the value was gathered.
+- Added new narrow random parameter value provider which chooses random values from narrower boundaries. E.g., not MIN_INT~MAX_INT, but 0~120.
+- Parameter value providers are now instantiated through a cached factory which caches previous instances for optimization purposes.
+- Fixed `TestRunner` that did not execute test interactions if 429 was not among the invalid status codes.
+- All responses containing JSON bodies are processed, independently of the declared response content-type. Previously, only responses with `application/json` as content type were processed, causing the loss of processing of potentially useful if the API responded with an inappropriate content-type (very common behavior, also in mainstream API).
+- Improved log messages.
+
 ### v23.07
 - New way to configure and launch the tool, including individual configuration for each API.
     - YAML OpenAPI specifications now natively supported (automatic conversion to JSON on first launch).

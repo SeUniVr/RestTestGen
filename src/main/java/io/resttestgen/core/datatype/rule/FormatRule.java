@@ -6,7 +6,9 @@ import io.resttestgen.core.datatype.parameter.attributes.ParameterTypeFormat;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestSequence;
-import io.resttestgen.implementation.parametervalueprovider.single.RandomParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +20,7 @@ import java.util.Set;
 public class FormatRule extends Rule {
 
     private final ParameterTypeFormat format;
-    private static final RandomParameterValueProvider randomValueProvider = new RandomParameterValueProvider();
+    private static final ParameterValueProvider randomValueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
 
     public FormatRule(ParameterName parameterName, ParameterTypeFormat format) {
         super(RuleType.FORMAT, parameterName);
@@ -37,7 +39,7 @@ public class FormatRule extends Rule {
     @Override
     public boolean isApplicable(Operation operation, List<Rule> combination) {
         List<Parameter> parameters = getParametersInOperation(operation);
-        return parameters.size() > 0
+        return !parameters.isEmpty()
                 && parameters.stream().allMatch(p -> format.isCompatibleWithType(p.getType()));
     }
 
@@ -45,7 +47,7 @@ public class FormatRule extends Rule {
     public void apply(Operation operation) {
         List<Parameter> parameters = getParametersInOperation(operation);
 
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             Parameter parameter = parameters.get(0);
             if (format.isCompatibleWithType(parameter.getType())) {
                 parameter.setFormat(format);
@@ -55,7 +57,7 @@ public class FormatRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             return parameter.getFormat() == format;
         }
@@ -74,15 +76,14 @@ public class FormatRule extends Rule {
         Operation operation  = clonedSequence.getFirst().getFuzzedOperation();
         List<Parameter> parameters = getParametersInOperation(operation);
 
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             Parameter firstOne = parameters.get(0);
             if (!format.isCompatibleWithType(firstOne.getType()) || !(firstOne instanceof LeafParameter)) {
                 return Set.of();
             }
 
             firstOne.setFormat(format);
-            Object value = randomValueProvider.provideValueFor((LeafParameter) firstOne);
-            ((LeafParameter) firstOne).setValue(value);
+            ((LeafParameter) firstOne).setValueWithProvider(randomValueProvider);
             if (playSequence(clonedSequence).isPass()) {
                 return Set.of(this);
             }

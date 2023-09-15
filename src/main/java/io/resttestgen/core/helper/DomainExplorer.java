@@ -28,7 +28,7 @@ public class DomainExplorer {
             iterations++;
             long middleValue = getMiddleValue(lowerBound, upperBound);
 
-            parameter.setValue(middleValue);
+            parameter.setValueManually(middleValue);
             if (playSequence(sequence).isPass()) {
                 lowerBound = middleValue + 1;
                 newMaximum = middleValue;
@@ -55,7 +55,7 @@ public class DomainExplorer {
             iterations++;
             long middleValue = getMiddleValue(lowerBound, upperBound);
 
-            parameter.setValue(middleValue);
+            parameter.setValueManually(middleValue);
             if (playSequence(sequence).isPass()) {
                 upperBound = middleValue - 1;
                 newMinimum = middleValue;

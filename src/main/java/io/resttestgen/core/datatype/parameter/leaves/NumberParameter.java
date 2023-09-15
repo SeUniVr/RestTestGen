@@ -79,15 +79,15 @@ public class NumberParameter extends LeafParameter {
             this.type = ParameterType.INTEGER;
             if (longValue == (long) integerValue) {
                 this.format = ParameterTypeFormat.INT32;
-                setValue(integerValue);
+                setValueManually(integerValue);
             } else {
                 this.format = ParameterTypeFormat.INT64;
-                setValue(longValue);
+                setValueManually(longValue);
             }
         } else {
             this.type = ParameterType.NUMBER;
             this.format = ParameterTypeFormat.DOUBLE;
-            setValue(doubleValue);
+            setValueManually(doubleValue);
         }
 
         this.name = new ParameterName(Objects.requireNonNullElse(name, ""));

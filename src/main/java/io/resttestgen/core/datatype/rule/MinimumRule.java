@@ -96,13 +96,13 @@ public class MinimumRule extends Rule {
         if (parameters.size() > 0 && parameters.get(0) instanceof NumberParameter) {
 
             NumberParameter parameter = (NumberParameter) parameters.get(0);
-            parameter.setValue(minimum + 1);
+            parameter.setValueManually(minimum + 1);
             fineValidationData.add(new Pair<>(minValueTestSequence, true));
 
             TestSequence minValueMinusOneTestSequence = minValueTestSequence.deepClone();
             Operation minValueMinusOneOperation = minValueMinusOneTestSequence.getFirst().getFuzzedOperation();
             NumberParameter minMinusOneParameter = (NumberParameter) getParametersInOperation(minValueMinusOneOperation).get(0);
-            minMinusOneParameter.setValue(minimum - 1);
+            minMinusOneParameter.setValueManually(minimum - 1);
             fineValidationData.add(new Pair<>(minValueMinusOneTestSequence, false));
         }
 
@@ -121,7 +121,7 @@ public class MinimumRule extends Rule {
         Parameter parameter = parameters.get(0);
         if (parameter instanceof NumberParameter) {
             NumberParameter asNumber = (NumberParameter) parameter;
-            asNumber.setValue(minimum - 1);
+            asNumber.setValueManually(minimum - 1);
             if (playSequence(clonedSequence).isPass()) {
                 Number inferredMinimum = DomainExplorer.getMinimumFromDomainExploration(asNumber, minimum, sequence);
                 if (inferredMinimum == null) {
@@ -131,7 +131,7 @@ public class MinimumRule extends Rule {
                 return Set.of(new MinimumRule(parameter.getName(), inferredMinimum.doubleValue()));
             }
 
-            asNumber.setValue(minimum);
+            asNumber.setValueManually(minimum);
             if (playSequence(clonedSequence).isPass()) {
                 return Set.of(this);
             }
@@ -139,12 +139,12 @@ public class MinimumRule extends Rule {
             StringParameter asString = (StringParameter) parameter;
             ExtendedRandom random = Environment.getInstance().getRandom();
 
-            asString.setValue(random.nextString((int) minimum - 1));
+            asString.setValueManually(random.nextString((int) minimum - 1));
             if (playSequence(clonedSequence).isPass()) {
                 return Set.of();
             }
 
-            asString.setValue(random.nextString((int) minimum));
+            asString.setValueManually(random.nextString((int) minimum));
             if (playSequence(clonedSequence).isPass()) {
                 return Set.of(this);
             }

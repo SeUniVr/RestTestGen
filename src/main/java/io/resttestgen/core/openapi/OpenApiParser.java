@@ -45,7 +45,7 @@ public class OpenApiParser {
             throw new CannotParseOpenApiException();
         }
 
-        logger.info("OpenAPI specification loaded correctly.");
+        logger.debug("OpenAPI specification correctly loaded from file. Starting parsing.");
     }
 
     public OpenApiParser(ApiUnderTest apiUnderTest) throws CannotParseOpenApiException {
@@ -64,7 +64,7 @@ public class OpenApiParser {
             throw new CannotParseOpenApiException();
         }
 
-        logger.info("OpenAPI specification loaded correctly.");
+        logger.debug("OpenAPI specification correctly loaded from file. Starting parsing.");
     }
 
     /**
@@ -155,7 +155,7 @@ public class OpenApiParser {
         openAPI.setLicenseUrl(safeGet(licenseMap, "url", String.class));
         openAPI.setVersion(safeGet(infoMap, "version", String.class));
 
-        logger.info("Specification parsed.");
+        logger.info("OpenAPI specification correctly parsed.");
         return openAPI;
     }
 
@@ -164,7 +164,7 @@ public class OpenApiParser {
      * for missing 'type' field
      */
     private void inferParameterTypes() {
-        logger.info("Inferring parameter types where missing...");
+        logger.debug("Inferring parameter types where missing...");
 
         Map<String, Map<String, Map<String, Object>>> paths =
                 (Map<String, Map<String, Map<String, Object>>>) this.openAPIMap.get("paths");
@@ -291,7 +291,7 @@ public class OpenApiParser {
      * the name of the schemas before their normalization
      */
     private void addSchemasNames() {
-        logger.info("Enriching specification with schema names..");
+        logger.debug("Enriching specification with schema names..");
 
         if (this.openAPIMap.containsKey("components")) {
             Map<String, Object> components = (Map<String, Object>) openAPIMap.get("components");
@@ -513,7 +513,7 @@ public class OpenApiParser {
         if (openAPIMap.containsKey("components")) {
             Map<String, Object> components = (Map<String, Object>) openAPIMap.get("components");
 
-            logger.info("Solving components/schemas refs..");
+            logger.debug("Solving components/schemas refs..");
             Map<String, Map<String, Object>> schemas = safeGet(components, "schemas", LinkedTreeMap.class);
 
             resolveSchemaRef(schemas);
@@ -522,17 +522,17 @@ public class OpenApiParser {
             schemas.values().forEach(this::resolvePropertyItemRef);
 
             // Parse responses
-            logger.info("Solving components/responses refs..");
+            logger.debug("Solving components/responses refs..");
             Map<String, Object> responses = safeGet(components, "responses", LinkedTreeMap.class);
             responses.values().forEach(response -> replaceContentRef((Map<String, Object>) response));
 
             // Parse parameters
-            logger.info("Solving components/parameters refs..");
+            logger.debug("Solving components/parameters refs..");
             Map<String, Object> parameters = safeGet(components, "parameters", LinkedTreeMap.class);
             parameters.values().forEach(parameter -> replaceSchemaRef((Map<String, Object>) parameter));
 
             // Parse requestBodies
-            logger.info("Solving components/requestBodies refs..");
+            logger.debug("Solving components/requestBodies refs..");
             Map<String, Object> bodies = safeGet(components, "requestBodies", LinkedTreeMap.class);
             bodies.values().forEach(body -> replaceContentRef((Map<String, Object>) body));
 
@@ -541,7 +541,7 @@ public class OpenApiParser {
         // Once components are solved, solve all refs inside pathItems
         recursiveReplaceRef((Map<String, Object>) openAPIMap.get("paths"));
 
-        logger.info("Specification references solved.");
+        logger.debug("Specification references solved.");
     }
 
     /**

@@ -44,7 +44,7 @@ public class RandomParameterValueProviderTest {
     @BeforeAll
     public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
-        randomParameterValueProvider = new RandomParameterValueProvider();
+        randomParameterValueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
         Gson gson = new Gson();
         longParameterMap = gson.fromJson(longParameterJSON, Map.class);
         intParameterMap = gson.fromJson(intParameterJSON, Map.class);

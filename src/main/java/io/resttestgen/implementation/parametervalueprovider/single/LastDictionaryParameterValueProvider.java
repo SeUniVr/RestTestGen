@@ -6,7 +6,8 @@ import io.resttestgen.core.dictionary.Dictionary;
 import io.resttestgen.core.dictionary.DictionaryEntry;
 import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValueProvider;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // TODO: add support for strict mode
 
@@ -15,25 +16,29 @@ public class LastDictionaryParameterValueProvider extends CountableParameterValu
     // Get values from global dictionary by default
     private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
 
-    @Override
-    public int countAvailableValuesFor(LeafParameter leafParameter) {
-        return dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()).size();
+    public LastDictionaryParameterValueProvider() {
+        setSameNormalizedNameValueSourceClass();
     }
 
     @Override
-    public Object provideValueFor(LeafParameter leafParameter) {
-        List<DictionaryEntry> entries = dictionary
-                .getEntriesByParameterName(leafParameter.getName(), leafParameter.getType());
-        if (entries.size() > 0) {
-            DictionaryEntry lastEntry = entries.get(0);
-            for (DictionaryEntry entry : entries) {
-                if (entry.getDiscoveryTime().after(lastEntry.getDiscoveryTime())) {
-                    lastEntry = entry;
-                }
-            }
-            return lastEntry;
+    protected Collection<Object> collectValuesFor(LeafParameter leafParameter) {
+        Set<DictionaryEntry> entries = new HashSet<>(dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
+        entries.addAll(dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType()));
+
+        // Filter dictionary entries by removing those with non-compliant values
+        if (isStrict()) {
+            entries = entries.stream().filter(e -> leafParameter.isValueCompliant(e.getSource().getConcreteValue())).collect(Collectors.toSet());
         }
-        return null;
+
+        if (entries.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        List<DictionaryEntry> orderedEntries = new LinkedList<>(entries);
+
+        orderedEntries.sort(Comparator.comparing(DictionaryEntry::getDiscoveryTime));
+
+        return Set.of(orderedEntries.get(entries.size() - 1));
     }
 
     /**

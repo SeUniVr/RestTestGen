@@ -2,6 +2,7 @@ package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
+import io.resttestgen.core.datatype.parameter.combined.OneOfParameter;
 import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
@@ -20,6 +21,7 @@ public class ParameterArraySerializer implements JsonSerializer<ArrayParameter> 
                 .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())
                 .registerTypeAdapter(NullParameter.class, new NullParameterSerializer())
                 .registerTypeAdapter(GenericParameter.class, new GenericParameterSerializer())
+                .registerTypeAdapter(OneOfParameter.class, new OneOfParameterSerializer())
                 .setPrettyPrinting()
                 .create();
 
@@ -43,7 +45,21 @@ public class ParameterArraySerializer implements JsonSerializer<ArrayParameter> 
             if (src.getMaxItems() != null && src.getMaxItems() > 0) {
                 result.addProperty("maxItems", src.getMaxItems());
             }
-        } else {
+        }
+
+        // If array is not located in body
+        else {
+
+            // Add name and in, if root element
+            if (src.getParent() == null) {
+                result.addProperty("name", src.getName().toString());
+                result.addProperty("in", src.getLocation().toString().toLowerCase());
+            }
+
+            // Add required, only if required
+            if (src.isRequired() || src.getLocation() == ParameterLocation.PATH || src.getReferenceElement().isRequired()) {
+                result.addProperty("required", true);
+            }
 
             JsonObject schema = new JsonObject();
 
@@ -64,11 +80,6 @@ public class ParameterArraySerializer implements JsonSerializer<ArrayParameter> 
             }
 
             result.add("schema", schema);
-
-            // Add required, if true
-            if (src.isRequired() || src.getLocation() == ParameterLocation.PATH) {
-                result.addProperty("required", true);
-            }
         }
 
         return result;

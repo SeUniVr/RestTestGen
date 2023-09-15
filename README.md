@@ -30,15 +30,19 @@ In addition to its role as a testing tool, RestTestGen also serves as a framewor
 
 ## Changelog
 
-### v23.07
-- New way to configure and launch the tool, including individual configuration for each API. See section [Getting started](#getting-started). 
-  - YAML OpenAPI specifications now natively supported (automatic conversion to JSON on first launch).
-  - Added support for reset script, allowing to reset the state of API under test.
-- Improved authentication support: multiple users; token is now refreshed when expired.
-- Added Dockerfile to quickly build and run RestTestGen in a Docker container.
-- Renamed classes and variables to match new implementation.
-- Improved messages in logs.
-- Updated Gradle to version 7.6.2.
+### v23.09
+- Fixed export of OpenAPI specifications, which caused some specifications to be invalid.
+- Added support for export of combined schemas (e.g., `allOf`, `oneOf`, etc.) in exported specifications.
+- Parameter value providers can be configured with a so-called "source class", allowing to specify the source of parameter values (this feature is working but not 100% precise in the current version):
+  - `SELF`: values are sourced from the particular instance of the parameter.
+  - `SAME_NAME`: values are sourced from all the parameters with the same name in the API. For instance, example values are source from all the parameters with the same name, potentially increasing the amount of valid values for the parameter.
+  - `SAME_NORMALIZED_NAME`: values are sourced from all the parameters with the same normalized name (according to RestTestGen's normalization algorithm) in the API.
+- New method to set values to parameter with providers, that stores the provider with which the value was gathered.
+- Added new narrow random parameter value provider which chooses random values from narrower boundaries. E.g., not MIN_INT~MAX_INT, but 0~120.
+- Parameter value providers are now instantiated through a cached factory which caches previous instances for optimization purposes.
+- Fixed `TestRunner` that did not execute test interactions if 429 was not among the invalid status codes. 
+- All responses containing JSON bodies are processed, independently of the declared response content-type. Previously, only responses with `application/json` as content type were processed, causing the loss of processing of potentially useful if the API responded with an inappropriate content-type (very common behavior, also in mainstream API).
+- Improved log messages.
 
 For the changelog of past versions, please see the [CHANGELOG.md](CHANGELOG.md) file.
 
@@ -57,10 +61,10 @@ To create an API directory for your specific API, navigate to the `apis/` direct
 The API directory can contain an API configuration file (`api-config.yml`) in which you can specify:
 - `name`: the API name, solely for display purposes (takes the API directory name by default, e.g., `bookstore`).
 - `specificationFileName`: the name of the specification file located in the `specifications/` subdirectory. (Default: `openapi.json`).
-- ~~`host`: the address or name of the host at which the API is reachable. Overrides the server address specified in the OpenAPI specification of the API.~~ (Currently not supported in RestTestGen v23.07).
+- ~~`host`: the address or name of the host at which the API is reachable. Overrides the server address specified in the OpenAPI specification of the API.~~ (Planned for next release).
 - `authenticationCommands`: a map `<label, command>` listing authentication commands that when called will return authentication information to RestTestGen. See [Authentication](#auth) section for further details. (None by default).
-- `resetCommand`: a command that when called will reset the state of the API. (None by default).
-- `resetBeforeTesting`: if set to `true`, RestTestGen will call the reset script before launching the testing strategy. (Default: `false`).
+- ~~`resetCommand`: a command that when called will reset the state of the API. (None by default).~~ (Planned for next release).
+- ~~`resetBeforeTesting`: if set to `true`, RestTestGen will call the reset script before launching the testing strategy. (Default: `false`).~~ (Planned for next release).
 
 You only need to specify the settings that you wish to override from their default values.
 

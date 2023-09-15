@@ -1,17 +1,21 @@
 package io.resttestgen.core.helper.jsonserializer;
 
 import com.google.gson.*;
+import io.resttestgen.core.datatype.parameter.combined.OneOfParameter;
 import io.resttestgen.core.datatype.parameter.leaves.*;
-import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.datatype.parameter.structured.ObjectParameter;
+import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
+import io.resttestgen.core.openapi.OpenApi;
+import io.resttestgen.core.openapi.Operation;
 
 import java.lang.reflect.Type;
 
-public class GenericParameterSerializer implements JsonSerializer<GenericParameter> {
-
+public class OneOfParameterSerializer implements JsonSerializer<OneOfParameter> {
     @Override
-    public JsonElement serialize(GenericParameter src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(OneOfParameter src, Type typeOfSrc, JsonSerializationContext context) {
         Gson gson = new GsonBuilder()
+                .registerTypeAdapter(OpenApi.class, new OpenApiSerializer())
+                .registerTypeAdapter(Operation.class, new OperationSerializer())
                 .registerTypeAdapter(ObjectParameter.class, new ParameterObjectSerializer())
                 .registerTypeAdapter(ArrayParameter.class, new ParameterArraySerializer())
                 .registerTypeAdapter(StringParameter.class, new StringParameterSerializer())
@@ -19,16 +23,12 @@ public class GenericParameterSerializer implements JsonSerializer<GenericParamet
                 .registerTypeAdapter(BooleanParameter.class, new BooleanParameterSerializer())
                 .registerTypeAdapter(NullParameter.class, new NullParameterSerializer())
                 .registerTypeAdapter(GenericParameter.class, new GenericParameterSerializer())
+                .registerTypeAdapter(OneOfParameter.class, new OneOfParameterSerializer())
                 .setPrettyPrinting()
                 .create();
 
         JsonObject result = new JsonObject();
-
-        // Add description, if defined
-        if (!src.getDescription().trim().equals("")) {
-            result.addProperty("description", src.getDescription());
-        }
-
+        result.add("oneOf", gson.toJsonTree(src.getParametersSchemas()));
         return result;
     }
 }

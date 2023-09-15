@@ -1,6 +1,6 @@
 package io.resttestgen.core.datatype.parameter.leaves;
 
-import io.resttestgen.core.datatype.parameter.*;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterLocation;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterStyle;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
@@ -8,17 +8,24 @@ import io.resttestgen.core.datatype.parameter.visitor.Visitor;
 import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
 import io.resttestgen.core.openapi.OpenApiParser;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
+import io.resttestgen.core.testing.parametervalueprovider.ValueNotAvailableException;
+import kotlin.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class LeafParameter extends Parameter {
     private static final Logger logger = LogManager.getLogger(LeafParameter.class);
 
     protected Object value;
+    protected ParameterValueProvider valueSource = null;
     protected boolean resourceIdentifier = false;
     protected boolean inferredResourceIdentifier = false;
 
@@ -32,6 +39,7 @@ public abstract class LeafParameter extends Parameter {
     protected LeafParameter(LeafParameter other) {
         super(other);
         value = ObjectHelper.deepCloneObject(other.value);
+        valueSource = other.valueSource;
         resourceIdentifier = other.resourceIdentifier;
         inferredResourceIdentifier = other.inferredResourceIdentifier;
     }
@@ -40,6 +48,7 @@ public abstract class LeafParameter extends Parameter {
         super(other);
         setParent(parent);
         value = ObjectHelper.deepCloneObject(other.value);
+        valueSource = other.valueSource;
         resourceIdentifier = other.resourceIdentifier;
         inferredResourceIdentifier = other.inferredResourceIdentifier;
     }
@@ -153,16 +162,36 @@ public abstract class LeafParameter extends Parameter {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValueManually(Object value) {
         if (getOperation() != null && getOperation().isReadOnly()) {
             throw new EditReadOnlyOperationException(getOperation());
         }
         if (this.isObjectTypeCompliant(value)) {
             this.value = value;
+            this.valueSource = null;
         } else {
-            logger.warn("Setting value '" + value + "' to parameter '" +
-                    this.getName() + "' is not possible due to type mismatch.");
+            logger.warn("Setting value '" + value + "' to parameter '" + this.getName() + "' is not possible due to type" +
+                    " mismatch. Consider changing the type of this parameter before setting this value again.");
         }
+    }
+
+    public void setValueWithProvider(ParameterValueProvider provider) {
+        if (getOperation() != null && getOperation().isReadOnly()) {
+            throw new EditReadOnlyOperationException(getOperation());
+        }
+        try {
+            Pair<ParameterValueProvider, Object> providerResult = provider.provideValueFor(this);
+            if (this.isObjectTypeCompliant(providerResult.getSecond())) {
+                this.value = providerResult.getSecond();
+                this.valueSource = providerResult.getFirst();
+            } else {
+                logger.warn("Setting value '" + value + "' to parameter '" + this.getName() + "' is not possible due to type" +
+                        " mismatch. Consider changing the type of this parameter before setting this value again.");
+            }
+        } catch (ValueNotAvailableException e) {
+            logger.warn(e.getMessage());
+        }
+
     }
 
     public void removeValue() {
@@ -223,6 +252,10 @@ public abstract class LeafParameter extends Parameter {
             logger.warn("Parameter " + getName() + " has an invalid value.");
         }
         return value != null;
+    }
+
+    public ParameterValueProvider getValueSource() {
+        return valueSource;
     }
 
     @Override

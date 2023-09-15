@@ -8,11 +8,15 @@ import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider
 import kotlin.Pair;
 
 /**
- * Generates a random value for the given parameter.
+ * Generates a random value for the given parameter in a narrower bound. For examples, numbers are not picked from the
+ * range (-MAX, +MAX), but rather from something narrower like (0, 120).
  */
-public class RandomParameterValueProvider extends ParameterValueProvider {
+public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
 
     private static final ExtendedRandom random = Environment.getInstance().getRandom();
+
+    private static final double NUMBER_LOWER_BOUND = 0.0;
+    private static final double NUMBER_UPPER_BOUND = 120.0;
 
     @Override
     public Pair<ParameterValueProvider, Object> provideValueFor(LeafParameter leafParameter) {
@@ -126,9 +130,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
 
         // With 0.5 probability, restrict the range of the generated value. This is done because values in the
         // restricted range (0 - 120 in this case) are used more commonly than other random values.
-        boolean restrictRange = false;
-        double RESTRICTED_MIN = 0.;
-        double RESTRICTED_MAX = 120.;
+        boolean restrictRange = true;
 
         // If the parameter is a double
         if (format == ParameterTypeFormat.DOUBLE) {
@@ -151,8 +153,8 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             max = parameter.isExclusiveMaximum() ? max - Double.MIN_VALUE : max;
 
             // Restrict the boundaries
-            min = restrictRange && RESTRICTED_MIN > min ? RESTRICTED_MIN : min;
-            max = restrictRange && RESTRICTED_MAX < max ? RESTRICTED_MAX : max;
+            min = restrictRange && NUMBER_LOWER_BOUND > min ? NUMBER_LOWER_BOUND : min;
+            max = restrictRange && NUMBER_UPPER_BOUND < max ? NUMBER_UPPER_BOUND : max;
 
             // Generate and return the value
             return random.nextDouble(min, max);
@@ -179,8 +181,8 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             max = parameter.isExclusiveMaximum() ? max - Float.MIN_VALUE : max;
 
             // Restrict the boundaries
-            min = restrictRange && (float) RESTRICTED_MIN > min ? (float) RESTRICTED_MIN : min;
-            max = restrictRange && (float) RESTRICTED_MAX < max ? (float) RESTRICTED_MAX : max;
+            min = restrictRange && (float) NUMBER_LOWER_BOUND > min ? (float) NUMBER_LOWER_BOUND : min;
+            max = restrictRange && (float) NUMBER_UPPER_BOUND < max ? (float) NUMBER_UPPER_BOUND : max;
 
             return random.nextFloat(min, max);
         }
@@ -256,8 +258,8 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             max = parameter.isExclusiveMaximum() ? max - 1 : max;
 
             // Restrict the boundaries
-            min = restrictRange && (long) RESTRICTED_MIN > min ? (long) RESTRICTED_MIN : min;
-            max = restrictRange && (long) RESTRICTED_MAX < max ? (long) RESTRICTED_MAX : max;
+            min = restrictRange && (long) NUMBER_LOWER_BOUND > min ? (long) NUMBER_LOWER_BOUND : min;
+            max = restrictRange && (long) NUMBER_UPPER_BOUND < max ? (long) NUMBER_UPPER_BOUND : max;
 
             if (isLong) {
                 return random.nextLong(min, max);

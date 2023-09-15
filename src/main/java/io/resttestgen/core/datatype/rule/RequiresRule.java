@@ -3,8 +3,9 @@ package io.resttestgen.core.datatype.rule;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
 import io.resttestgen.implementation.helper.InterParameterDependenciesHelper;
-import io.resttestgen.implementation.parametervalueprovider.multi.EnumAndExamplePriorityParameterValueProvider;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,7 +85,7 @@ public class RequiresRule extends Rule {
         fineValidationTestSequence.reset();
         Operation fineValidationOperation = fineValidationTestSequence.getFirst().getFuzzedOperation();
 
-        InterParameterDependenciesHelper ipdHelper = new InterParameterDependenciesHelper(fineValidationOperation, new EnumAndExamplePriorityParameterValueProvider());
+        InterParameterDependenciesHelper ipdHelper = new InterParameterDependenciesHelper(fineValidationOperation, ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM_AND_EXAMPLE_PRIORITY));
         ipdHelper.applyStatementToOperation(condition);
         ipdHelper.applyStatementToOperation(statement);
         fineValidationData.add(new Pair<>(fineValidationTestSequence, true));
@@ -99,14 +100,14 @@ public class RequiresRule extends Rule {
         TestSequence fineValidationStepOneSequence = coarseValidatedTestSequence.deepClone();
         fineValidationStepOneSequence.reset();
         Operation fineValidationStepOneOperation = fineValidationStepOneSequence.getFirst().getFuzzedOperation();
-        InterParameterDependenciesHelper stepOneIpdHelper = new InterParameterDependenciesHelper(fineValidationStepOneOperation, new EnumAndExamplePriorityParameterValueProvider());
+        InterParameterDependenciesHelper stepOneIpdHelper = new InterParameterDependenciesHelper(fineValidationStepOneOperation, ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM_AND_EXAMPLE_PRIORITY));
         stepOneIpdHelper.applyStatementToOperation(condition);
         stepOneIpdHelper.applyStatementToOperation(statement);
 
         TestSequence fineValidationStepTwoSequence = coarseValidatedTestSequence.deepClone();
         fineValidationStepTwoSequence.reset();
         Operation fineValidationStepTwoOperation = fineValidationStepTwoSequence.getFirst().getFuzzedOperation();
-        InterParameterDependenciesHelper stepTwoIpdHelper = new InterParameterDependenciesHelper(fineValidationStepTwoOperation, new EnumAndExamplePriorityParameterValueProvider());
+        InterParameterDependenciesHelper stepTwoIpdHelper = new InterParameterDependenciesHelper(fineValidationStepTwoOperation, ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM_AND_EXAMPLE_PRIORITY));
         stepTwoIpdHelper.applyStatementToOperation(condition);
         stepTwoIpdHelper.applyNegationOfStatementToOperation(statement);
 

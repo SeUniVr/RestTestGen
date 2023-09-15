@@ -617,7 +617,7 @@ public class ArrayParameter extends StructuredParameter {
 
                 // Create new element for the array from reference element
                 LeafParameter newLeaf = (LeafParameter) this.getReferenceElement().deepClone();
-                newLeaf.setValue(value);
+                newLeaf.setValueManually(value);
                 this.addElement(newLeaf);
             }
         }

@@ -32,7 +32,7 @@ public class NullParameter extends LeafParameter {
     public NullParameter(JsonElement jsonElement, String name) {
         super();
         this.type = ParameterType.UNKNOWN;
-        setValue(null);
+        setValueManually(null);
 
         this.name = new ParameterName(Objects.requireNonNullElse(name, ""));
     }
