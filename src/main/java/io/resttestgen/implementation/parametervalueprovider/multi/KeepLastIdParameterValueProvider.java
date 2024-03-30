@@ -34,8 +34,8 @@ public class KeepLastIdParameterValueProvider extends ParameterValueProvider {
             }
 
             // Try to get value from dictionary
-            LastDictionaryParameterValueProvider localNormalizedDictionaryProvider =
-                    new LastDictionaryParameterValueProvider();
+            LastResponseDictionaryParameterValueProvider localNormalizedDictionaryProvider =
+                    new LastResponseDictionaryParameterValueProvider();
             if (localNormalizedDictionaryProvider.countAvailableValuesFor(leafParameter) > 0) {
                 return localNormalizedDictionaryProvider.provideValueFor(leafParameter);
             }

@@ -11,32 +11,32 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DictionaryParameterValueProvider extends CountableParameterValueProvider {
+public class RequestDictionaryParameterValueProvider extends CountableParameterValueProvider {
 
     // Get values from global dictionary by default
-    private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
+    private Dictionary requestDictionary = Environment.getInstance().getGlobalRequestDictionary();
 
     // Remove duplicates by default
     private boolean removeDuplicates = true;
 
-    public DictionaryParameterValueProvider() {
+    public RequestDictionaryParameterValueProvider() {
         setSameNormalizedNameValueSourceClass();
     }
 
     @Override
     protected Collection<Object> collectValuesFor(LeafParameter leafParameter) {
-        Set<DictionaryEntry> entries = new HashSet<>(dictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
-        entries.addAll(dictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType()));
+        Set<DictionaryEntry> entries = new HashSet<>(requestDictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
+        entries.addAll(requestDictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType()));
         Set<Object> values = entries.stream().map(DictionaryEntry::getSource).collect(Collectors.toSet());
         return strict ? filterNonCompliantValues(values, leafParameter) : values;
     }
 
     /**
      * Set the dictionary from which the provider picks the value.
-     * @param dictionary the dictionary from which the provider picks the value.
+     * @param requestDictionary the dictionary from which the provider picks the value.
      */
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+    public void setRequestDictionary(Dictionary requestDictionary) {
+        this.requestDictionary = requestDictionary;
     }
 
     public boolean isRemoveDuplicates() {

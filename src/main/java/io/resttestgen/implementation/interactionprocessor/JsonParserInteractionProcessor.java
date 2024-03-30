@@ -1,31 +1,32 @@
-package io.resttestgen.implementation.responseprocessor;
+package io.resttestgen.implementation.interactionprocessor;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import io.resttestgen.core.datatype.parameter.ParameterFactory;
 import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
-import io.resttestgen.core.testing.ResponseProcessor;
+import io.resttestgen.core.testing.InteractionProcessor;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.TestStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * Parses JSON response bodies to the internal parameter structure.
  */
-public class JsonParserResponseProcessor extends ResponseProcessor {
+public class JsonParserInteractionProcessor extends InteractionProcessor {
 
-    private static final Logger logger = LogManager.getLogger(JsonParserResponseProcessor.class);
+    private static final Logger logger = LogManager.getLogger(JsonParserInteractionProcessor.class);
     private static final Gson gson = new Gson();
 
     @Override
-    public void process(TestInteraction testInteraction) {
+    public boolean canProcess(TestInteraction testInteraction) {
+        return testInteraction.getTestStatus() == TestStatus.EXECUTED && testInteraction.getResponseBody() != null &&
+                testInteraction.getResponseBody().length() > 1 && testInteraction.getResponseBody().length() < 1000000;
+    }
 
-        // Terminate processing if the response body is null, shorter than 2 chars, or longer than 1 million chars
-        if (testInteraction.getResponseBody() == null || testInteraction.getResponseBody().length() < 2 ||
-                testInteraction.getResponseBody().length() > 1000000) {
-            return;
-        }
+    @Override
+    public void process(TestInteraction testInteraction) {
 
         // Try to parse the body with GSON
         try {

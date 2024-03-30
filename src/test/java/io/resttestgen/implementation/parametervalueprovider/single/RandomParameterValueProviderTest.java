@@ -7,6 +7,8 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.openapi.CannotParseOpenApiException;
+import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
+import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,7 @@ public class RandomParameterValueProviderTest {
     @BeforeAll
     public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
-        randomParameterValueProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
+        randomParameterValueProvider = (RandomParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
         Gson gson = new Gson();
         longParameterMap = gson.fromJson(longParameterJSON, Map.class);
         intParameterMap = gson.fromJson(intParameterJSON, Map.class);
@@ -58,7 +60,7 @@ public class RandomParameterValueProviderTest {
     public void testLongNumberParameter() {
         NumberParameter numberParameter = new NumberParameter(longParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated long: " + generated);
             }
@@ -74,7 +76,7 @@ public class RandomParameterValueProviderTest {
         numberParameter.setMinimum(MIN);
         numberParameter.setMaximum(MAX);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated long: " + generated);
             }
@@ -87,7 +89,7 @@ public class RandomParameterValueProviderTest {
     public void testIntegerNumberParameter() {
         NumberParameter numberParameter = new NumberParameter(intParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated integer: " + generated);
             }
@@ -103,7 +105,7 @@ public class RandomParameterValueProviderTest {
         numberParameter.setMinimum(MIN);
         numberParameter.setMaximum(MAX);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated integer: " + generated);
             }
@@ -116,7 +118,7 @@ public class RandomParameterValueProviderTest {
     public void testDoubleNumberParameter() {
         NumberParameter numberParameter = new NumberParameter(doubleParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated double: " + generated);
             }
@@ -132,7 +134,7 @@ public class RandomParameterValueProviderTest {
         numberParameter.setMinimum(MIN);
         numberParameter.setMaximum(MAX);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated double: " + generated);
             }
@@ -145,7 +147,7 @@ public class RandomParameterValueProviderTest {
     public void testFloatNumberParameter() {
         NumberParameter numberParameter = new NumberParameter(floatParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated float: " + generated);
             }
@@ -161,7 +163,7 @@ public class RandomParameterValueProviderTest {
         numberParameter.setMinimum(MIN);
         numberParameter.setMaximum(MAX);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(numberParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(numberParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated float: " + generated);
             }
@@ -174,7 +176,7 @@ public class RandomParameterValueProviderTest {
     public void testStringParameter() {
         StringParameter stringParameter = new StringParameter(stringParameterMap, null);
         for (int i = 0; i < NUM_TESTS; i++) {
-            Object generated = randomParameterValueProvider.provideValueFor(stringParameter);
+            Object generated = randomParameterValueProvider.provideValueFor(stringParameter).getSecond();
             if (printGeneratedValues) {
                 System.out.println("Generated string: " + generated);
             }

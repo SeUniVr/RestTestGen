@@ -15,8 +15,10 @@ public enum ParameterValueProviderType {
     ENUM,
     EXAMPLES,
     DEFAULT,
-    DICTIONARY,
-    LAST_DICTIONARY,
+    REQUEST_DICTIONARY,
+    RESPONSE_DICTIONARY,
+    LAST_REQUEST_DICTIONARY,
+    LAST_RESPONSE_DICTIONARY,
 
     //MULTI
     RANDOM_PROVIDER,
@@ -36,10 +38,14 @@ public enum ParameterValueProviderType {
             return EXAMPLES;
         } else if (provider instanceof DefaultParameterValueProvider) {
             return DEFAULT;
-        } else if (provider instanceof DictionaryParameterValueProvider) {
-            return DICTIONARY;
-        } else if (provider instanceof LastDictionaryParameterValueProvider) {
-            return LAST_DICTIONARY;
+        } else if (provider instanceof RequestDictionaryParameterValueProvider) {
+            return REQUEST_DICTIONARY;
+        } else if (provider instanceof ResponseDictionaryParameterValueProvider) {
+            return RESPONSE_DICTIONARY;
+        } else if (provider instanceof LastRequestDictionaryParameterValueProvider) {
+            return LAST_REQUEST_DICTIONARY;
+        } else if (provider instanceof LastResponseDictionaryParameterValueProvider) {
+            return LAST_RESPONSE_DICTIONARY;
         } else if (provider instanceof RandomProviderParameterValueProvider) {
             return RANDOM_PROVIDER;
         } else if (provider instanceof GlobalDictionaryPriorityParameterValueProvider) {

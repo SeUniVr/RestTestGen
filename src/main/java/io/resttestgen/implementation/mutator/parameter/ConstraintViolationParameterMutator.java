@@ -1,11 +1,12 @@
-package io.resttestgen.implementation.mutator;
+package io.resttestgen.implementation.mutator.parameter;
 
 import io.resttestgen.core.Environment;
+import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.helper.ExtendedRandom;
-import io.resttestgen.core.testing.Mutator;
+import io.resttestgen.core.testing.mutator.ParameterMutator;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
 import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
@@ -16,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ConstraintViolationMutator extends Mutator {
+public class ConstraintViolationParameterMutator extends ParameterMutator {
 
-    private static final Logger logger = LogManager.getLogger(ConstraintViolationMutator.class);
+    private static final Logger logger = LogManager.getLogger(ConstraintViolationParameterMutator.class);
     private static final ParameterValueProvider valueProvider =
             ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
 
     @Override
-    public boolean isParameterMutable(LeafParameter parameter) {
+    public boolean isParameterMutable(Parameter parameter) {
         if (parameter.getValue() == null) {
             return false;
         }
@@ -51,10 +52,10 @@ public class ConstraintViolationMutator extends Mutator {
     }
 
     @Override
-    public LeafParameter mutate(LeafParameter parameter) {
+    public Parameter mutate(Parameter parameter) {
         if (isParameterMutable(parameter)) {
             if (parameter.isEnum() && !parameter.getEnumValues().isEmpty()) {
-                mutateEnum(parameter);
+                mutateEnum((LeafParameter) parameter);
             } else if (parameter instanceof StringParameter) {
                 mutateString((StringParameter) parameter);
             } else if (parameter instanceof NumberParameter) {
@@ -128,4 +129,9 @@ public class ConstraintViolationMutator extends Mutator {
         Optional<Double> chosenValue = random.nextElement(values);
         chosenValue.ifPresent(parameter::setValueManually);
     }
- }
+
+    @Override
+    public boolean isErrorMutator() {
+        return true;
+    }
+}

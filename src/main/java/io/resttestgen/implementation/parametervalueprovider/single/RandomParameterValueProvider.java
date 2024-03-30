@@ -1,16 +1,21 @@
 package io.resttestgen.implementation.parametervalueprovider.single;
 
+import com.mifmif.common.regex.Generex;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterTypeFormat;
 import io.resttestgen.core.datatype.parameter.leaves.*;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider;
 import kotlin.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Generates a random value for the given parameter.
  */
 public class RandomParameterValueProvider extends ParameterValueProvider {
+
+    private static final Logger logger = LogManager.getLogger(RandomParameterValueProvider.class);
 
     private static final ExtendedRandom random = Environment.getInstance().getRandom();
 
@@ -46,6 +51,31 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
     }
 
     private String generateCompliantString(StringParameter parameter) {
+
+        // If pattern (regex) is provided for the string, use it
+        if (parameter.getPattern() != null && !parameter.getPattern().isEmpty()) {
+
+            String pattern = parameter.getPattern();
+
+            // Clean pattern if it starts with ~ and ends with $
+            if (pattern.startsWith("^") && pattern.endsWith("$")) {
+                pattern = pattern.substring(1, pattern.length() - 1) + "\\d{3";
+            }
+
+            // Compute values of minLength and maxLength in the case they are null
+            int min = parameter.getMinLength() == null || parameter.getMinLength() < 0 ? 0 : parameter.getMinLength();
+            int max = parameter.getMaxLength() == null || parameter.getMaxLength() < min ? min + random.nextInt(20) : parameter.getMaxLength();
+
+            try {
+                Generex generex = new Generex(pattern);
+                return generex.random(min, max);
+            }
+
+            // If the pattern is invalid, ignore it and continue with standard random generation
+            catch (IllegalArgumentException e) {
+                logger.warn("The specified pattern (" + parameter.getPattern() + ") for parameter " + parameter + " is invalid. Ignoring it.");
+            }
+        }
 
         // Generate a random length according to the provided bounds
         int length = random.nextLength(parameter.getMinLength(), parameter.getMaxLength());

@@ -7,7 +7,7 @@ import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProvider
 import io.resttestgen.core.testing.parametervalueprovider.ValueNotAvailableException;
 import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import io.resttestgen.implementation.parametervalueprovider.single.DefaultParameterValueProvider;
-import io.resttestgen.implementation.parametervalueprovider.single.DictionaryParameterValueProvider;
+import io.resttestgen.implementation.parametervalueprovider.single.ResponseDictionaryParameterValueProvider;
 import io.resttestgen.implementation.parametervalueprovider.single.EnumParameterValueProvider;
 import io.resttestgen.implementation.parametervalueprovider.single.ExamplesParameterValueProvider;
 import kotlin.Pair;
@@ -22,7 +22,7 @@ public class GlobalDictionaryPriorityParameterValueProvider extends ParameterVal
     public Pair<ParameterValueProvider, Object> provideValueFor(LeafParameter leafParameter) throws ValueNotAvailableException {
 
         // Try to get value from normalized dictionary
-        DictionaryParameterValueProvider localNormalizedDictionaryProvider = (DictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DICTIONARY);
+        ResponseDictionaryParameterValueProvider localNormalizedDictionaryProvider = (ResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RESPONSE_DICTIONARY);
         localNormalizedDictionaryProvider.setStrict(this.strict);
         if (localNormalizedDictionaryProvider.countAvailableValuesFor(leafParameter) > 0) {
             return localNormalizedDictionaryProvider.provideValueFor(leafParameter);

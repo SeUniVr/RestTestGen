@@ -12,7 +12,7 @@ import io.resttestgen.core.operationdependencygraph.OperationNode;
 import io.resttestgen.core.testing.operationsorter.DynamicOperationsSorter;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
 import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
-import io.resttestgen.implementation.parametervalueprovider.single.DictionaryParameterValueProvider;
+import io.resttestgen.implementation.parametervalueprovider.single.ResponseDictionaryParameterValueProvider;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -89,7 +89,7 @@ public class GraphBasedOperationsSorter extends DynamicOperationsSorter {
                 .collect(Collectors.toSet());
         Set<NormalizedParameterName> unsatisfiedParameters = Sets.difference(allParametersInOperation, satisfiedParameters);
 
-        DictionaryParameterValueProvider provider = (DictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DICTIONARY);
+        ResponseDictionaryParameterValueProvider provider = (ResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RESPONSE_DICTIONARY);
         provider.setSameNormalizedNameValueSourceClass();
 
         Set<NormalizedParameterName> parametersInDictionary = new HashSet<>();

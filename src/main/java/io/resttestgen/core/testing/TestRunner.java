@@ -6,9 +6,10 @@ import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
 import io.resttestgen.core.helper.RequestManager;
 import io.resttestgen.core.testing.coverage.CoverageManager;
-import io.resttestgen.implementation.responseprocessor.DictionaryResponseProcessor;
-import io.resttestgen.implementation.responseprocessor.GraphResponseProcessor;
-import io.resttestgen.implementation.responseprocessor.JsonParserResponseProcessor;
+import io.resttestgen.implementation.interactionprocessor.RequestDictionaryInteractionProcessor;
+import io.resttestgen.implementation.interactionprocessor.ResponseDictionaryInteractionProcessor;
+import io.resttestgen.implementation.interactionprocessor.GraphInteractionProcessor;
+import io.resttestgen.implementation.interactionprocessor.JsonParserInteractionProcessor;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,7 +40,7 @@ public class TestRunner {
 
     private static TestRunner instance = null;
     private final OkHttpClient client;
-    private final List<ResponseProcessor> responseProcessors = new LinkedList<>();
+    private final List<InteractionProcessor> interactionProcessors = new LinkedList<>();
     private final Set<HttpStatusCode> invalidStatusCodes = new HashSet<>();
     private static final int MAX_ATTEMPTS = 10;
     private AuthenticationInfo authenticationInfo = Environment.getInstance().getApiUnderTest().getDefaultAuthenticationInfo();
@@ -79,9 +80,10 @@ public class TestRunner {
             logger.warn("Could not instantiate OkHttp client to accept self-signed certificates. Using default client.");
         }
         client = client1;
-        addResponseProcessor(new JsonParserResponseProcessor());
-        addResponseProcessor(new DictionaryResponseProcessor());
-        addResponseProcessor(new GraphResponseProcessor());
+        addInteractionProcessor(new JsonParserInteractionProcessor());
+        addInteractionProcessor(new RequestDictionaryInteractionProcessor());
+        addInteractionProcessor(new ResponseDictionaryInteractionProcessor());
+        addInteractionProcessor(new GraphInteractionProcessor());
         addInvalidStatusCode(new HttpStatusCode(429));
     }
 
@@ -167,7 +169,7 @@ public class TestRunner {
         }
 
         // Process response if the interaction could be executed correctly
-        processResponse(testInteraction);
+        processInteraction(testInteraction);
     }
 
     /**
@@ -218,29 +220,29 @@ public class TestRunner {
     }
 
     /**
-     * Process responses with response processors, only if the test interaction is marked as executed.
-     * @param testInteraction the test interaction containing the response to process.
+     * Process interaction with interaction processors, only with compatible interaction processors.
+     * @param testInteraction the test interaction to process.
      */
-    private void processResponse(TestInteraction testInteraction) {
-        if (testInteraction.getTestStatus() == TestStatus.EXECUTED) {
-            responseProcessors.forEach(responseProcessor -> responseProcessor.process(testInteraction));
-        }
+    private void processInteraction(TestInteraction testInteraction) {
+        interactionProcessors.stream()
+                .filter(ip -> ip.canProcess(testInteraction))
+                .forEachOrdered(ip -> ip.process(testInteraction));
     }
 
-    public void addResponseProcessor(ResponseProcessor responseProcessor) {
-        responseProcessors.add(responseProcessor);
+    public void addInteractionProcessor(InteractionProcessor interactionProcessor) {
+        interactionProcessors.add(interactionProcessor);
     }
 
-    public void removeResponseProcessor(ResponseProcessor responseProcessor) {
-        responseProcessors.remove(responseProcessor);
+    public void removeInteractionProcessor(InteractionProcessor interactionProcessor) {
+        interactionProcessors.remove(interactionProcessor);
     }
 
-    public List<ResponseProcessor> getResponseProcessors() {
-        return Collections.unmodifiableList(responseProcessors);
+    public List<InteractionProcessor> getInteractionProcessors() {
+        return Collections.unmodifiableList(interactionProcessors);
     }
 
-    public List<ResponseProcessor> getResponseProcessorsByType(Class<? extends ResponseProcessor> responseProcessorClass) {
-        return responseProcessors.stream().filter(responseProcessorClass::isInstance).collect(Collectors.toList());
+    public List<InteractionProcessor> getInteractionProcessorsByType(Class<? extends InteractionProcessor> responseProcessorClass) {
+        return interactionProcessors.stream().filter(responseProcessorClass::isInstance).collect(Collectors.toList());
     }
 
     public void addInvalidStatusCode(HttpStatusCode statusCode) {

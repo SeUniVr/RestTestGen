@@ -21,7 +21,7 @@ public class StringParameter extends LeafParameter {
 
     private Integer maxLength; // MUST be >= 0
     private Integer minLength = 0;
-    private String pattern; // TODO: add support for pattern
+    private String pattern; // TODO: complete support for pattern
 
     private static final Logger logger = LogManager.getLogger(StringParameter.class);
 
@@ -109,6 +109,14 @@ public class StringParameter extends LeafParameter {
 
     public Integer getMaxLength() {
         return maxLength;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 
     public StringParameter merge(Parameter other) {

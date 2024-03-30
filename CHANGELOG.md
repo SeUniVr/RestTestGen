@@ -1,5 +1,12 @@
 # RestTestGen Changelog
 
+### v24.03
+- Upgraded Gradle to v8.3 (both Gradle Wrapper and Docker).
+- Support for patterns (regular expressions) to generate compliant values.
+- New implementation of mutators (parameter and operation mutators).
+- Response processors are now called interaction processors as they can also process request data.
+- Improved log messages.
+
 ### v23.09
 - Fixed export of OpenAPI specifications, which caused some specifications to be invalid.
 - Added support for export of combined schemas (e.g., `allOf`, `oneOf`, etc.) in exported specifications.

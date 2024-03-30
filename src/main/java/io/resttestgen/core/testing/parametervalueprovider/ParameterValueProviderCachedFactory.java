@@ -23,11 +23,17 @@ public class ParameterValueProviderCachedFactory {
                 case DEFAULT:
                     provider = new DefaultParameterValueProvider();
                     break;
-                case DICTIONARY:
-                    provider = new DictionaryParameterValueProvider();
+                case REQUEST_DICTIONARY:
+                    provider = new RequestDictionaryParameterValueProvider();
                     break;
-                case LAST_DICTIONARY:
-                    provider = new LastDictionaryParameterValueProvider();
+                case RESPONSE_DICTIONARY:
+                    provider = new ResponseDictionaryParameterValueProvider();
+                    break;
+                case LAST_REQUEST_DICTIONARY:
+                    provider = new LastRequestDictionaryParameterValueProvider();
+                    break;
+                case LAST_RESPONSE_DICTIONARY:
+                    provider = new LastResponseDictionaryParameterValueProvider();
                     break;
                 case NARROW_RANDOM:
                     provider = new NarrowRandomParameterValueProvider();

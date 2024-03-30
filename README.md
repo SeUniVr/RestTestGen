@@ -30,18 +30,11 @@ In addition to its role as a testing tool, RestTestGen also serves as a framewor
 
 ## Changelog
 
-### v23.09
-- Fixed export of OpenAPI specifications, which caused some specifications to be invalid.
-- Added support for export of combined schemas (e.g., `allOf`, `oneOf`, etc.) in exported specifications.
-- Parameter value providers can be configured with a so-called "source class", allowing to specify the source of parameter values (this feature is working but not 100% precise in the current version):
-  - `SELF`: values are sourced from the particular instance of the parameter.
-  - `SAME_NAME`: values are sourced from all the parameters with the same name in the API. For instance, example values are source from all the parameters with the same name, potentially increasing the amount of valid values for the parameter.
-  - `SAME_NORMALIZED_NAME`: values are sourced from all the parameters with the same normalized name (according to RestTestGen's normalization algorithm) in the API.
-- New method to set values to parameter with providers, that stores the provider with which the value was gathered.
-- Added new narrow random parameter value provider which chooses random values from narrower boundaries. E.g., not MIN_INT~MAX_INT, but 0~120.
-- Parameter value providers are now instantiated through a cached factory which caches previous instances for optimization purposes.
-- Fixed `TestRunner` that did not execute test interactions if 429 was not among the invalid status codes. 
-- All responses containing JSON bodies are processed, independently of the declared response content-type. Previously, only responses with `application/json` as content type were processed, causing the loss of processing of potentially useful if the API responded with an inappropriate content-type (very common behavior, also in mainstream API).
+### v24.03
+- Upgraded Gradle to v8.3 (both Gradle Wrapper and Docker).
+- Support for patterns (regular expressions) to generate compliant values.
+- New implementation of mutators (parameter and operation mutators).
+- Response processors are now called interaction processors as they can also process request data.
 - Improved log messages.
 
 For the changelog of past versions, please see the [CHANGELOG.md](CHANGELOG.md) file.
@@ -114,7 +107,9 @@ Requirements: Docker. For further information see the [REQUIREMENTS.md](REQUIREM
 
 To build and run RestTestGen with Docker, follow these steps:
 1. Build the image with: `docker build -t rtg .`
-2. Run the container from the image with: `docker run -v ./:/app --network="host" rtg`
+2. Run the container from the image with: `docker run --rm -v ./:/app --network host rtg`
+
+> If Docker raises an error about the relative path `./`, please replace the relative path with an absolute path to the RestTestGen's source code, for example `docker run --rm -v /my/absolute/path/to/resttestgen:/app --network host rtg`.
 
 > The Docker container will only include Java 11 and Gradle 7.6.2, without Python. If your authentication or reset scripts rely on Python, we recommend running RestTestGen directly on your machine using Gradle. However, in upcoming versions of RestTestGen, we aim to provide a more comprehensive container that includes additional dependencies, such as Python, to better support authentication and reset scripts.
 

@@ -8,6 +8,7 @@ import io.resttestgen.core.datatype.parameter.visitor.ArraysVisitor;
 import io.resttestgen.core.datatype.parameter.visitor.CombinedSchemasVisitor;
 import io.resttestgen.core.datatype.parameter.visitor.LeavesVisitor;
 import io.resttestgen.core.datatype.parameter.visitor.ObjectsVisitor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -15,43 +16,44 @@ import java.util.Collection;
  * Collection of static helper methods for the parameter classes
  */
 public class ParameterUtils {
-    static public boolean isObject(Parameter element) {
+
+    static public boolean isObject(@NotNull Parameter element) {
         return element instanceof ObjectParameter;
     }
 
-    static public boolean isArray(Parameter element) {
+    static public boolean isArray(@NotNull Parameter element) {
         return element instanceof ArrayParameter;
     }
 
-    static public boolean isArrayOfLeaves(Parameter element) {
+    static public boolean isArrayOfLeaves(@NotNull Parameter element) {
         return element instanceof ArrayParameter && ((ArrayParameter) element).getReferenceElement() instanceof LeafParameter;
     }
 
-    static public boolean isArrayOfArrays(Parameter element) {
+    static public boolean isArrayOfArrays(@NotNull Parameter element) {
         return element instanceof ArrayParameter && ((ArrayParameter) element).getReferenceElement() instanceof ArrayParameter;
     }
 
-    static public boolean isArrayOfObjects(Parameter element) {
+    static public boolean isArrayOfObjects(@NotNull Parameter element) {
         return element instanceof ArrayParameter && ((ArrayParameter) element).getReferenceElement() instanceof ObjectParameter;
     }
 
-    static public boolean isLeaf(Parameter element) {
+    static public boolean isLeaf(@NotNull Parameter element) {
         return element instanceof LeafParameter;
     }
 
-    static public boolean isNumber(Parameter element) {
+    static public boolean isNumber(@NotNull Parameter element) {
         return element instanceof NumberParameter;
     }
 
-    static public boolean isString(Parameter element) {
+    static public boolean isString(@NotNull Parameter element) {
         return element instanceof StringParameter;
     }
 
-    static public boolean isBoolean(Parameter element) {
+    static public boolean isBoolean(@NotNull Parameter element) {
         return element instanceof BooleanParameter;
     }
 
-    static public boolean isNull(Parameter element) {
+    static public boolean isNull(@NotNull Parameter element) {
         return element instanceof NullParameter;
     }
 
@@ -59,7 +61,7 @@ public class ParameterUtils {
      * Check if a parameter element is a reference element of an array parameter.
      * @return true if parameter is reference element.
      */
-    static public boolean isReferenceElement(Parameter element) {
+    static public boolean isReferenceElement(@NotNull Parameter element) {
         return element.getParent() != null
                 && element.getParent() instanceof ArrayParameter
                 && ((ArrayParameter) element.getParent()).getReferenceElement() == element;
@@ -69,7 +71,7 @@ public class ParameterUtils {
      * Check if a parameter is an element of an array parameter.
      * @return true if parameter is an element of an array parameter.
      */
-    static public boolean isArrayElement(Parameter element) {
+    static public boolean isArrayElement(@NotNull Parameter element) {
         return element.getParent() != null
                 && element.getParent() instanceof ArrayParameter
                 && ((ArrayParameter) element.getParent()).getElements().contains(element);
@@ -79,7 +81,7 @@ public class ParameterUtils {
      * Check if a parameter is a property of an object.
      * @return true if parameter is property of an object.
      */
-    static public boolean isObjectProperty(Parameter element) {
+    static public boolean isObjectProperty(@NotNull Parameter element) {
         return element.getParent() != null
                 && element.getParent() instanceof ObjectParameter
                 && ((ObjectParameter) element.getParent()).getProperties().contains(element);
@@ -89,7 +91,7 @@ public class ParameterUtils {
      * Return a collection containing the arrays in the parameter element and underlying elements.
      * @return the collection of arrays in the parameter.
      */
-    static public Collection<ArrayParameter> getArrays(Parameter element) {
+    static public Collection<ArrayParameter> getArrays(@NotNull Parameter element) {
         return element.accept(new ArraysVisitor());
     }
 
@@ -97,7 +99,7 @@ public class ParameterUtils {
      * Return a collection containing the objects in the parameter element and underlying elements.
      * @return the collection of objects in the parameter.
      */
-    static public Collection<ObjectParameter> getObjects(Parameter element) {
+    static public Collection<ObjectParameter> getObjects(@NotNull Parameter element) {
         return element.accept(new ObjectsVisitor());
     }
 
@@ -106,7 +108,7 @@ public class ParameterUtils {
      * only the objects in reference element are returned.
      * @return the collection of objects in the parameter.
      */
-    static public Collection<ObjectParameter> getReferenceObjects(Parameter element) {
+    static public Collection<ObjectParameter> getReferenceObjects(@NotNull Parameter element) {
         return element.accept(new ObjectsVisitor(true));
     }
 
@@ -114,7 +116,7 @@ public class ParameterUtils {
      * Returns a collection containing the leaves in the parameter element and underlying elements.
      * @return the collection of leaves in the parameter
      */
-    static public Collection<LeafParameter> getLeaves(Parameter element) {
+    static public Collection<LeafParameter> getLeaves(@NotNull Parameter element) {
         return element.accept(new LeavesVisitor());
     }
 
@@ -123,7 +125,7 @@ public class ParameterUtils {
      * array.
      * @return the reference leaves in the parameter.
      */
-    static public Collection<LeafParameter> getReferenceLeaves(Parameter element) {
+    static public Collection<LeafParameter> getReferenceLeaves(@NotNull Parameter element) {
         return element.accept(new LeavesVisitor(true));
     }
 
@@ -132,7 +134,7 @@ public class ParameterUtils {
      * Returns a collection containing the combined schemas in the parameter element and underlying elements.
      * @return the collection of combined schemas in the parameter
      */
-    static public Collection<CombinedSchemaParameter> getCombinedSchemas(Parameter element) {
+    static public Collection<CombinedSchemaParameter> getCombinedSchemas(@NotNull Parameter element) {
         return element.accept(new CombinedSchemasVisitor());
     }
 }

@@ -33,8 +33,10 @@ public class RandomProviderParameterValueProvider extends ParameterValueProvider
         candidateProviders.add((DefaultParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DEFAULT));
         candidateProviders.add((EnumParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM));
         candidateProviders.add((ExamplesParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.EXAMPLES));
-        candidateProviders.add((DictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DICTIONARY));
-        candidateProviders.add((LastDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_DICTIONARY));
+        candidateProviders.add((ResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RESPONSE_DICTIONARY));
+        candidateProviders.add((RequestDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.REQUEST_DICTIONARY));
+        candidateProviders.add((LastResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_RESPONSE_DICTIONARY));
+        candidateProviders.add((LastRequestDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_REQUEST_DICTIONARY));
 
         candidateProviders.forEach(p -> p.setStrict(this.strict));
 

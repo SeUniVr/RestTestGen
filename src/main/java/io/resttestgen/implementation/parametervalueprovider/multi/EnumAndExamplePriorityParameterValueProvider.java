@@ -50,10 +50,10 @@ public class EnumAndExamplePriorityParameterValueProvider extends ParameterValue
         // List of candidate providers, that will be used only if they have values available
         Set<CountableParameterValueProvider> candidateProviders = new HashSet<>();
         candidateProviders.add((DefaultParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DEFAULT));
-        DictionaryParameterValueProvider normalizedDameDictionaryParameterValueProvider = (DictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DICTIONARY);
-        candidateProviders.add(normalizedDameDictionaryParameterValueProvider);
-        LastDictionaryParameterValueProvider lastDictionaryParameterValueProvider = (LastDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_DICTIONARY);
-        candidateProviders.add(lastDictionaryParameterValueProvider);
+        ResponseDictionaryParameterValueProvider responseDictionaryParameterValueProvider = (ResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RESPONSE_DICTIONARY);
+        candidateProviders.add(responseDictionaryParameterValueProvider);
+        LastResponseDictionaryParameterValueProvider lastResponseDictionaryParameterValueProvider = (LastResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_RESPONSE_DICTIONARY);
+        candidateProviders.add(lastResponseDictionaryParameterValueProvider);
 
         candidateProviders.forEach(p -> p.setStrict(this.strict));
 

@@ -28,7 +28,8 @@ public class Environment {
     private ApiUnderTest apiUnderTest;
     private OpenApi openAPI;
     private OperationDependencyGraph operationDependencyGraph;
-    private Dictionary globalDictionary;
+    private Dictionary globalResponseDictionary;
+    private Dictionary globalRequestDictionary;
     private ExtendedRandom random;
 
     private Environment() {}
@@ -48,7 +49,8 @@ public class Environment {
         this.apiUnderTest = apiUnderTest;
         this.openAPI = new OpenApiParser(apiUnderTest).parse();
         this.operationDependencyGraph = new OperationDependencyGraph(openAPI);
-        this.globalDictionary = new Dictionary();
+        this.globalResponseDictionary = new Dictionary();
+        this.globalRequestDictionary = new Dictionary();
         this.random = new ExtendedRandom();
 
         return this;
@@ -89,12 +91,12 @@ public class Environment {
         this.operationDependencyGraph = operationDependencyGraph;
     }
 
-    public Dictionary getGlobalDictionary() {
-        return globalDictionary;
+    public Dictionary getGlobalResponseDictionary() {
+        return globalResponseDictionary;
     }
 
-    public void setGlobalDictionary(Dictionary dictionary) {
-        this.globalDictionary = dictionary;
+    public Dictionary getGlobalRequestDictionary() {
+        return globalRequestDictionary;
     }
 
     public ExtendedRandom getRandom() {
@@ -113,7 +115,7 @@ public class Environment {
         apiUnderTest = null;
         openAPI = null;
         operationDependencyGraph = null;
-        globalDictionary = null;
+        globalResponseDictionary = null;
         random = null;
         return this;
     }

@@ -16,7 +16,7 @@ import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.operationsorter.OperationsSorter;
 import io.resttestgen.implementation.fuzzer.NominalFuzzer;
 import io.resttestgen.implementation.operationssorter.GraphBasedOperationsSorter;
-import io.resttestgen.implementation.responseprocessor.NlpResponseProcessor;
+import io.resttestgen.implementation.interactionprocessor.NlpInteractionProcessor;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class SecondNlpStrategy extends Strategy {
 
     private static final TestRunner testRunner = TestRunner.getInstance();
-    private static final NlpResponseProcessor nlpResponseProcessor = new NlpResponseProcessor();
+    private static final NlpInteractionProcessor NLP_INTERACTION_PROCESSOR = new NlpInteractionProcessor();
     private static final Gson gson = new Gson();
 
     private static final long maxIntervalPerOperation = 360; // Max 120 seconds to validate each operation
@@ -57,7 +57,7 @@ public class SecondNlpStrategy extends Strategy {
         RuleExtractorProxy.printStatistics();
 
         // NLP response processor will identify text in error responses and send it to NLPRestTest
-        testRunner.addResponseProcessor(nlpResponseProcessor);
+        testRunner.addInteractionProcessor(NLP_INTERACTION_PROCESSOR);
 
         OperationsSorter sorter = new GraphBasedOperationsSorter();
 
@@ -189,7 +189,7 @@ public class SecondNlpStrategy extends Strategy {
                                                                         if (successfulSequence == null) {
 
                                                                             // Get rules from server message
-                                                                            Set<Rule> newServerMessageRules = nlpResponseProcessor.getRulesAndReset();
+                                                                            Set<Rule> newServerMessageRules = NLP_INTERACTION_PROCESSOR.getRulesAndReset();
 
                                                                             // If new rules are available, restart combinatorial validation
                                                                             if (newServerMessageRules.size() > 0 && Sets.difference(newServerMessageRules, rulesToValidate).size() > 0) {
@@ -225,7 +225,7 @@ public class SecondNlpStrategy extends Strategy {
             if (successfulSequence != null) {
 
                 // Stop processing responses during fine validation
-                nlpResponseProcessor.setProcess(false);
+                NLP_INTERACTION_PROCESSOR.setProcess(false);
 
                 // Keep only rules that can be fine-validated
                 Set<Rule> rulesToFineValidate = Sets.difference(Sets.union(specificationRules.get(operation), serverMessageRules.get(operation)), coarseValidationDiscardedRules.get(operation)).stream().filter(Rule::canBeFineValidated).collect(Collectors.toSet());
@@ -265,7 +265,7 @@ public class SecondNlpStrategy extends Strategy {
                     }
                 }*/
 
-                nlpResponseProcessor.setProcess(true);
+                NLP_INTERACTION_PROCESSOR.setProcess(true);
             }
 
             Map<String, Set<Rule>> operationMap = new TreeMap<>();

@@ -25,7 +25,7 @@ public class LocalDictionaryPriorityParameterValueProvider extends ParameterValu
         if (localDictionary != null) {
 
             // Try to get value from normalized dictionary
-            DictionaryParameterValueProvider localDictionaryProvider = (DictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DICTIONARY);
+            ResponseDictionaryParameterValueProvider localDictionaryProvider = (ResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RESPONSE_DICTIONARY);
             localDictionaryProvider.setDictionary(localDictionary);
             localDictionaryProvider.setStrict(this.strict);
             if (localDictionaryProvider.countAvailableValuesFor(leafParameter) > 0) {

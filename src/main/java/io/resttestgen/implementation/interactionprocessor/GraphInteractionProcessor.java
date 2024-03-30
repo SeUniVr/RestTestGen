@@ -1,29 +1,32 @@
-package io.resttestgen.implementation.responseprocessor;
+package io.resttestgen.implementation.interactionprocessor;
 
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
 import io.resttestgen.core.operationdependencygraph.DependencyEdge;
 import io.resttestgen.core.operationdependencygraph.OperationDependencyGraph;
-import io.resttestgen.core.testing.ResponseProcessor;
+import io.resttestgen.core.testing.InteractionProcessor;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.TestStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
 
-public class GraphResponseProcessor extends ResponseProcessor {
+public class GraphInteractionProcessor extends InteractionProcessor {
 
     final OperationDependencyGraph operationDependencyGraph = Environment.getInstance().getOperationDependencyGraph();
 
     @Override
+    public boolean canProcess(TestInteraction testInteraction) {
+        return testInteraction.getTestStatus() == TestStatus.EXECUTED && testInteraction.getResponseStatusCode().isSuccessful();
+    }
+
+    @Override
     public void process(TestInteraction testInteraction) {
 
-        // If the obtained status code is successful, set the operation as tested in the graph
-        if (testInteraction.getResponseStatusCode().isSuccessful()) {
-            operationDependencyGraph.setOperationAsTested(testInteraction.getFuzzedOperation());
-        }
+        operationDependencyGraph.setOperationAsTested(testInteraction.getFuzzedOperation());
 
         StructuredParameter responseBody = testInteraction.getFuzzedOperation().getResponseBody();
 

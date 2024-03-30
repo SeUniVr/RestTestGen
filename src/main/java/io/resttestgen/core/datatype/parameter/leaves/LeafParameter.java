@@ -248,9 +248,6 @@ public abstract class LeafParameter extends Parameter {
 
     @Override
     public boolean hasValue() {
-        if (value == null) {
-            logger.warn("Parameter " + getName() + " has an invalid value.");
-        }
         return value != null;
     }
 

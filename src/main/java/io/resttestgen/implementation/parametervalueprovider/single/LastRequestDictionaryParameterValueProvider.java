@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 
 // TODO: add support for strict mode
 
-public class LastDictionaryParameterValueProvider extends CountableParameterValueProvider {
+public class LastRequestDictionaryParameterValueProvider extends CountableParameterValueProvider {
 
     // Get values from global dictionary by default
-    private Dictionary dictionary = Environment.getInstance().getGlobalDictionary();
+    private Dictionary dictionary = Environment.getInstance().getGlobalRequestDictionary();
 
-    public LastDictionaryParameterValueProvider() {
+    public LastRequestDictionaryParameterValueProvider() {
         setSameNormalizedNameValueSourceClass();
     }
 
