@@ -20,7 +20,7 @@
             "type": "string"
           }
         },
-        "x-schemaName": "MyBaseSchema"
+        "x-componentName": "MyBaseSchema"
       },
       "MyRefSchema": {
         "properties": {
@@ -32,11 +32,11 @@
                   "type": "string"
                 }
               },
-              "x-schemaName": "MyBaseSchema"
+              "x-componentName": "MyBaseSchema"
             }
           }
         },
-        "x-schemaName": "MyRefSchema"
+        "x-componentName": "MyRefSchema"
       }
     },
     "responses": {
@@ -53,11 +53,11 @@
                         "type": "string"
                       }
                     },
-                    "x-schemaName": "MyBaseSchema"
+                    "x-componentName": "MyBaseSchema"
                   }
                 }
               },
-              "x-schemaName": "MyRefSchema"
+              "x-componentName": "MyRefSchema"
             }
           }
         }

@@ -34,9 +34,9 @@
                             "type": "integer"
                           }
                         },
-                        "x-schemaName": "baseObject"
+                        "x-componentName": "baseObject"
                       },
-                      "x-schemaName": "baseArray"
+                      "x-componentName": "baseArray"
                     },
                     "second": {
                       "type": "array",
@@ -50,14 +50,14 @@
                             "type": "integer"
                           }
                         },
-                        "x-schemaName": "baseObject"
+                        "x-componentName": "baseObject"
                       },
-                      "x-schemaName": "baseArray"
+                      "x-componentName": "baseArray"
                     }
                   },
-                  "x-schemaName": "objectWithNestedArray"
+                  "x-componentName": "objectWithNestedArray"
                 },
-                "x-schemaName": "topLevelArray"
+                "x-componentName": "topLevelArray"
               }
             }
           },
@@ -85,9 +85,9 @@
                               "type": "integer"
                             }
                           },
-                          "x-schemaName": "baseObject"
+                          "x-componentName": "baseObject"
                         },
-                        "x-schemaName": "baseArray"
+                        "x-componentName": "baseArray"
                       },
                       "second": {
                         "type": "array",
@@ -101,14 +101,14 @@
                               "type": "integer"
                             }
                           },
-                          "x-schemaName": "baseObject"
+                          "x-componentName": "baseObject"
                         },
-                        "x-schemaName": "baseArray"
+                        "x-componentName": "baseArray"
                       }
                     },
-                    "x-schemaName": "objectWithNestedArray"
+                    "x-componentName": "objectWithNestedArray"
                   },
-                  "x-schemaName": "topLevelArray"
+                  "x-componentName": "topLevelArray"
                 }
               }
             }
@@ -129,7 +129,7 @@
             "type": "integer"
           }
         },
-        "x-schemaName": "baseObject"
+        "x-componentName": "baseObject"
       },
       "baseArray": {
         "type": "array",
@@ -143,9 +143,9 @@
               "type": "integer"
             }
           },
-          "x-schemaName": "baseObject"
+          "x-componentName": "baseObject"
         },
-        "x-schemaName": "baseArray"
+        "x-componentName": "baseArray"
       },
       "objectWithNestedArray": {
         "type": "object",
@@ -162,9 +162,9 @@
                   "type": "integer"
                 }
               },
-              "x-schemaName": "baseObject"
+              "x-componentName": "baseObject"
             },
-            "x-schemaName": "baseArray"
+            "x-componentName": "baseArray"
           },
           "second": {
             "type": "array",
@@ -178,12 +178,12 @@
                   "type": "integer"
                 }
               },
-              "x-schemaName": "baseObject"
+              "x-componentName": "baseObject"
             },
-            "x-schemaName": "baseArray"
+            "x-componentName": "baseArray"
           }
         },
-        "x-schemaName": "objectWithNestedArray"
+        "x-componentName": "objectWithNestedArray"
       },
       "topLevelArray": {
         "type": "array",
@@ -202,9 +202,9 @@
                     "type": "integer"
                   }
                 },
-                "x-schemaName": "baseObject"
+                "x-componentName": "baseObject"
               },
-              "x-schemaName": "baseArray"
+              "x-componentName": "baseArray"
             },
             "second": {
               "type": "array",
@@ -218,14 +218,14 @@
                     "type": "integer"
                   }
                 },
-                "x-schemaName": "baseObject"
+                "x-componentName": "baseObject"
               },
-              "x-schemaName": "baseArray"
+              "x-componentName": "baseArray"
             }
           },
-          "x-schemaName": "objectWithNestedArray"
+          "x-componentName": "objectWithNestedArray"
         },
-        "x-schemaName": "topLevelArray"
+        "x-componentName": "topLevelArray"
       }
     }
   }

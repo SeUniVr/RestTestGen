@@ -42,7 +42,7 @@ public class OperationSerializer implements JsonSerializer<Operation> {
         }
 
         // Add mandatory empty response in case no responses are not defined in the specification
-        if (responses.size() == 0) {
+        if (responses.isEmpty()) {
             responses.put("default", new Response());
         }
 
@@ -50,9 +50,9 @@ public class OperationSerializer implements JsonSerializer<Operation> {
         JsonObject result = new JsonObject();
         result.add("tags", null);
         result.add("summary", null);
-        result.add("description", gson.toJsonTree(src.getDescription().equals("") ? null : src.getDescription()));
+        result.add("description", gson.toJsonTree(src.getDescription().isEmpty() ? null : src.getDescription()));
         result.add("externalDocs", null);
-        result.add("operationId", gson.toJsonTree(src.getOperationId().equals("") ? null : src.getOperationId()));
+        result.add("operationId", gson.toJsonTree(src.getOperationId().isEmpty() ? null : src.getOperationId()));
 
         // Remove objects from parameters (not supported outside body at the moment)
         // FIXME: investigate how to support objects in parameters
@@ -73,7 +73,7 @@ public class OperationSerializer implements JsonSerializer<Operation> {
         List<String> idps = renderIPDs(src);
 
         // Export IDPs only if at least one exists
-        if (idps.size() > 0) {
+        if (!idps.isEmpty()) {
             result.add("x-dependencies", gson.toJsonTree(idps));
         }
         return result;
@@ -133,7 +133,7 @@ public class OperationSerializer implements JsonSerializer<Operation> {
         private final Boolean required;
 
         public RequestBody(Operation operation) {
-            this.description = operation.getRequestBodyDescription().equals("") ? null : operation.getRequestBodyDescription();
+            this.description = operation.getRequestBodyDescription().isEmpty() ? null : operation.getRequestBodyDescription();
             Map<String, StructuredParameter> schema = new HashMap<>();
             schema.put("schema", operation.getRequestBody());
             this.content.put(operation.getRequestContentType(), schema);

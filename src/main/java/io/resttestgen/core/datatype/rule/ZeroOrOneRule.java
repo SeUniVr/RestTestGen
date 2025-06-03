@@ -37,7 +37,7 @@ public class ZeroOrOneRule extends Rule {
         combination.stream().filter(r -> r.getRuleType() == RuleType.ONLY_ONE || r.getRuleType() == RuleType.OR ||
                 r.getRuleType() == RuleType.ALL_OR_NONE).forEach(r -> otherIpdsParameterNames.addAll(r.getParameterNames()));
 
-        return Sets.intersection(parameterNames, otherIpdsParameterNames).size() == 0;
+        return Sets.intersection(parameterNames, otherIpdsParameterNames).isEmpty();
     }
 
     @Override

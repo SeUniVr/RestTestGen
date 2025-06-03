@@ -18,6 +18,6 @@ public class ParameterCreationException extends RuntimeException {
     }
 
     public ParameterCreationException(Map<String, Object> parameterMap) {
-        logger.warn("Unable to create parameter " + parameterMap);
+        logger.warn("Unable to create parameter {}", parameterMap);
     }
 }

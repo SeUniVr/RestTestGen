@@ -47,8 +47,7 @@ public class MutateRandomParameterWithParameterMutatorOperationMutator extends O
         mutatedParameter = Optional.of((LeafParameter) parameterMutator.mutate(mutatedParameter.get()));
         mutatedParameter.get().addTag("mutated");
 
-        logger.debug("Mutated parameter " + mutatedParameter.get() + " with " + parameterMutator + ". New value: " +
-                mutatedParameter.get().getConcreteValue());
+        logger.debug("Mutated parameter {} with {}. New value: {}", mutatedParameter.get(), parameterMutator, mutatedParameter.get().getConcreteValue());
 
         return mutatedOperation;
     }

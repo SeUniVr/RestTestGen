@@ -152,8 +152,7 @@ public class TestRunner {
                     while (matcher.find()) {
                         retryAfter = Integer.parseInt(matcher.group(1));
                     }
-                    logger.warn("Status code 429 detected. The request will be replayed in " + retryAfter +
-                            " seconds. (Attempt " + (attempts + 1) + "/" + MAX_ATTEMPTS + ")");
+                    logger.warn("Status code 429 detected. The request will be replayed in {} seconds. (Attempt {}/" + MAX_ATTEMPTS + ")", retryAfter, attempts + 1);
                 }
             } else {
 
@@ -208,7 +207,7 @@ public class TestRunner {
                     new Timestamp(response.receivedResponseAtMillis()));
             testInteraction.setTestStatus(TestStatus.EXECUTED);
             coverage.updateCoverage(testInteraction);
-            logger.info("Executed test interaction: " + testInteraction.getFuzzedOperation() + " [" + testInteraction.getResponseStatusCode() + "]");
+            logger.info("Executed test interaction: {} [{}]", testInteraction.getFuzzedOperation(), testInteraction.getResponseStatusCode());
         } catch (IOException e) {
             logger.warn("Request execution failed: connectivity problem or timeout.");
             call.cancel();

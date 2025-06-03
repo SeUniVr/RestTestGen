@@ -33,7 +33,7 @@ public class NormalizedParameterName {
     public static void setQualifiableNames(Collection<String> names) {
         qualifiableNames = new HashSet<>();
 
-        logger.debug("Names to qualify: " + names);
+        logger.debug("Names to qualify: {}", names);
 
         for (String name : names) {
             qualifiableNames.add(stemmer.stem(name));
@@ -46,13 +46,26 @@ public class NormalizedParameterName {
         if (name.length() <= 2) {
             return name;
         }
+
         // First, split using camelCase, '_' , '-'
         String[] tokens = name.split("(?=[A-Z])|_|-");
+
+        // Force splitting of last token if ends with a qualifiable string
+        String lastToken = tokens[tokens.length - 1];
+        for (String qualifiableName : qualifiableNames) {
+            if (lastToken.toLowerCase().endsWith(qualifiableName) && lastToken.length() > qualifiableName.length()) {
+                tokens[tokens.length - 1] = lastToken.substring(0, lastToken.length() - qualifiableName.length());
+                tokens = Arrays.copyOf(tokens, tokens.length + 1);
+                tokens[tokens.length - 1] = qualifiableName;
+                break;
+            }
+        }
+
         ArrayList<String> stemmed = new ArrayList<>();
 
         // Stem each token
         for (String token : tokens) {
-            if (token.length() > 0) {
+            if (!token.isEmpty()) {
                 stemmed.add(stemmer.stem(token));
             }
         }
@@ -78,15 +91,15 @@ public class NormalizedParameterName {
 
         String name = parameter.getName().toString();
 
-        // Check that name is qualifiable. Skip header parameters.
+        // Check whether the name is qualifiable. Skip header parameters.
         if (qualifiableNames != null && qualifiableNames.contains(stemmer.stem(name)) &&
                 !parameter.getLocation().equals(ParameterLocation.HEADER)) {
 
             // First, check out if it has a parent
             Parameter parent = parameter.getParent();
 
-            // Check for parent node name
-            if (parent != null && parent.getNormalizedName().toString().length() > 0) {
+            // Check for the parent node name
+            if (parent != null && !parent.getNormalizedName().toString().isEmpty()) {
                 String qualified;
 
                 // Concat the two names in camel case
@@ -100,14 +113,14 @@ public class NormalizedParameterName {
                 return qualified;
             }
 
-            // Check for additional info in parameter endpoint
+            // Check for additional info in the parameter's endpoint
             String endpoint = parameter.getOperation().getEndpoint();
             String[] tokens = endpoint.split("/");
             ArrayList<String> keywords = new ArrayList<>();
 
             // Remove path parameters from the path
             for (String token : tokens) {
-                if (!token.contains("{") && token.length() > 0) {
+                if (!token.contains("{") && !token.isEmpty()) {
                     keywords.add(token);
                 }
             }
@@ -121,8 +134,8 @@ public class NormalizedParameterName {
                 }
             }
 
-            // If no candidate has a match, qualify using last URL part of the path
-            String candidateName = keywords.size() > 0 ?
+            // If no candidate has a match, qualify using the last URL part of the path
+            String candidateName = !keywords.isEmpty() ?
                     computeNormalizedName(stemmer.stem(keywords.get(keywords.size() - 1)) + "_" + name) :
                     name;
             qualifiedNames.add(candidateName);
@@ -158,7 +171,7 @@ public class NormalizedParameterName {
             Parameter parent = parameter.getParent();
 
             // Check for parent node name
-            if (parent != null && parent.getNormalizedName().toString().length() > 0) {
+            if (parent != null && !parent.getNormalizedName().toString().isEmpty()) {
                 String qualified;
 
                 // Concat the two names in camel case
@@ -179,7 +192,7 @@ public class NormalizedParameterName {
 
             // Remove path parameters from the path
             for (String token : tokens) {
-                if (!token.contains("{") && token.length() > 0) {
+                if (!token.contains("{") && !token.isEmpty()) {
                     keywords.add(token);
                 }
             }
@@ -194,7 +207,7 @@ public class NormalizedParameterName {
             }
 
             // If no candidate has a match, qualify using last URL part of the path
-            String candidateName = keywords.size() > 0 ?
+            String candidateName = !keywords.isEmpty() ?
                     computeNormalizedName(stemmer.stem(keywords.get(keywords.size() - 1)) + "_" + name) :
                     name;
             qualifiedNames.add(candidateName);

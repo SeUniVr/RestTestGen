@@ -26,12 +26,12 @@
       "SimpleString": {
         "type": "string",
         "maxLength": 10.0,
-        "x-schemaName": "SimpleString"
+        "x-componentName": "SimpleString"
       },
       "SimpleStringMin": {
         "type": "string",
         "minLength": 3.0,
-        "x-schemaName": "SimpleStringMin"
+        "x-componentName": "SimpleStringMin"
       },
       "Person": {
         "properties": {
@@ -41,12 +41,12 @@
               "first": {
                 "type": "string",
                 "maxLength": 10.0,
-                "x-schemaName": "SimpleString"
+                "x-componentName": "SimpleString"
               },
               "last": {
                 "type": "string",
                 "maxLength": 10.0,
-                "x-schemaName": "SimpleString"
+                "x-componentName": "SimpleString"
               }
             }
           },
@@ -56,12 +56,12 @@
               "items": {
                 "type": "string",
                 "maxLength": 10.0,
-                "x-schemaName": "SimpleString"
+                "x-componentName": "SimpleString"
               }
             }
           }
         },
-        "x-schemaName": "Person"
+        "x-componentName": "Person"
       },
       "Quotes": {
         "type": "array",
@@ -70,10 +70,10 @@
           "items": {
             "type": "string",
             "maxLength": 10.0,
-            "x-schemaName": "SimpleString"
+            "x-componentName": "SimpleString"
           }
         },
-        "x-schemaName": "Quotes"
+        "x-componentName": "Quotes"
       },
       "Words": {
         "type": "array",
@@ -82,16 +82,16 @@
             {
               "type": "string",
               "maxLength": 10.0,
-              "x-schemaName": "SimpleString"
+              "x-componentName": "SimpleString"
             },
             {
               "type": "string",
               "minLength": 3.0,
-              "x-schemaName": "SimpleStringMin"
+              "x-componentName": "SimpleStringMin"
             }
           ]
         },
-        "x-schemaName": "Words"
+        "x-componentName": "Words"
       }
     }
   }

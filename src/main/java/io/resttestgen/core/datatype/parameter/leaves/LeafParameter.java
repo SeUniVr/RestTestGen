@@ -140,8 +140,7 @@ public abstract class LeafParameter extends Parameter {
                         parameterStyle == ParameterStyle.DEEP_OBJECT) {
                     parameterStyle = ParameterStyle.SIMPLE;
                 }
-                logger.warn(getName() +
-                        ": Style not consistent with parameter type. Returning '" + parameterStyle + "' style.");
+                logger.warn("{}: Style not consistent with parameter type. Returning '{}' style.", getName(), parameterStyle);
                 return getValueAsFormattedString(parameterStyle);
         }
     }
@@ -170,8 +169,7 @@ public abstract class LeafParameter extends Parameter {
             this.value = value;
             this.valueSource = null;
         } else {
-            logger.warn("Setting value '" + value + "' to parameter '" + this.getName() + "' is not possible due to type" +
-                    " mismatch. Consider changing the type of this parameter before setting this value again.");
+            logger.warn("Setting value '{}' to parameter '{}' is not possible due to type mismatch. Consider changing the type of this parameter before setting this value again.", value, this.getName());
         }
     }
 
@@ -185,8 +183,7 @@ public abstract class LeafParameter extends Parameter {
                 this.value = providerResult.getSecond();
                 this.valueSource = providerResult.getFirst();
             } else {
-                logger.warn("Setting value '" + value + "' to parameter '" + this.getName() + "' is not possible due to type" +
-                        " mismatch. Consider changing the type of this parameter before setting this value again.");
+                logger.warn("Setting value '{}' to parameter '{}' is not possible due to type mismatch. Consider changing the type of this parameter before setting this value again.", value, this.getName());
             }
         } catch (ValueNotAvailableException e) {
             logger.warn(e.getMessage());

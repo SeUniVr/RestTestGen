@@ -21,7 +21,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "x-schemaName": "CustomString"
+              "x-componentName": "CustomString"
             }
           },
           {
@@ -29,7 +29,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "x-schemaName": "CustomString"
+              "x-componentName": "CustomString"
             }
           },
           {
@@ -37,7 +37,7 @@
             "in": "header",
             "schema": {
               "type": "string",
-              "x-schemaName": "CustomString"
+              "x-componentName": "CustomString"
             }
           }
         ],
@@ -53,7 +53,7 @@
     "schemas": {
       "CustomString": {
         "type": "string",
-        "x-schemaName": "CustomString"
+        "x-componentName": "CustomString"
       },
       "MyBaseSchema": {
         "properties": {
@@ -61,7 +61,7 @@
             "type": "string"
           }
         },
-        "x-schemaName": "MyBaseSchema"
+        "x-componentName": "MyBaseSchema"
       },
       "MyRefSchema": {
         "properties": {
@@ -73,11 +73,11 @@
                   "type": "string"
                 }
               },
-              "x-schemaName": "MyBaseSchema"
+              "x-componentName": "MyBaseSchema"
             }
           }
         },
-        "x-schemaName": "MyRefSchema"
+        "x-componentName": "MyRefSchema"
       }
     }
   }

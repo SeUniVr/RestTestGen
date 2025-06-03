@@ -5,7 +5,6 @@ import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.rule.*;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,7 +19,7 @@ public class RuleCombinationHelperTest {
     private static Environment environment;
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenApiException, IOException {
+    public static void setUp() throws IOException {
         environment = Starter.initEnvironment(ApiUnderTest.loadTestApiFromFile("rule-combination"));
     }
 

@@ -47,7 +47,7 @@ public class ExclusiveMaximumRule extends Rule {
 
     @Override
     public void apply(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             if (parameter instanceof NumberParameter) {
                 ((NumberParameter) parameter).setExclusiveMaximum(exclusiveMaximum);
@@ -57,7 +57,7 @@ public class ExclusiveMaximumRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             if (parameter instanceof NumberParameter) {
                 return ((NumberParameter) parameter).isExclusiveMaximum() == exclusiveMaximum;

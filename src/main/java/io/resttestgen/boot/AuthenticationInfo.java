@@ -44,8 +44,7 @@ public class AuthenticationInfo {
 
         // Proceed only if the command is not null or too short
         if (command == null || command.trim().length() <= 1) {
-            logger.warn("Invalid authentication command specified in the API configuration for '" + description +
-                    "'. " + ignoredAuthInfoError);
+            logger.warn("Invalid authentication command specified in the API configuration for '{}'. " + ignoredAuthInfoError, description);
             return false;
         }
 
@@ -63,7 +62,7 @@ public class AuthenticationInfo {
                 stringBuilder.append(s);
             }
         } catch (IOException e) {
-            logger.error("Could not execute authentication script for '" + description + "'. " + ignoredAuthInfoError);
+            logger.error("Could not execute authentication script for '{}'. " + ignoredAuthInfoError, description);
         }
 
         LinkedHashMap<String, Object> map = null;
@@ -71,8 +70,7 @@ public class AuthenticationInfo {
         try {
             map = new Gson().fromJson(stringBuilder.toString(), LinkedHashMap.class);
         } catch (JsonSyntaxException | NullPointerException e) {
-            logger.warn("Authorization script must return valid JSON data, in the format specified in the README.md file. " +
-                    "Instead, its result was: " + stringBuilder + ". " + ignoredAuthInfoError);
+            logger.warn("Authorization script must return valid JSON data, in the format specified in the README.md file. Instead, its result was: {}. " + ignoredAuthInfoError, stringBuilder);
             return false;
         }
 
@@ -80,8 +78,7 @@ public class AuthenticationInfo {
         if (map.size() < 4 || !map.containsKey("name") || !map.containsKey("value") ||
                 !map.containsKey("in") || !map.containsKey("duration")) {
 
-            logger.error("Authorization script must return a JSON containing all and only the following fields " +
-                    "'name', 'value', 'in', 'duration'. Instead, its result was: " + map + ". " + ignoredAuthInfoError);
+            logger.error("Authorization script must return a JSON containing all and only the following fields 'name', 'value', 'in', 'duration'. Instead, its result was: {}. " + ignoredAuthInfoError, map);
             return false;
         }
 

@@ -30,7 +30,7 @@ public class StringParameterSerializer implements JsonSerializer<StringParameter
         if (src.getLocation() == ParameterLocation.REQUEST_BODY || src.getLocation() == ParameterLocation.RESPONSE_BODY) {
 
             // Add description, if defined
-            if (!src.getDescription().trim().equals("")) {
+            if (!src.getDescription().trim().isEmpty()) {
                 result.addProperty("description", src.getDescription());
             }
 
@@ -63,13 +63,13 @@ public class StringParameterSerializer implements JsonSerializer<StringParameter
             }
 
             // Add enum, if enum values are provided
-            if (src.getEnumValues().size() > 0) {
+            if (!src.getEnumValues().isEmpty()) {
                 result.add("enum", gson.toJsonTree(src.getEnumValues()));
             }
 
             // Add examples, if examples are provided
             // FIXME: check if export format is correct
-            if (src.getExamples().size() > 0) {
+            if (!src.getExamples().isEmpty()) {
                 result.add("example", gson.toJsonTree(src.getExamples()));
             }
         } else {
@@ -85,7 +85,7 @@ public class StringParameterSerializer implements JsonSerializer<StringParameter
             }
 
             // Add description, if not empty
-            if (!src.getDescription().trim().equals("")) {
+            if (!src.getDescription().trim().isEmpty()) {
                 result.addProperty("description", src.getDescription());
             }
 
@@ -124,7 +124,7 @@ public class StringParameterSerializer implements JsonSerializer<StringParameter
             }
 
             // Add enum, if enum values are provided
-            if (src.getEnumValues().size() > 0) {
+            if (!src.getEnumValues().isEmpty()) {
                 schema.add("enum", gson.toJsonTree(src.getEnumValues()));
             }
 

@@ -62,7 +62,7 @@ public class Operation {
     private final List<Set<ParameterName>> zeroOrOne = new LinkedList<>();
     // TODO: support arithmetic/relational IPDs
 
-    private boolean isReadOnly = false; // Field to avoid changes to template operation parsed from specification
+    private boolean isReadOnly = false; // Field to avoid changes to the operation template parsed from the specification
 
     private static final Logger logger = LogManager.getLogger(Operation.class);
 
@@ -112,7 +112,7 @@ public class Operation {
             }
         }
 
-        logger.debug("Fetching operation " + method + " " + endpoint);
+        logger.debug("Fetching operation {} {}", method, endpoint);
 
         operationId = OpenApiParser.safeGet(operationMap, "operationId", String.class);
         description = OpenApiParser.safeGet(operationMap, "description", String.class);
@@ -127,14 +127,12 @@ public class Operation {
             try {
                 parameter = ParameterFactory.getParameter(param);
             } catch (ParameterCreationException e) {
-                logger.warn("Skipping parameter \"" + param.get("name") + "\" in operation \"" + this + "\" due to " +
-                        "a ParameterCreationException.");
+                logger.warn("Skipping parameter \"{}\" in operation \"{}\" due to a ParameterCreationException.", param.get("name"), this);
             }
 
             if (parameter != null) {
                 if (!addParameter(location, parameter)) {
-                    logger.warn("Skipping parameter \"" + param.get("name") + "\" in operation \"" + this +
-                            "\" due to a wrong \"in\" field value (actual value:" + param.get("in") + " ).");
+                    logger.warn("Skipping parameter \"{}\" in operation \"{}\" due to a wrong \"in\" field value (actual value:{} ).", param.get("name"), this, param.get("in"));
                 }
             }
         }
@@ -165,11 +163,9 @@ public class Operation {
                 schema.put("in", "request_body");
                 setRequestBody(ParameterFactory.getStructuredParameter(schema, ""));
             } catch (ParameterCreationException e) {
-                logger.warn("Skipping \"request body\" in operation \"" + this + "\" due to " +
-                        "a ParameterCreationException.");
+                logger.warn("Skipping \"request body\" in operation \"{}\" due to a ParameterCreationException.", this);
             } catch (UnsupportedSpecificationFeature e) {
-                logger.warn("Skipping \"request body\" in operation \"" + this + "\" due to " +
-                        "an unsupported feature in OpenAPI specification.");
+                logger.warn("Skipping \"request body\" in operation \"{}\" due to an unsupported feature in OpenAPI specification.", this);
             }
         }
 
@@ -197,11 +193,9 @@ public class Operation {
                             ParameterFactory.getStructuredParameter(schema, "")
                     );
                 } catch (ParameterCreationException e) {
-                    logger.warn("Skipping \"response body\" for status code \"" + responseMap.getKey() + "\" due to " +
-                            "a ParameterCreationException.");
+                    logger.warn("Skipping \"response body\" for status code \"{}\" due to a ParameterCreationException.", responseMap.getKey());
                 } catch (UnsupportedSpecificationFeature e) {
-                    logger.warn("Skipping \"response body\" for status code \"" + responseMap.getKey() + "\" due to " +
-                            "an unsupported feature in OpenAPI specification.");
+                    logger.warn("Skipping \"response body\" for status code \"{}\" due to an unsupported feature in OpenAPI specification.", responseMap.getKey());
                 }
             }
         }
@@ -229,13 +223,13 @@ public class Operation {
             this.targetSchemas.add(this.requestBody.getSchemaName());
         }*/
 
-        logger.debug("\tPathParams: " + pathParameters);
-        logger.debug("\tQueryParams: " + queryParameters);
-        logger.debug("\tHeaderParams: " + headerParameters);
-        logger.debug("\tCookieParams: " + cookieParameters);
-        logger.debug("\tRequestBody: " + this.requestBody);
-        logger.debug("\tOutputParams: " + outputParameters);
-        logger.debug("\tOutputParamsSet: " + getOutputParametersSet());
+        logger.debug("\tPathParams: {}", pathParameters);
+        logger.debug("\tQueryParams: {}", queryParameters);
+        logger.debug("\tHeaderParams: {}", headerParameters);
+        logger.debug("\tCookieParams: {}", cookieParameters);
+        logger.debug("\tRequestBody: {}", this.requestBody);
+        logger.debug("\tOutputParams: {}", outputParameters);
+        logger.debug("\tOutputParamsSet: {}", getOutputParametersSet());
 
         this.isReadOnly = true;
         inferredOperationSemantics = OperationSemantics.inferSemantics(this);

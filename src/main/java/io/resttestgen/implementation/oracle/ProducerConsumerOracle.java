@@ -27,7 +27,7 @@ public class ProducerConsumerOracle extends Oracle {
             // Get the producer interaction and check that it actually produced something
             TestInteraction producerInteraction = testSequence.getFirst();
             if (producerInteraction.getResponseBody() == null ||
-                    producerInteraction.getResponseBody().trim().equals("")) {
+                    producerInteraction.getResponseBody().trim().isEmpty()) {
                 testResult.setFail("The first operation returned an empty body.");
             } else {
                 TestInteraction consumerInteraction = testSequence.getLast();
@@ -53,8 +53,7 @@ public class ProducerConsumerOracle extends Oracle {
 
                 double ratio = found.doubleValue() / (found.doubleValue() + notFound.doubleValue());
 
-                logger.debug("Found " + found + " producer/consumer relations (" + ratio * 100 + "%). Not found: " +
-                        notFound + ".");
+                logger.debug("Found {} producer/consumer relations ({}%). Not found: {}.", found, ratio * 100, notFound);
 
                 if (ratio >= 0.7) {
                     testResult.setPass("Producer/consumer relation found for more than 70% of the parameters.");

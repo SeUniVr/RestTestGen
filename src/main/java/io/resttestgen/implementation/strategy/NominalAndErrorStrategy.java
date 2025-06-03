@@ -2,6 +2,7 @@ package io.resttestgen.implementation.strategy;
 
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.Strategy;
+import io.resttestgen.core.testing.StrategyConfiguration;
 import io.resttestgen.core.testing.TestRunner;
 import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.operationsorter.OperationsSorter;
@@ -9,6 +10,7 @@ import io.resttestgen.implementation.fuzzer.ErrorFuzzer;
 import io.resttestgen.implementation.fuzzer.NominalFuzzer;
 import io.resttestgen.implementation.operationssorter.GraphBasedOperationsSorter;
 import io.resttestgen.implementation.oracle.StatusCodeOracle;
+import io.resttestgen.implementation.strategy.configuration.NominalAndErrorStrategyConfiguration;
 import io.resttestgen.implementation.writer.CoverageReportWriter;
 import io.resttestgen.implementation.writer.ReportWriter;
 import io.resttestgen.implementation.writer.RestAssuredWriter;
@@ -22,6 +24,7 @@ import java.util.List;
 public class NominalAndErrorStrategy extends Strategy {
 
     private static final Logger logger = LogManager.getLogger(NominalAndErrorStrategy.class);
+    private final NominalAndErrorStrategyConfiguration config = StrategyConfiguration.loadConfiguration(NominalAndErrorStrategyConfiguration.class);
 
     private final TestSequence globalNominalTestSequence = new TestSequence();
 
@@ -30,10 +33,12 @@ public class NominalAndErrorStrategy extends Strategy {
         // According to the order provided by the graph, execute the nominal fuzzer
         OperationsSorter sorter = new GraphBasedOperationsSorter();
         while (!sorter.isEmpty()) {
+
+
             Operation operationToTest = sorter.getFirst();
-            logger.debug("Testing operation " + operationToTest);
+            logger.debug("Testing operation {}", operationToTest);
             NominalFuzzer nominalFuzzer = new NominalFuzzer(operationToTest);
-            List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(20);
+            List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(config.getNumberOfSequences());
 
             for (TestSequence testSequence : nominalSequences) {
 
@@ -58,8 +63,6 @@ public class NominalAndErrorStrategy extends Strategy {
             globalNominalTestSequence.append(nominalSequences);
             sorter.removeFirst();
         }
-
-
 
 
         // Keep only successful test interactions in the sequence

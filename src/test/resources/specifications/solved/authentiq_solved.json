@@ -108,7 +108,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -136,7 +136,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -164,7 +164,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -192,7 +192,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -225,7 +225,7 @@
                 "required": [
                   "sub"
                 ],
-                "x-schemaName": "AuthentiqID"
+                "x-componentName": "AuthentiqID"
               }
             }
           },
@@ -275,7 +275,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -303,7 +303,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -379,7 +379,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -407,7 +407,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -435,7 +435,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -508,7 +508,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -536,7 +536,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -564,7 +564,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -615,7 +615,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -643,7 +643,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -671,7 +671,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -715,7 +715,7 @@
                 "required": [
                   "sub"
                 ],
-                "x-schemaName": "AuthentiqID"
+                "x-componentName": "AuthentiqID"
               }
             }
           },
@@ -761,7 +761,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -789,7 +789,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -833,7 +833,7 @@
                 "required": [
                   "sub"
                 ],
-                "x-schemaName": "AuthentiqID"
+                "x-componentName": "AuthentiqID"
               }
             }
           },
@@ -879,7 +879,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -907,7 +907,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -935,7 +935,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -996,7 +996,7 @@
                   "iss",
                   "aud"
                 ],
-                "x-schemaName": "PushToken"
+                "x-componentName": "PushToken"
               }
             }
           },
@@ -1042,7 +1042,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1070,7 +1070,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1129,7 +1129,7 @@
                   "sub",
                   "scope"
                 ],
-                "x-schemaName": "Claims"
+                "x-componentName": "Claims"
               }
             }
           },
@@ -1179,7 +1179,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1207,7 +1207,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1274,7 +1274,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1302,7 +1302,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1395,7 +1395,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               },
               "application/jwt": {
@@ -1418,7 +1418,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1446,7 +1446,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1501,7 +1501,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1529,7 +1529,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1594,7 +1594,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1622,7 +1622,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1650,7 +1650,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1678,7 +1678,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1747,7 +1747,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1775,7 +1775,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1803,7 +1803,7 @@
                   "required": [
                     "error"
                   ],
-                  "x-schemaName": "Error"
+                  "x-componentName": "Error"
                 }
               }
             },
@@ -1857,7 +1857,7 @@
               "required": [
                 "sub"
               ],
-              "x-schemaName": "AuthentiqID"
+              "x-componentName": "AuthentiqID"
             }
           }
         },
@@ -1888,7 +1888,7 @@
               "required": [
                 "error"
               ],
-              "x-schemaName": "Error"
+              "x-componentName": "Error"
             }
           }
         },
@@ -1911,7 +1911,7 @@
         "required": [
           "sub"
         ],
-        "x-schemaName": "AuthentiqID"
+        "x-componentName": "AuthentiqID"
       },
       "Claims": {
         "description": "Claim in JWT format, self- or issuer-signed. \n",
@@ -1941,7 +1941,7 @@
           "sub",
           "scope"
         ],
-        "x-schemaName": "Claims"
+        "x-componentName": "Claims"
       },
       "Error": {
         "properties": {
@@ -1962,7 +1962,7 @@
         "required": [
           "error"
         ],
-        "x-schemaName": "Error"
+        "x-componentName": "Error"
       },
       "PushToken": {
         "description": "PushToken in JWT format, self-signed. \n",
@@ -1994,7 +1994,7 @@
           "iss",
           "aud"
         ],
-        "x-schemaName": "PushToken"
+        "x-componentName": "PushToken"
       }
     }
   }

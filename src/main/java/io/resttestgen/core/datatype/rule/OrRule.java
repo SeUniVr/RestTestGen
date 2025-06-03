@@ -48,7 +48,7 @@ public class OrRule extends Rule {
         combination.stream().filter(r -> r.getRuleType() == RuleType.ONLY_ONE || r.getRuleType() == RuleType.ALL_OR_NONE ||
                 r.getRuleType() == RuleType.ZERO_OR_ONE).forEach(r -> otherIpdsParameterNames.addAll(r.getParameterNames()));
 
-        return Sets.intersection(parameterNames, otherIpdsParameterNames).size() == 0;
+        return Sets.intersection(parameterNames, otherIpdsParameterNames).isEmpty();
     }
 
     @Override

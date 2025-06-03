@@ -33,7 +33,7 @@ public class GenericParameter extends LeafParameter {
 
     @Override
     public Parameter merge(Parameter other) {
-        logger.warn("Cannot merge " + GenericParameter.class + " instances.");
+        logger.warn("Cannot merge {} instances.", GenericParameter.class);
         return this;
     }
 

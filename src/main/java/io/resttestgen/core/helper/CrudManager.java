@@ -55,7 +55,7 @@ public class CrudManager {
     public static Set<String> collectResourceTypes(OpenApi openAPI) {
         Set<String> resourceTypes = new HashSet<>();
         for (Operation operation : openAPI.getOperations()) {
-            if (operation.getCrudResourceType() != null && !operation.getCrudResourceType().equals("")) {
+            if (operation.getCrudResourceType() != null && !operation.getCrudResourceType().isEmpty()) {
                 resourceTypes.add(operation.getCrudResourceType());
             }
         }
@@ -65,7 +65,7 @@ public class CrudManager {
     public static Set<String> collectInferredResourceTypes(OpenApi openAPI) {
         Set<String> inferredResourceTypes = new HashSet<>();
         for (Operation operation : openAPI.getOperations()) {
-            if (operation.getInferredCrudResourceType() != null && !operation.getInferredCrudResourceType().equals("")) {
+            if (operation.getInferredCrudResourceType() != null && !operation.getInferredCrudResourceType().isEmpty()) {
                 inferredResourceTypes.add(operation.getInferredCrudResourceType());
             }
         }

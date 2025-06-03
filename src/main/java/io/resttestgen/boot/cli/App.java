@@ -2,7 +2,6 @@ package io.resttestgen.boot.cli;
 
 import io.resttestgen.boot.Configuration;
 import io.resttestgen.boot.Starter;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.InvalidOpenApiException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +16,7 @@ import java.io.IOException;
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class);
-    private static final String toolVersion = "24.03";
+    private static final String toolVersion = "25.06";
     private static final String messageHeader = "RestTestGen CLI " + toolVersion;
     private static final String helpMessage = messageHeader + "\n"
             + "Arguments:\n"
@@ -54,11 +53,9 @@ public class App {
         // Start RestTestGen using the starter class
         try {
             Starter.start(configuration);
-        } catch (CannotParseOpenApiException e) {
-            logger.error("Cannot parse the provided OpenAPI specification.");
-            System.exit(-1);
+            logger.info("RestTestGen execution completed successfully.");
         } catch (InvalidOpenApiException e) {
-            logger.error("The provided OpenAPI specification is not valid.");
+            logger.error("The provided OpenAPI specification is not valid. {}", e.getMessage());
             System.exit(-1);
         } catch (Exception e) {
             logger.error("An error occurred during the execution of RestTestGen. Please report it on GitHub.");

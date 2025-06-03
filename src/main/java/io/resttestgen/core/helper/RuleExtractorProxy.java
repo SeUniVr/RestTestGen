@@ -101,7 +101,7 @@ public class RuleExtractorProxy {
         HashSet<Rule> rules = new HashSet<>();
 
         // Continues only if operation has request parameters and description has at least 3 chars
-        if (operation.getAllRequestParameters().size() > 0 && operation.getDescription().trim().length() > 3) {
+        if (!operation.getAllRequestParameters().isEmpty() && operation.getDescription().trim().length() > 3) {
 
             Map<String, Object> jsonMap = new TreeMap<>();
             jsonMap.put("param_names", getParameterNamesList(operation));
@@ -196,7 +196,7 @@ public class RuleExtractorProxy {
         HashSet<Rule> rules = new HashSet<>();
 
         // Continues only if operation has request parameters and description has at least 3 chars
-        if (operation.getAllRequestParameters().size() > 0 && serverMessage.trim().length() > 3) {
+        if (!operation.getAllRequestParameters().isEmpty() && serverMessage.trim().length() > 3) {
 
             Map<String, Object> jsonMap = new TreeMap<>();
             jsonMap.put("param_names", getParameterNamesList(operation));
@@ -260,7 +260,7 @@ public class RuleExtractorProxy {
         StringJoiner stringJoiner = new StringJoiner(",");
         if (operation.getSuccessfulOutputParameters() != null) {
             List<String> parameterNames = operation.getSuccessfulOutputParameters().getAllParameters().stream()
-                    .filter(e -> !(e.getParent() instanceof ArrayParameter) && !e.getName().toString().trim().equals(""))
+                    .filter(e -> !(e.getParent() instanceof ArrayParameter) && !e.getName().toString().trim().isEmpty())
                     .map(e -> e.getName().toString())
                     .distinct().sorted()
                     .collect(Collectors.toList());
@@ -272,7 +272,7 @@ public class RuleExtractorProxy {
     private static String getUsedRequestParameterNamesList(Operation operation) {
         StringJoiner stringJoiner = new StringJoiner(",");
         List<String> parameterNames = operation.getAllRequestParameters().stream()
-                .filter(e -> e.getValue() != null && !(e.getParent() instanceof ArrayParameter) && !e.getName().toString().trim().equals(""))
+                .filter(e -> e.getValue() != null && !(e.getParent() instanceof ArrayParameter) && !e.getName().toString().trim().isEmpty())
                 .map(e -> e.getName().toString())
                 .distinct().sorted()
                 .collect(Collectors.toList());
@@ -300,6 +300,6 @@ public class RuleExtractorProxy {
     }
 
     public static void printStatistics() {
-        logger.info("STATISTICS: " + serverCount + "/" + cacheCount + " (server/cache)");
+        logger.info("STATISTICS: {}/{} (server/cache)", serverCount, cacheCount);
     }
 }

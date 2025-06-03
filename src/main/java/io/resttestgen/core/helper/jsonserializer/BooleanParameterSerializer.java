@@ -29,7 +29,7 @@ public class BooleanParameterSerializer implements JsonSerializer<BooleanParamet
         if (src.getLocation() == ParameterLocation.REQUEST_BODY || src.getLocation() == ParameterLocation.RESPONSE_BODY) {
 
             // Add description, if not empty
-            if (!src.getDescription().trim().equals("")) {
+            if (!src.getDescription().trim().isEmpty()) {
                 result.addProperty("description", src.getDescription());
             }
 
@@ -45,7 +45,7 @@ public class BooleanParameterSerializer implements JsonSerializer<BooleanParamet
             }
 
             // Add enum, if enum values are provided
-            if (src.getEnumValues().size() > 0) {
+            if (!src.getEnumValues().isEmpty()) {
                 result.add("enum", gson.toJsonTree(src.getEnumValues()));
             }
 
@@ -67,7 +67,7 @@ public class BooleanParameterSerializer implements JsonSerializer<BooleanParamet
             }
 
             // Add description, if not empty
-            if (!src.getDescription().trim().equals("")) {
+            if (!src.getDescription().trim().isEmpty()) {
                 result.addProperty("description", src.getDescription());
             }
 
@@ -92,13 +92,13 @@ public class BooleanParameterSerializer implements JsonSerializer<BooleanParamet
             }
 
             // Add enum, if enum values are provided
-            if (src.getEnumValues().size() > 0) {
+            if (!src.getEnumValues().isEmpty()) {
                 schema.add("enum", gson.toJsonTree(src.getEnumValues()));
             }
 
             // Add examples, if examples are provided
             // FIXME: check if export format is correct
-            if (src.getExamples().size() > 0) {
+            if (!src.getExamples().isEmpty()) {
                 result.add("example", gson.toJsonTree(src.getExamples()));
             }
 

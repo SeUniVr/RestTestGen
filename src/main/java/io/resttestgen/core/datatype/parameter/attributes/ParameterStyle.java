@@ -34,7 +34,7 @@ public enum ParameterStyle {
             case "deepobject":
                 return DEEP_OBJECT;
             default:
-                logger.warn("Unknown type \"" + styleName + "\".");
+                logger.warn("Unknown type \"{}\".", styleName);
                 return null;
         }
     }

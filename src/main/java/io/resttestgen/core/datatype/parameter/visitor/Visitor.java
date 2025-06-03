@@ -17,10 +17,14 @@ import io.resttestgen.core.datatype.parameter.structured.StructuredParameter;
  */
 public interface Visitor<T> {
 
-    default T visit(Parameter element) { return null; };
-    default T visit(LeafParameter element) { return null; };
-    default T visit(StructuredParameter element) { return null; };
-    default T visit(CombinedSchemaParameter element) { return null; };
+    default T visit(Parameter element) { return null; }
+
+    default T visit(LeafParameter element) { return null; }
+
+    default T visit(StructuredParameter element) { return null; }
+
+    default T visit(CombinedSchemaParameter element) { return null; }
+
     T visit(ArrayParameter element);
     T visit(ObjectParameter element);
     T visit(StringParameter element);

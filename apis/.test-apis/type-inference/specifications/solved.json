@@ -164,24 +164,21 @@
       "SimpleObject": {
         "properties": {
           "First": {
-            "maxLength": 10.0,
-            "x-schemaName": "SimpleString"
+            "$ref": "#/components/schemas/SimpleString"
           }
         },
         "x-schemaName": "SimpleObject"
       },
       "SimpleArray": {
         "items": {
-          "maxLength": 10.0,
-          "x-schemaName": "SimpleString"
+          "$ref": "#/components/schemas/SimpleString"
         },
         "x-schemaName": "SimpleArray"
       },
       "OneOfMaxString": {
         "oneOf": [
           {
-            "maxLength": 10.0,
-            "x-schemaName": "SimpleString"
+            "$ref": "#/components/schemas/SimpleString"
           },
           {
             "minLength": 10.0
@@ -192,8 +189,7 @@
       "AnyOfNumber": {
         "anyOf": [
           {
-            "maximum": 20.0,
-            "x-schemaName": "SimpleNumber"
+            "$ref": "#/components/schemas/SimpleNumber"
           },
           {
             "minimum": 5.0
@@ -208,8 +204,7 @@
         "type": "number",
         "allOf": [
           {
-            "maximum": 20.0,
-            "x-schemaName": "SimpleNumber"
+            "$ref": "#/components/schemas/SimpleNumber"
           },
           {
             "minimum": 5.0

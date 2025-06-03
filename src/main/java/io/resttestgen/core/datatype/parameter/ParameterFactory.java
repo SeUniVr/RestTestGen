@@ -59,8 +59,7 @@ public class ParameterFactory {
             case UNKNOWN:
             default:
                 // Fallback
-                logger.warn("Unsupported type '" + elementMap.get("type") + "' for parameter " +
-                        name + ". Created a generic parameter.");
+                logger.warn("Unsupported type '{}' for parameter {}. Created a generic parameter.", elementMap.get("type"), name);
                 try {
                     return new GenericParameter(elementMap, name);
                 } catch (ClassCastException e) {
@@ -113,7 +112,7 @@ public class ParameterFactory {
         } catch (ClassCastException e) {
             name = getParameterName(elementMap, name);
             throw new ParameterCreationException("Cannot cast to structured parameter " +
-                    (name.equals("") ? "" : "'" + name + "'"));
+                    (name.isEmpty() ? "" : "'" + name + "'"));
         }
     }
 
@@ -121,7 +120,7 @@ public class ParameterFactory {
         name = getParameterName(elementMap, name);
         if (elementMap.containsKey("not")) {
             throw new UnsupportedSpecificationFeature("Unsupported property 'not' found in " +
-                    (name.equals("") ? "" : "'" + name + "', "));
+                    (name.isEmpty() ? "" : "'" + name + "', "));
         }
     }
 

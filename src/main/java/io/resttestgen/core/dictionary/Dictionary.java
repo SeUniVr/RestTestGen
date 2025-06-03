@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Dictionary that stores parameter values to be reused. Values are loaded from a default dictionary (file) and taken
- * from output data observed during testing. Each value is associated to a source that tells where that particular
+ * from output data observed during testing. Each value is associated with a source that tells where that particular
  * value was observed
  */
 public class Dictionary {
@@ -27,7 +27,7 @@ public class Dictionary {
      */
     public void addEntry(DictionaryEntry dictionaryEntry) {
 
-        // Get list of similar entries
+        // Get a list of similar entries
         List<DictionaryEntry> matchingEntries = dictionary.stream()
                 .filter(entry -> entry.getParameterName().equals(dictionaryEntry.getParameterName()) &&
                         entry.getNormalizedParameterName().equals(dictionaryEntry.getNormalizedParameterName()) &&
@@ -35,8 +35,8 @@ public class Dictionary {
                         entry.getParameterType().equals(dictionaryEntry.getParameterType()))
                 .collect(Collectors.toList());
 
-        // If there are no similar entries, add entry to dictionary
-        if (matchingEntries.size() == 0) {
+        // If there are no similar entries, add entry to the dictionary
+        if (matchingEntries.isEmpty()) {
             dictionary.add(dictionaryEntry);
         }
 

@@ -79,21 +79,21 @@ public class OpenApiSerializer implements JsonSerializer<OpenApi> {
         private final String version;
 
         public Info(OpenApi openAPI) {
-            this.title = openAPI.getTitle().equals("") ? null : openAPI.getTitle();
-            this.summary = openAPI.getSummary().equals("") ? null : openAPI.getSummary();
-            this.description = openAPI.getDescription().equals("") ? null : openAPI.getDescription();
-            this.termsOfService = openAPI.getTermsOfService().equals("") ? null : openAPI.getTermsOfService();
-            if (!openAPI.getContactName().equals("") || !openAPI.getContactUrl().equals("") || !openAPI.getContactEmail().equals("")) {
+            this.title = openAPI.getTitle().isEmpty() ? null : openAPI.getTitle();
+            this.summary = openAPI.getSummary().isEmpty() ? null : openAPI.getSummary();
+            this.description = openAPI.getDescription().isEmpty() ? null : openAPI.getDescription();
+            this.termsOfService = openAPI.getTermsOfService().isEmpty() ? null : openAPI.getTermsOfService();
+            if (!openAPI.getContactName().isEmpty() || !openAPI.getContactUrl().isEmpty() || !openAPI.getContactEmail().isEmpty()) {
                 this.contact = new Contact(openAPI);
             } else {
                 this.contact = null;
             }
-            if (!openAPI.getLicenseName().equals("") || !openAPI.getLicenseUrl().equals("")) {
+            if (!openAPI.getLicenseName().isEmpty() || !openAPI.getLicenseUrl().isEmpty()) {
                 this.license = new License(openAPI);
             } else {
                 this.license = null;
             }
-            this.version = openAPI.getVersion().equals("") ? null : openAPI.getVersion();
+            this.version = openAPI.getVersion().isEmpty() ? null : openAPI.getVersion();
         }
     }
 
@@ -104,9 +104,9 @@ public class OpenApiSerializer implements JsonSerializer<OpenApi> {
         private String email;
 
         public Contact(OpenApi openAPI) {
-            this.name = openAPI.getContactName().equals("") ? null : openAPI.getContactName();
-            this.url = openAPI.getContactUrl().equals("") ? null : openAPI.getContactUrl();
-            this.email = openAPI.getContactEmail().equals("") ? null : openAPI.getContactEmail();
+            this.name = openAPI.getContactName().isEmpty() ? null : openAPI.getContactName();
+            this.url = openAPI.getContactUrl().isEmpty() ? null : openAPI.getContactUrl();
+            this.email = openAPI.getContactEmail().isEmpty() ? null : openAPI.getContactEmail();
         }
     }
 
@@ -116,8 +116,8 @@ public class OpenApiSerializer implements JsonSerializer<OpenApi> {
         private String url;
 
         public License(OpenApi openAPI) {
-            this.name = openAPI.getLicenseName().equals("") ? null : openAPI.getLicenseName();
-            this.url = openAPI.getLicenseUrl().equals("") ? null : openAPI.getLicenseUrl();
+            this.name = openAPI.getLicenseName().isEmpty() ? null : openAPI.getLicenseName();
+            this.url = openAPI.getLicenseUrl().isEmpty() ? null : openAPI.getLicenseUrl();
         }
     }
 

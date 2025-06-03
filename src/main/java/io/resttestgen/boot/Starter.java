@@ -1,7 +1,7 @@
 package io.resttestgen.boot;
 
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
+import io.resttestgen.core.openapi.InvalidOpenApiException;
 import io.resttestgen.core.testing.Strategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +25,7 @@ public class Starter {
      * the configuration
      * @param configuration the configuration.
      */
-    public static void start(Configuration configuration) throws CannotParseOpenApiException, IOException {
+    public static void start(Configuration configuration) throws InvalidOpenApiException, IOException {
         initEnvironment(configuration);
         launchStrategyByClassName(configuration.getStrategyClassName());
     }
@@ -33,22 +33,22 @@ public class Starter {
 
 
 
-    public static void start(Configuration configuration, ApiUnderTest apiUnderTest, Strategy strategy) throws CannotParseOpenApiException {
+    public static void start(Configuration configuration, ApiUnderTest apiUnderTest, Strategy strategy) throws InvalidOpenApiException {
         initEnvironment(configuration, apiUnderTest);
         launchStrategyByClass(strategy);
     }
 
-    public static void start(Configuration configuration, String apiWildcard, Strategy strategy) throws CannotParseOpenApiException, IOException {
+    public static void start(Configuration configuration, String apiWildcard, Strategy strategy) throws InvalidOpenApiException, IOException {
         initEnvironment(configuration, apiWildcard);
         launchStrategyByClass(strategy);
     }
 
-    public static void start(Configuration configuration, ApiUnderTest apiUnderTest, String strategyClassName) throws CannotParseOpenApiException {
+    public static void start(Configuration configuration, ApiUnderTest apiUnderTest, String strategyClassName) throws InvalidOpenApiException {
         initEnvironment(configuration, apiUnderTest);
         launchStrategyByClassName(strategyClassName);
     }
 
-    public static void start(Configuration configuration, String apiWildcard, String strategyClassName) throws CannotParseOpenApiException, IOException {
+    public static void start(Configuration configuration, String apiWildcard, String strategyClassName) throws InvalidOpenApiException, IOException {
         initEnvironment(configuration, apiWildcard);
         launchStrategyByClassName(strategyClassName);
     }
@@ -57,22 +57,22 @@ public class Starter {
 
 
 
-    public static void start(ApiUnderTest apiUnderTest, Strategy strategy) throws CannotParseOpenApiException {
+    public static void start(ApiUnderTest apiUnderTest, Strategy strategy) throws InvalidOpenApiException {
         initEnvironment(apiUnderTest);
         launchStrategyByClass(strategy);
     }
 
-    public static void start(String apiWildcard, Strategy strategy) throws CannotParseOpenApiException, IOException {
+    public static void start(String apiWildcard, Strategy strategy) throws InvalidOpenApiException, IOException {
         initEnvironment(apiWildcard);
         launchStrategyByClass(strategy);
     }
 
-    public static void start(ApiUnderTest apiUnderTest, String strategyClassName) throws CannotParseOpenApiException {
+    public static void start(ApiUnderTest apiUnderTest, String strategyClassName) throws InvalidOpenApiException {
         initEnvironment(apiUnderTest);
         launchStrategyByClassName(strategyClassName);
     }
 
-    public static void start(String apiWildcard, String strategyClassName) throws CannotParseOpenApiException, IOException {
+    public static void start(String apiWildcard, String strategyClassName) throws InvalidOpenApiException, IOException {
         initEnvironment(apiWildcard);
         launchStrategyByClassName(strategyClassName);
     }
@@ -81,21 +81,21 @@ public class Starter {
 
 
 
-    public static Environment initEnvironment(Configuration configuration) throws IOException, CannotParseOpenApiException {
+    public static Environment initEnvironment(Configuration configuration) throws IOException, InvalidOpenApiException {
         ApiUnderTest apiUnderTest = ApiUnderTest.loadApiFromFile(configuration.getApiUnderTest());
         logApiName(apiUnderTest);
         resetBeforeTestingIfSpecifiedInApiConfig(apiUnderTest);
         return Environment.getInstance().reset().setUp(configuration, apiUnderTest);
     }
 
-    public static Environment initEnvironment(Configuration configuration, ApiUnderTest apiUnderTest) throws CannotParseOpenApiException {
+    public static Environment initEnvironment(Configuration configuration, ApiUnderTest apiUnderTest) throws InvalidOpenApiException {
         updateConfigurationWithApiWildcard(configuration, apiUnderTest.getWildcard());
         logApiName(apiUnderTest);
         resetBeforeTestingIfSpecifiedInApiConfig(apiUnderTest);
         return Environment.getInstance().reset().setUp(configuration, apiUnderTest);
     }
 
-    public static Environment initEnvironment(Configuration configuration, String apiWildcard) throws IOException, CannotParseOpenApiException {
+    public static Environment initEnvironment(Configuration configuration, String apiWildcard) throws IOException, InvalidOpenApiException {
         updateConfigurationWithApiWildcard(configuration, apiWildcard);
         ApiUnderTest apiUnderTest = ApiUnderTest.loadApiFromFile(apiWildcard);
         logApiName(apiUnderTest);
@@ -103,7 +103,7 @@ public class Starter {
         return Environment.getInstance().reset().setUp(configuration, apiUnderTest);
     }
 
-    public static Environment initEnvironment(ApiUnderTest apiUnderTest) throws CannotParseOpenApiException {
+    public static Environment initEnvironment(ApiUnderTest apiUnderTest) throws InvalidOpenApiException {
         Configuration configuration = Configuration.defaultConfiguration();
         updateConfigurationWithApiWildcard(configuration, apiUnderTest.getWildcard());
         logApiName(apiUnderTest);
@@ -111,7 +111,7 @@ public class Starter {
         return Environment.getInstance().reset().setUp(configuration, apiUnderTest);
     }
 
-    public static Environment initEnvironment(String apiWildcard) throws IOException, CannotParseOpenApiException {
+    public static Environment initEnvironment(String apiWildcard) throws IOException, InvalidOpenApiException {
         ApiUnderTest apiUnderTest = ApiUnderTest.loadApiFromFile(apiWildcard);
         Configuration configuration = Configuration.defaultConfiguration();
         updateConfigurationWithApiWildcard(configuration, apiWildcard);
@@ -130,16 +130,16 @@ public class Starter {
      * @param strategyClassName the name of the strategy class.
      */
     private static void launchStrategyByClassName(String strategyClassName) {
-        logger.info("Launching strategy with class name '" + strategyClassName + "'");
+        logger.info("Launching strategy with class name '{}'", strategyClassName);
         final String strategyClassFullName = strategyPackageName + "." + strategyClassName;
         try {
             Class<?> strategyClass = Class.forName(strategyClassFullName);
             Strategy strategy = (Strategy) strategyClass.getDeclaredConstructor().newInstance();
             launchStrategyByClass(strategy);
         } catch (ClassNotFoundException e) {
-            logger.error("Strategy class with name '" + strategyClassFullName + "' not found.");
+            logger.error("Strategy class with name '{}' not found.", strategyClassFullName);
         } catch (NoSuchMethodException e) {
-            logger.error("Constructor not found in class '" + strategyClassFullName + "'.");
+            logger.error("Constructor not found in class '{}'.", strategyClassFullName);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -168,6 +168,6 @@ public class Starter {
     }
 
     private static void logApiName(ApiUnderTest apiUnderTest) {
-        logger.info("API under test: " + apiUnderTest.getName() + " [" + apiUnderTest.getWildcard() + "]");
+        logger.info("API under test: {} [{}]", apiUnderTest.getName(), apiUnderTest.getWildcard());
     }
 }

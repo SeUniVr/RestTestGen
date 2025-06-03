@@ -35,9 +35,9 @@
                             "required": true
                           }
                         },
-                        "x-schemaName": "baseObject"
+                        "x-componentName": "baseObject"
                       },
-                      "x-schemaName": "baseArray"
+                      "x-componentName": "baseArray"
                     },
                     "second": {
                       "type": "array",
@@ -52,15 +52,15 @@
                             "required": true
                           }
                         },
-                        "x-schemaName": "baseObject"
+                        "x-componentName": "baseObject"
                       },
-                      "x-schemaName": "baseArray",
+                      "x-componentName": "baseArray",
                       "required": true
                     }
                   },
-                  "x-schemaName": "objectWithNestedArray"
+                  "x-componentName": "objectWithNestedArray"
                 },
-                "x-schemaName": "topLevelArray"
+                "x-componentName": "topLevelArray"
               }
             }
           },
@@ -89,9 +89,9 @@
                               "required": true
                             }
                           },
-                          "x-schemaName": "baseObject"
+                          "x-componentName": "baseObject"
                         },
-                        "x-schemaName": "baseArray"
+                        "x-componentName": "baseArray"
                       },
                       "second": {
                         "type": "array",
@@ -106,15 +106,15 @@
                               "required": true
                             }
                           },
-                          "x-schemaName": "baseObject"
+                          "x-componentName": "baseObject"
                         },
-                        "x-schemaName": "baseArray",
+                        "x-componentName": "baseArray",
                         "required": true
                       }
                     },
-                    "x-schemaName": "objectWithNestedArray"
+                    "x-componentName": "objectWithNestedArray"
                   },
-                  "x-schemaName": "topLevelArray",
+                  "x-componentName": "topLevelArray",
                   "required": true
                 }
               }
@@ -140,9 +140,9 @@
                             "required": true
                           }
                         },
-                        "x-schemaName": "baseObject"
+                        "x-componentName": "baseObject"
                       },
-                      "x-schemaName": "baseArray"
+                      "x-componentName": "baseArray"
                     },
                     "second": {
                       "type": "array",
@@ -157,13 +157,13 @@
                             "required": true
                           }
                         },
-                        "x-schemaName": "baseObject"
+                        "x-componentName": "baseObject"
                       },
-                      "x-schemaName": "baseArray",
+                      "x-componentName": "baseArray",
                       "required": true
                     }
                   },
-                  "x-schemaName": "objectWithNestedArray",
+                  "x-componentName": "objectWithNestedArray",
                   "required": true
                 }
               }
@@ -233,9 +233,9 @@
                           "required": true
                         }
                       },
-                      "x-schemaName": "baseObject"
+                      "x-componentName": "baseObject"
                     },
-                    "x-schemaName": "baseArray"
+                    "x-componentName": "baseArray"
                   },
                   "second": {
                     "type": "array",
@@ -250,13 +250,13 @@
                           "required": true
                         }
                       },
-                      "x-schemaName": "baseObject"
+                      "x-componentName": "baseObject"
                     },
-                    "x-schemaName": "baseArray",
+                    "x-componentName": "baseArray",
                     "required": true
                   }
                 },
-                "x-schemaName": "objectWithNestedArray"
+                "x-componentName": "objectWithNestedArray"
               }
             }
           },
@@ -281,7 +281,7 @@
                           "required": true
                         }
                       },
-                      "x-schemaName": "baseObject"
+                      "x-componentName": "baseObject"
                     },
                     "b": {
                       "type": "object",
@@ -294,11 +294,11 @@
                           "required": true
                         }
                       },
-                      "x-schemaName": "baseObject",
+                      "x-componentName": "baseObject",
                       "required": true
                     }
                   },
-                  "x-schemaName": "composedObject",
+                  "x-componentName": "composedObject",
                   "required": true
                 }
               }
@@ -323,7 +323,7 @@
             "type": "integer"
           }
         },
-        "x-schemaName": "baseObject"
+        "x-componentName": "baseObject"
       },
       "baseArray": {
         "type": "array",
@@ -340,9 +340,9 @@
               "type": "integer"
             }
           },
-          "x-schemaName": "baseObject"
+          "x-componentName": "baseObject"
         },
-        "x-schemaName": "baseArray"
+        "x-componentName": "baseArray"
       },
       "objectWithNestedArray": {
         "type": "object",
@@ -365,9 +365,9 @@
                   "type": "integer"
                 }
               },
-              "x-schemaName": "baseObject"
+              "x-componentName": "baseObject"
             },
-            "x-schemaName": "baseArray"
+            "x-componentName": "baseArray"
           },
           "second": {
             "type": "array",
@@ -384,12 +384,12 @@
                   "type": "integer"
                 }
               },
-              "x-schemaName": "baseObject"
+              "x-componentName": "baseObject"
             },
-            "x-schemaName": "baseArray"
+            "x-componentName": "baseArray"
           }
         },
-        "x-schemaName": "objectWithNestedArray"
+        "x-componentName": "objectWithNestedArray"
       },
       "topLevelArray": {
         "type": "array",
@@ -414,9 +414,9 @@
                     "type": "integer"
                   }
                 },
-                "x-schemaName": "baseObject"
+                "x-componentName": "baseObject"
               },
-              "x-schemaName": "baseArray"
+              "x-componentName": "baseArray"
             },
             "second": {
               "type": "array",
@@ -433,14 +433,14 @@
                     "type": "integer"
                   }
                 },
-                "x-schemaName": "baseObject"
+                "x-componentName": "baseObject"
               },
-              "x-schemaName": "baseArray"
+              "x-componentName": "baseArray"
             }
           },
-          "x-schemaName": "objectWithNestedArray"
+          "x-componentName": "objectWithNestedArray"
         },
-        "x-schemaName": "topLevelArray"
+        "x-componentName": "topLevelArray"
       },
       "composedObject": {
         "type": "object",
@@ -461,7 +461,7 @@
                 "type": "integer"
               }
             },
-            "x-schemaName": "baseObject"
+            "x-componentName": "baseObject"
           },
           "b": {
             "type": "object",
@@ -476,10 +476,10 @@
                 "type": "integer"
               }
             },
-            "x-schemaName": "baseObject"
+            "x-componentName": "baseObject"
           }
         },
-        "x-schemaName": "composedObject"
+        "x-componentName": "composedObject"
       }
     }
   }

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class RuleFactory {
 
     public Rule createRule(ParameterName parameterName, Pair<String, String> rule) {
-        if (parameterName.toString().equals("")) {
+        if (parameterName.toString().isEmpty()) {
             return null;
         }
         switch (rule.getFirst()) {

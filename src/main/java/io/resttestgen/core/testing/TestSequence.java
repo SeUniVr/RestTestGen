@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static io.resttestgen.core.datatype.parameter.ParameterUtils.getLeaves;
@@ -25,6 +26,10 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
     private String generator = "UserInstantiated";
     private String name = generateRandomTestSequenceName();
     private List<TestInteraction> testInteractions = new LinkedList<>();
+
+    // ID
+    private static final AtomicLong nextId = new AtomicLong(1);
+    private final long id = nextId.getAndIncrement();
 
     // Time information
     private final Timestamp generatedAt;
@@ -51,6 +56,10 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
 
     protected void setTestInteractions(List<TestInteraction> testInteractions) {
         this.testInteractions = testInteractions;
+    }
+
+    public long getId() {
+        return id;
     }
 
     /**
@@ -196,7 +205,7 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
      * @param testSequence the test sequence to append to the current one
      */
     public void append(TestSequence testSequence) {
-        if (testInteractions.size() == 0) {
+        if (testInteractions.isEmpty()) {
             this.generator = testSequence.generator;
         } else if (!this.generator.endsWith(testSequence.generator)){
             this.generator = this.generator + "+" + testSequence.generator;
@@ -229,7 +238,7 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
     }
 
     public void setName(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("The name for a test sequence must not be null or an empty string.");
         }
         this.name = name;

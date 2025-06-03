@@ -25,9 +25,9 @@ public class Helper {
     }
 
     public static Map<String, Object> getParserMap(OpenApiParser parser) throws NoSuchFieldException, IllegalAccessException {
-        Field openAPIMapField = OpenApiParser.class.getDeclaredField("openAPIMap");
-        openAPIMapField.setAccessible(true);
-        return (Map<String, Object>) openAPIMapField.get(parser);
+        Field openApiMapField = OpenApiParser.class.getDeclaredField("openApiMap");
+        openApiMapField.setAccessible(true);
+        return (Map<String, Object>) openApiMapField.get(parser);
     }
 
     public static void invokeParserMethod(OpenApiParser parser, String methodName) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {

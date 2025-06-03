@@ -36,7 +36,7 @@ public class StringParameter extends LeafParameter {
         if (sourceMap.containsKey("maxLength")) {
             int maxLength = (int) ((double) sourceMap.get("maxLength"));
             if (maxLength < 0) {
-                logger.warn("Max length " + maxLength + " not valid for parameter '" + getName() + "'. The value will be ignored.");
+                logger.warn("Max length {} not valid for parameter '{}'. The value will be ignored.", maxLength, getName());
             } else {
                 this.maxLength = maxLength;
             }
@@ -45,7 +45,7 @@ public class StringParameter extends LeafParameter {
         if (sourceMap.containsKey("minLength")) {
             int minLength = (int) ((double) sourceMap.get("minLength"));
             if (minLength < 0 || (this.maxLength != null && minLength > this.maxLength)) {
-                logger.warn("Min length " + minLength + " not valid for parameter '" + getName() + "'. The value will be ignored.");
+                logger.warn("Min length {} not valid for parameter '{}'. The value will be ignored.", minLength, getName());
             } else {
                 this.minLength = minLength;
             }
@@ -147,7 +147,7 @@ public class StringParameter extends LeafParameter {
             String stringValue = ObjectHelper.castToString(value);
 
             // Check if value is in enum set, if enum values are available
-            if (getEnumValues().size() == 0 || getEnumValues().contains(stringValue)) {
+            if (getEnumValues().isEmpty() || getEnumValues().contains(stringValue)) {
 
                 // Check if length is compliant with maxLength and minLength, if defined
                 if ((maxLength == null || stringValue.length() <= maxLength) && (minLength == null || stringValue.length() >= minLength)) {

@@ -39,7 +39,7 @@ public class CollectionFormatRule extends Rule {
 
         // If there is no type rule in combination, then the parameter bust be an array
         else {
-            if (getParametersInOperation(operation).size() > 0) {
+            if (!getParametersInOperation(operation).isEmpty()) {
                 Parameter parameter = getParametersInOperation(operation).get(0);
                 return ParameterUtils.isArray(parameter);
             }
@@ -50,7 +50,7 @@ public class CollectionFormatRule extends Rule {
 
     @Override
     public void apply(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             parameter.setStyle(ParameterStyle.FORM);
             parameter.setExplode(false);
@@ -59,7 +59,7 @@ public class CollectionFormatRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             return parameter.getStyle() == ParameterStyle.FORM && !parameter.isExplode();
         }

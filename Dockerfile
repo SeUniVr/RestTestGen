@@ -1,3 +1,3 @@
-FROM gradle:8.3-jdk11-jammy
+FROM gradle:8.14-jdk11-jammy
 WORKDIR /app
 CMD gradle run

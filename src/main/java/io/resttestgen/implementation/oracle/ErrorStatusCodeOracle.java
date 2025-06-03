@@ -19,7 +19,7 @@ public class ErrorStatusCodeOracle extends Oracle {
             return testResult.setError("One or more interaction in the sequence have not been executed.");
         }
 
-        if (testSequence.size() > 0) {
+        if (!testSequence.isEmpty()) {
             TestInteraction testInteraction = testSequence.getLast();
             if (testInteraction.getResponseStatusCode().isClientError()) {
                 testResult.setPass("The erroneous test sequence was rejected by the server.");

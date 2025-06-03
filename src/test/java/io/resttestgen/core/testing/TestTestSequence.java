@@ -3,7 +3,6 @@ package io.resttestgen.core.testing;
 import io.resttestgen.boot.ApiUnderTest;
 import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.Operation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,7 +17,7 @@ public class TestTestSequence {
     static TestSequence testSequence;
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static void setUp() throws IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
         testSequence = new TestSequence();
 

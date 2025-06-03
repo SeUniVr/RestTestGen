@@ -68,7 +68,7 @@ public class InterParameterDependenciesHelper {
                             parameterValue = parameterValue.substring(1, parameterValue.length() - 1);
                         }
 
-                        if (parameters.size() > 0) {
+                        if (!parameters.isEmpty()) {
                             for (Parameter parameter : parameters) {
                                 if (parameter instanceof LeafParameter) {
                                     parameter.addExample(parameterValue);
@@ -110,7 +110,7 @@ public class InterParameterDependenciesHelper {
                     List<Parameter> conditionParameters = collectRequestParametersWithNames(operation, parameterNames)
                             .stream().filter(p -> p.getParent() == null || !(p.getParent().getName().equals(p.getName()))).collect(Collectors.toList());
 
-                    if (conditionParameters.size() > 0) {
+                    if (!conditionParameters.isEmpty()) {
                         for (Parameter parameter : conditionParameters) {
                             if (parameter instanceof LeafParameter) {
 
@@ -145,13 +145,13 @@ public class InterParameterDependenciesHelper {
                 parameterNames.add(new ParameterName(requires.getFirst()));
                 List<Parameter> conditionParameters = collectRequestParametersWithNames(operation, parameterNames)
                         .stream().filter(p -> p.getParent() == null || !(p.getParent().getName().equals(p.getName()))).collect(Collectors.toList());
-                if (conditionParameters.size() > 0) {
+                if (!conditionParameters.isEmpty()) {
                     for (Parameter parameter : conditionParameters) {
                         if (parameter instanceof LeafParameter && ((LeafParameter) parameter).getConcreteValue() == null) {
                             conditionHolds = false;
                             break;
                         } else if (isArrayOfLeaves(parameter)) {
-                            if (((ArrayParameter) parameter).getElements().size() == 0) {
+                            if (((ArrayParameter) parameter).getElements().isEmpty()) {
                                 conditionHolds = false;
                                 break;
                             }
@@ -175,7 +175,7 @@ public class InterParameterDependenciesHelper {
             List<Parameter> orParameters = collectRequestParametersWithNames(operation, or);
             // If none of the or parameters is set, then set a value for a subset of these parameters
             if (orParameters.stream().noneMatch(p -> (p instanceof LeafParameter && ((LeafParameter) p).getConcreteValue() != null) ||
-                    (isArrayOfLeaves(p) && ((ArrayParameter) p).getElements().size() == 0))) {
+                    (isArrayOfLeaves(p) && ((ArrayParameter) p).getElements().isEmpty()))) {
                 random.nextElement(orParameters).ifPresent(this::setValue);
             }
         }
@@ -186,7 +186,7 @@ public class InterParameterDependenciesHelper {
             List<Parameter> onlyOneParameters = collectRequestParametersWithNames(operation, onlyOne);
             List<Parameter> setOnlyOneParameters = filterBySetParameters(onlyOneParameters);
             // In case all parameters are not set, set one of them with value
-            if (setOnlyOneParameters.size() == 0 && onlyOneParameters.size() > 0) {
+            if (setOnlyOneParameters.isEmpty() && !onlyOneParameters.isEmpty()) {
                 random.nextElement(onlyOneParameters).ifPresent(this::setValue);
             }
             // In case more than one parameter is set, just keep one and remove all the others
@@ -201,12 +201,12 @@ public class InterParameterDependenciesHelper {
         for (Set<ParameterName> allOrNone : operation.getAllOrNone()) {
             List<Parameter> allOrNoneParameters = collectRequestParametersWithNames(operation, allOrNone);
             List<Parameter> setAllOrNoneParameters = filterBySetParameters(allOrNoneParameters);
-            if (!(setAllOrNoneParameters.size() == 0 || setAllOrNoneParameters.size() == allOrNoneParameters.size())) {
+            if (!(setAllOrNoneParameters.isEmpty() || setAllOrNoneParameters.size() == allOrNoneParameters.size())) {
                 boolean allOrNoneChoice = random.nextBoolean(); // true: all, false: none
                 if (allOrNoneChoice) {
                     for (Parameter parameter : allOrNoneParameters) {
                         if ((parameter instanceof LeafParameter && ((LeafParameter) parameter).getConcreteValue() == null) ||
-                                (isArrayOfLeaves(parameter) && ((ArrayParameter) parameter).getElements().size() == 0)) {
+                                (isArrayOfLeaves(parameter) && ((ArrayParameter) parameter).getElements().isEmpty())) {
                             setValue(parameter);
                         }
                     }
@@ -295,7 +295,7 @@ public class InterParameterDependenciesHelper {
                     ArrayParameter arrayParameter = (ArrayParameter) parameter;
 
                     // Add values, only if no values are present
-                    if (arrayParameter.getElements().size() == 0) {
+                    if (arrayParameter.getElements().isEmpty()) {
                         int n = random.nextShortLength(arrayParameter.getMinItems(), arrayParameter.getMaxItems());
 
                         // No elements are not accepted
@@ -348,7 +348,7 @@ public class InterParameterDependenciesHelper {
                                     try {
                                         newValue = parameterValueProvider.provideValueFor(leafParameter).toString();
                                     } catch (ValueNotAvailableException e) {
-                                        logger.warn("Could not retrieve a value for parameter " + leafParameter);
+                                        logger.warn("Could not retrieve a value for parameter {}", leafParameter);
                                     }
                                 }
 
@@ -363,7 +363,7 @@ public class InterParameterDependenciesHelper {
                         ArrayParameter arrayParameter = (ArrayParameter) parameter;
 
                         // If values are complying, remove one of them
-                        if (arrayParameter.hasValues(parameterValue) && arrayParameter.getElements().size() > 0) {
+                        if (arrayParameter.hasValues(parameterValue) && !arrayParameter.getElements().isEmpty()) {
                             Parameter firstParamenter = arrayParameter.getElements().get(0);
                             if (firstParamenter != null) {
                                 //
@@ -416,7 +416,7 @@ public class InterParameterDependenciesHelper {
     private List<Parameter> filterBySetParameters(List<Parameter> parameters) {
         return parameters.stream()
                 .filter(p -> (p instanceof LeafParameter && ((LeafParameter) p).getConcreteValue() != null) ||
-                        (isArrayOfLeaves(p) && ((ArrayParameter) p).getElements().size() > 0))
+                        (isArrayOfLeaves(p) && !((ArrayParameter) p).getElements().isEmpty()))
                 .collect(Collectors.toList());
     }
 
@@ -429,7 +429,7 @@ public class InterParameterDependenciesHelper {
                 arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
             }
         } catch (ValueNotAvailableException e) {
-            logger.warn("Could not retrieve a value for parameter " + parameter);
+            logger.warn("Could not retrieve a value for parameter {}", parameter);
         }
     }
 

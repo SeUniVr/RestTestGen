@@ -53,11 +53,11 @@ public class RestAssuredWriter extends Writer {
         FileWriter writer = new FileWriter(path + getSuggestedFileName("java").replaceAll("-","_"));
 
 
-        //write imports
+        // Write imports
         String content = generateImport() +
-                //write tests classes
+                // Write tests classes
                 generateClass() +
-                //write mainClass
+                // Write mainClass
                 generateMainTestMethod() +
                 "}\n";
         writer.write(content);
@@ -93,7 +93,7 @@ public class RestAssuredWriter extends Writer {
     private String generateClass(){
         String s = "//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)\n";
         s += "@Order("+sequenceId+")\n";
-        s += "public class " + testSequence.getName().replaceAll("-","_") +"{\n\n";
+        s += "public class " + getSuggestedFileName("").replaceAll("-", "_") + " {\n\n";
         return s;
     }
 
@@ -101,20 +101,21 @@ public class RestAssuredWriter extends Writer {
         StringBuilder content = new StringBuilder();
 
         // Set baseURL from OpenAPI
-        content.append("String baseURL =\"").append(environment.getOpenAPI().getServers().get(0)).append("\";\n\n");
+        content.append("\tString baseURL = \"").append(environment.getOpenAPI().getServers().get(0)).append("\";\n\n");
 
 
         // TODO: only on the last testInteraction or on all testInteractions ?
 
-        // Generate method for all TestInteractions in the sequence
+        // Generate methods for all TestInteractions in the sequence
         for (TestInteraction testInteraction : testSequence) {
             content.append(generateTestMethod(testInteraction));
             this.numberOfInteraction++;
         }
 
         // Write main class Test
+        content.append("\n");
         content.append("\t@Test\n");
-        content.append("\tpublic void test_").append(testSequence.getName().replaceAll("-","_")).append("()  throws JSONException{\n");
+        content.append("\tpublic void test_").append(testSequence.getName().replaceAll("-","_")).append("() throws JSONException {\n");
 
 
         for( int i = 0; i < numberOfInteraction; i++){
@@ -136,16 +137,16 @@ public class RestAssuredWriter extends Writer {
         operationsInitialization(operation);
 
         // Test
-        content.append("\tprivate void test").append(this.numberOfInteraction).append("() throws JSONException{\n");
+        content.append("\tprivate void test").append(this.numberOfInteraction).append("() throws JSONException {\n");
         // Write method for get parameters
 
         writeOperation(content);
         content.append("\t\t//OPERATION 0\n");
         parametersInitialization(operation,content,0);
         if(Objects.equals(testSequence.getGenerator(), "ErrorFuzzer")){
-            content.append("\t\tAssertions.assertFalse(response0.getStatusCode()<=299,\"StatusCode 2xx: The test sequence was not executed successfully.\");\n");
+            content.append("\t\tAssertions.assertFalse(response0.getStatusCode() <= 299, \"Status code 2XX: The API accepted a malformed input as valid.\");\n");
         }
-        content.append("\t\tAssertions.assertFalse(response0.getStatusCode()>=500,\"StatusCode 5xx: The test sequence was not executed successfully.\");\n");
+        content.append("\t\tAssertions.assertFalse(response0.getStatusCode() >= 500, \"Status code 5XX: The API encountered an internal server error while processing the request.\");\n");
         //content.append("result0.getStatusCode().assertThat().statusCode(").append(operation.getOutputParameters().get("code")).append(");");
         content.append("\t}\n");
         return content.toString();
@@ -194,7 +195,7 @@ public class RestAssuredWriter extends Writer {
         content.append("\t\tObject ").append(parentName).append(" = ");
         if(parameter.getValue() instanceof LeafParameter && !parameter.getTags().contains("mutated")) {
             LeafParameter parameterRef= (LeafParameter) parameter.getValue();
-            //check if location of parameterLeaf is not RESPONSE_BODY
+            // Check if the location of parameterLeaf is not RESPONSE_BODY
             if(parameterRef.getLocation()!= ParameterLocation.RESPONSE_BODY){
                 content.append(buildVariableName("request",allOperation.indexOf(parameterRef.getOperation()) + 1,parameterRef.getLocation().toString(),parameterRef.getName()));
             }
@@ -222,7 +223,7 @@ public class RestAssuredWriter extends Writer {
     private void parametersInitialization(Operation operation, StringBuilder content, int numOperation){
         Set<Parameter> parameters = (Set<Parameter>) operation.getAllRequestParameters();
 
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             content.append("\t\t//Parameter initialization\n");
         }
         for(Parameter parameter : parameters){
@@ -236,7 +237,7 @@ public class RestAssuredWriter extends Writer {
             }
         }
 
-        //write the Rest Assured operation for Response
+        // Write the Rest Assured operation for Response
         buildRequest(content,operation,numOperation);
 
     }
@@ -274,7 +275,7 @@ public class RestAssuredWriter extends Writer {
         }
         content.append("\t\t//Build Response\n");
         content.append("\t\tResponse ").append(buildVariableName("response",numOperation,null,null)).append(" = ").append(buildVariableName("request",numOperation,null,null));
-        content.append(".when().").append(operation.getMethod().toString().toLowerCase()).append("(baseURL+\"").append(operation.getEndpoint()).append("\");\n");
+        content.append(".when().").append(operation.getMethod().toString().toLowerCase()).append("(baseURL + \"").append(operation.getEndpoint()).append("\");\n");
 
         //extract body as String
         if(operation.getResponseBody()!=null && !operation.getResponseBody().isEmpty()){
@@ -287,12 +288,12 @@ public class RestAssuredWriter extends Writer {
     }
 
     private void operationsInitialization(Operation operation) {
-        //for each parameter check if it is a ParameterLeaf
+        // For each parameter, check if it is a ParameterLeaf
         Collection<LeafParameter> allParameters = operation.getLeaves();
         for(LeafParameter p:allParameters){
             if(p.getValue() instanceof LeafParameter){
                 Operation newOperation = ((LeafParameter) p.getValue()).getOperation();
-                //this avoids the replication of operations
+                // This avoids the replication of operations
                 allOperation.remove(newOperation);
                 allOperation.add(newOperation);
                 operationsInitialization(newOperation);
@@ -301,7 +302,7 @@ public class RestAssuredWriter extends Writer {
     }
 
     private void writeOperation(StringBuilder content) {
-        //write operation from the last one
+        // Write operation from the last one
         for(int count = allOperation.size();count>0;count--){
             content.append("\t\t//OPERATION ").append(count).append("\n");
             parametersInitialization(allOperation.get(count-1),content,count);

@@ -90,11 +90,11 @@ public abstract class CombinedSchemaParameter extends Parameter {
                 Parameter parameter = ParameterFactory.getParameter(p, "");
                 addToParameterSchema(parameter);
             } catch (ParameterCreationException e) {
-                logger.warn("Discarding schema in '" + getKeyFiledName() + "' field of '" + getName() + "'.");
+                logger.warn("Discarding schema in '{}' field of '{}'.", getKeyFiledName(), getName());
             }
         });
 
-        if (this.parametersSchemas.size() == 0) {
+        if (this.parametersSchemas.isEmpty()) {
             throw new ParameterCreationException("Combined schema with no valid schema listed will be discarded (" +
                     getName() + ").");
         }
@@ -155,8 +155,7 @@ public abstract class CombinedSchemaParameter extends Parameter {
         if (outputParameterSchema != null) {
             return outputParameterSchema.getJSONString();
         }
-        logger.error("Requested JSON string for parameter '" + getName() + "(operation '" + getOperation() + "')," +
-                " but no schema was selected. Returning an empty string.");
+        logger.error("Requested JSON string for parameter '{}(operation '{}'), but no schema was selected. Returning an empty string.", getName(), getOperation());
         return "";
     }
 
@@ -170,8 +169,7 @@ public abstract class CombinedSchemaParameter extends Parameter {
         if (outputParameterSchema != null) {
             return outputParameterSchema.getValueAsFormattedString(style, explode);
         }
-        logger.error("Requested formatted string for parameter '" + getName() + "(operation '" + getOperation() + "')," +
-                " but no schema was selected. Returning an empty string.");
+        logger.error("Requested formatted string for parameter '{}(operation '{}'), but no schema was selected. Returning an empty string.", getName(), getOperation());
         return "";
     }
 

@@ -69,7 +69,7 @@ public abstract class Parameter extends Taggable {
                 (Map<String, Object>) parameterMap.get("schema") :
                 parameterMap;
 
-        this.schemaName = (String) sourceMap.get("x-schemaName");
+        this.schemaName = (String) sourceMap.get("x-componentName");
         this.required = parameterMap.containsKey("required") ?
                 (Boolean) parameterMap.get("required") :
                 false;
@@ -106,9 +106,9 @@ public abstract class Parameter extends Taggable {
             } else {
                 try {
                     enumValues.add(ObjectHelper.castToParameterValueType(value, type));
-                    logger.warn("Enum value '" + value + castedWarn);
+                    logger.warn("Enum value '{}" + castedWarn, value);
                 } catch (ClassCastException e) {
-                    logger.warn("Enum value '" + value + discardedWarn);
+                    logger.warn("Enum value '{}" + discardedWarn, value);
                 }
             }
         });
@@ -122,9 +122,9 @@ public abstract class Parameter extends Taggable {
             } else {
                 try {
                     examples.add(ObjectHelper.castToParameterValueType(exampleValue, type));
-                    logger.warn("Example value '" + exampleValue + castedWarn);
+                    logger.warn("Example value '{}" + castedWarn, exampleValue);
                 } catch (ClassCastException e) {
-                    logger.warn("Example value '" + exampleValue + discardedWarn);
+                    logger.warn("Example value '{}" + discardedWarn, exampleValue);
                 }
             }
         }
@@ -139,9 +139,9 @@ public abstract class Parameter extends Taggable {
                 } else {
                     try {
                         this.examples.add(ObjectHelper.castToParameterValueType(value, type));
-                        logger.warn("Example value " + value + castedWarn);
+                        logger.warn("Example value {}" + castedWarn, value);
                     } catch (ClassCastException e) {
-                        logger.warn("Example value " + value + discardedWarn);
+                        logger.warn("Example value {}" + discardedWarn, value);
                     }
                 }
             } else if (example.containsKey("externalValue")) {
@@ -276,7 +276,7 @@ public abstract class Parameter extends Taggable {
      * parameter name.
      */
     protected String getJSONHeading() {
-        return name == null || name.toString().equals("") ? "" : "\"" + name + "\": ";
+        return name == null || name.toString().isEmpty() ? "" : "\"" + name + "\": ";
     }
 
     /**
@@ -367,9 +367,9 @@ public abstract class Parameter extends Taggable {
             if (defaultValue != null) {
                 try {
                     this.defaultValue = ObjectHelper.castToParameterValueType(defaultValue, getType());
-                    logger.warn("Default value '" + defaultValue + castedWarn);
+                    logger.warn("Default value '{}" + castedWarn, defaultValue);
                 } catch (ClassCastException e) {
-                    logger.warn("Default value '" + defaultValue + discardedWarn);
+                    logger.warn("Default value '{}" + discardedWarn, defaultValue);
                 }
             }
         }
@@ -416,9 +416,9 @@ public abstract class Parameter extends Taggable {
         } else {
             try {
                 enumValues.add(ObjectHelper.castToParameterValueType(o, type));
-                logger.warn("Enum value '" + o + castedWarn);
+                logger.warn("Enum value '{}" + castedWarn, o);
             } catch (ClassCastException e) {
-                logger.warn("Enum value '" + o + discardedWarn);
+                logger.warn("Enum value '{}" + discardedWarn, o);
                 return false;
             }
         }
@@ -434,9 +434,9 @@ public abstract class Parameter extends Taggable {
         } else {
             try {
                 this.examples.add(ObjectHelper.castToParameterValueType(o, getType()));
-                logger.warn("Example value '" + o + castedWarn);
+                logger.warn("Example value '{}" + castedWarn, o);
             } catch (ClassCastException e) {
-                logger.warn("Example value '" + o + discardedWarn);
+                logger.warn("Example value '{}" + discardedWarn, o);
                 return false;
             }
         }

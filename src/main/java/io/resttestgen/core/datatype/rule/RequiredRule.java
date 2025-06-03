@@ -29,14 +29,14 @@ public class RequiredRule extends Rule {
 
     @Override
     public boolean isApplicable(Operation operation, List<Rule> combination) {
-        return getParametersInOperation(operation).size() > 0 &&
+        return !getParametersInOperation(operation).isEmpty() &&
                 combination.stream().noneMatch(r -> r.getRuleType() == RuleType.REMOVE && r.getParameterNames().containsAll(parameterNames));
     }
 
     @Override
     public void apply(Operation operation) {
         List<Parameter> parameters = getParametersInOperation(operation);
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             Parameter parameter = parameters.get(0);
             parameter.setRequired(required);
         }
@@ -44,7 +44,7 @@ public class RequiredRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             return parameter.isRequired() == required;
         }
@@ -61,7 +61,7 @@ public class RequiredRule extends Rule {
         Operation fineValidationOperation = fineValidationTestSequence.getFirst().getFuzzedOperation();
 
         List<Parameter> parameters = getParametersInOperation(fineValidationOperation);
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             parameters.get(0).remove();
             fineValidationData.add(new Pair<>(fineValidationTestSequence, false));
         }
@@ -75,7 +75,7 @@ public class RequiredRule extends Rule {
         Operation operation = clonedSequence.getFirst().getFuzzedOperation();
         List<Parameter> parameters = getParametersInOperation(operation);
 
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             parameters.forEach(Parameter::remove);
 
             if (playSequence(clonedSequence).isFail()) {

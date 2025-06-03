@@ -112,7 +112,7 @@ public class RulesCombinationHelper {
 
         boolean[] staticallyValidCombinationWithMostRules;
 
-        if (validCombinations.size() > 0) {
+        if (!validCombinations.isEmpty()) {
             staticallyValidCombinationWithMostRules = validCombinations.stream()
                     .sorted(Comparator.comparing(c -> Booleans.countTrue((boolean[]) c)).reversed())
                     .collect(Collectors.toList()).get(0);
@@ -294,7 +294,7 @@ public class RulesCombinationHelper {
                 }
 
                 // Return if some parameters, but not all, are required within an all or none rule
-                if (rule instanceof AllOrNoneRule && (requiredParameters.size() == 0 || requiredParameters.size() == rule.getParameterNames().size())) {
+                if (rule instanceof AllOrNoneRule && (requiredParameters.isEmpty() || requiredParameters.size() == rule.getParameterNames().size())) {
                     return i;
                 }
 

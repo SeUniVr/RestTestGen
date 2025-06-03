@@ -46,7 +46,7 @@ public enum ParameterType {
             case "oneof":
                 return ONEOF;
             default:
-                logger.warn("Unknown type \"" + typeName + "\".");
+                logger.warn("Unknown type \"{}\".", typeName);
                 return UNKNOWN;
         }
     }

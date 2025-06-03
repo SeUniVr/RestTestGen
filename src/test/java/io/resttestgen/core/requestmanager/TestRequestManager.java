@@ -12,7 +12,6 @@ import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
 import io.resttestgen.core.datatype.parameter.structured.ArrayParameter;
 import io.resttestgen.core.helper.RequestManager;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.Operation;
 import okhttp3.Request;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +29,7 @@ public class TestRequestManager {
     private static Environment environment;
 
     @BeforeAll
-    public static void setUp() throws IOException, CannotParseOpenApiException {
+    public static void setUp() throws IOException {
         environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
     }
 

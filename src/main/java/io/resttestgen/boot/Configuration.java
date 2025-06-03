@@ -46,7 +46,7 @@ public class Configuration {
         LocalDateTime now = LocalDateTime.now();
         testingSessionName = "testing-session-" + dtf.format(now);
 
-        // Use local path (API path) by default
+        // Use the local path (API path) by default
         globalOutputPath = false;
 
         strategyClassName = "NominalAndErrorStrategy";
@@ -139,7 +139,7 @@ public class Configuration {
 
         Map<String, Object> configMap;
 
-        // Search for configuration file
+        // Search for the configuration file
         if (ymlConfig.exists()) {
             configMap = yaml.load(new FileInputStream(ymlConfig));
         } else if (yamlConfig.exists()) {
@@ -151,7 +151,7 @@ public class Configuration {
             return configuration;
         }
 
-        // If parsing of configMap failed for some reason, just return default configuration.
+        // If parsing of configMap failed for some reason, just return the default configuration.
         if (configMap == null) {
             logger.warn("Could not parse RestTestGen configuration file. Using default configuration.");
             return configuration;

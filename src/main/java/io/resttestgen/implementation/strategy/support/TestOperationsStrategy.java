@@ -27,7 +27,7 @@ public class TestOperationsStrategy extends Strategy {
         OperationsSorter sorter = new RandomOperationsSorter();
         while (!sorter.isEmpty()) {
             Operation operationToTest = sorter.getFirst();
-            logger.debug("Testing operation " + operationToTest);
+            logger.debug("Testing operation {}", operationToTest);
             NominalFuzzer nominalFuzzer = new NominalFuzzer(operationToTest);
             List<TestSequence> nominalSequences = nominalFuzzer.generateTestSequences(8);
 

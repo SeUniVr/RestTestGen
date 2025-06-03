@@ -42,7 +42,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -51,7 +51,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           }
         ],
@@ -82,7 +82,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -91,7 +91,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -112,7 +112,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -135,7 +135,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -181,7 +181,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -190,7 +190,7 @@
             "schema": {
               "type": "string",
               "default": "special!",
-              "x-schemaName": "SpecialString"
+              "x-componentName": "SpecialString"
             }
           },
           {
@@ -214,7 +214,7 @@
       "SpecialString": {
         "type": "string",
         "default": "special!",
-        "x-schemaName": "SpecialString"
+        "x-componentName": "SpecialString"
       }
     },
     "parameters": {
@@ -224,7 +224,7 @@
         "schema": {
           "type": "string",
           "default": "special!",
-          "x-schemaName": "SpecialString"
+          "x-componentName": "SpecialString"
         }
       }
     }

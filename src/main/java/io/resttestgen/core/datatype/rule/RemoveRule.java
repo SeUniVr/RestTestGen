@@ -39,13 +39,13 @@ public class RemoveRule extends Rule {
      */
     @Override
     public boolean isApplicable(Operation operation, List<Rule> combination) {
-        return getParametersInOperation(operation).size() > 0 &&
+        return !getParametersInOperation(operation).isEmpty() &&
                 combination.stream().noneMatch(r -> r.getRuleType() == RuleType.REQUIRED && r.getParameterNames().containsAll(parameterNames));
     }
 
     @Override
     public void apply(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             if (!parameter.isRequired()) {
                 parameter.remove();
@@ -55,7 +55,7 @@ public class RemoveRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() == 0) {
+        if (getParametersInOperation(operation).isEmpty()) {
             return true;
         }
         return false;

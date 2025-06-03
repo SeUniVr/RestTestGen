@@ -174,9 +174,9 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
                         try {
 
-                            logger.info("Trying CREATE injection on parameter: " + readOnlyParameterName);
-                            logger.info("Create operation: " + createOperation);
-                            logger.info("Read operation: " + readOperation);
+                            logger.info("Trying CREATE injection on parameter: {}", readOnlyParameterName);
+                            logger.info("Create operation: {}", createOperation);
+                            logger.info("Read operation: {}", readOperation);
 
                             TestSequence finalTestSequence = new TestSequence();
                             finalTestSequence.readOnlyParameter = readOnlyParameterName.toString();
@@ -277,10 +277,10 @@ public class MassAssignmentFuzzer extends Fuzzer {
 
                             try {
 
-                                logger.info("Trying UPDATE injection on parameter: " + readOnlyParameterName);
-                                logger.info("Create operation: " + createOperation);
-                                logger.info("Read operation: " + readOperation);
-                                logger.info("Update operation: " + updateOperation);
+                                logger.info("Trying UPDATE injection on parameter: {}", readOnlyParameterName);
+                                logger.info("Create operation: {}", createOperation);
+                                logger.info("Read operation: {}", readOperation);
+                                logger.info("Update operation: {}", updateOperation);
 
                                 TestSequence finalTestSequence = new TestSequence();
                                 finalTestSequence.setGenerator(this);

@@ -19,6 +19,7 @@ import okhttp3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -88,12 +89,24 @@ public class RequestManager {
      * @return the built request.
      */
     private Request requestBuilder(String token, boolean dropAuth, boolean asFuzzed) {
-        logger.debug("Building request for operation " + operation);
+        logger.debug("Building request for operation {}", operation);
 
         // To avoid OkHttp crashes, remove parameters with null values
         removeUninitializedParameters();
 
+        // URL (basepath) from specification
         URL server = Environment.getInstance().getOpenAPI().getDefaultServer();
+
+        // If another host is manually provided
+        String host = Environment.getInstance().getApiUnderTest().getHost();
+        if (host != null && host.length() > 1) {
+            try {
+                URL tempServer = new URL(Environment.getInstance().getApiUnderTest().getHost());
+                server = new URL(tempServer.getProtocol(), tempServer.getHost(), tempServer.getPort(), server.getFile());
+            } catch (MalformedURLException e) {
+                logger.warn("The manually specified host ({}) is invalid. Using the OpenAPI specification provided host.", host);
+            }
+        }
         HttpUrl.Builder httpBuilder = new HttpUrl.Builder();
         Request.Builder requestBuilder = new Request.Builder();
 
@@ -164,8 +177,10 @@ public class RequestManager {
         // By default, accept application/json. If differently defined (in the specification) it will be overridden
         requestBuilder.header("Accept", "application/json");
 
+        // Add header parameters with encoded values but remove chars that are unsupporter in HTTP headers
         operation.getHeaderParameters().forEach(p ->
-                requestBuilder.header(p.getName().toString(), p.getValueAsFormattedString()));
+                requestBuilder.header(p.getName().toString(),
+                        p.getValueAsFormattedString().replaceAll("[^\\x20-\\x7E]", "")));
 
         // Apply authorization
         if (authenticationInfo != null) {
@@ -209,10 +224,8 @@ public class RequestManager {
             }
         }
 
-        // TODO: implement raw http logger
-
         // Add query parameters
-        if (queryParametersMap.size() > 0) {
+        if (!queryParametersMap.isEmpty()) {
             StringJoiner queryString = new StringJoiner("&");
             queryParametersMap.values().forEach(queryString::add);
             httpBuilder.query(queryString.toString());
@@ -244,20 +257,20 @@ public class RequestManager {
                 break;
             case REQUEST_BODY:
                 if (!(parameter instanceof StructuredParameter)) {
-                    logger.error("Cannot cast parameter '" + parameter.getName() + "' to a structured parameter in " +
-                            "'" + this.operation + "' request body.");
+                    logger.error("Cannot cast parameter '{}' to a structured parameter in '{}' request body.",
+                            parameter.getName(), this.operation);
                 } else {
                     this.operation.setRequestBody((StructuredParameter) parameter);
                 }
                 break;
             case RESPONSE_BODY:
-                logger.error("Cannot add parameter '" + parameter.getName() + "' to operation '" + this.operation +
-                        "since it is declared as a response body.");
+                logger.error("Cannot add parameter '{}' to operation '{}since it is declared as a response body.",
+                        parameter.getName(), this.operation);
                 break;
             case MISSING:
             case UNKNOWN:
-                logger.error("Cannot add parameter '" + parameter.getName() + "' to operation '" + this.operation +
-                        "since its location (' " + parameter.getLocation() + "') is not valid.");
+                logger.error("Cannot add parameter '{}' to operation '{}since its location (' {}') is not valid.",
+                        parameter.getName(), this.operation, parameter.getLocation());
                 break;
         }
     }
@@ -281,12 +294,11 @@ public class RequestManager {
                 this.operation.setRequestBody(null);
                 break;
             case RESPONSE_BODY:
-                logger.error("Cannot remove response body in operation '" + this.operation + "'.");
+                logger.error("Cannot remove response body in operation '{}'.", this.operation);
                 break;
             case MISSING:
             case UNKNOWN:
-                logger.error("Cannot remove response body in operation '" + this.operation + "' since location '" +
-                        parameter.getLocation() + "' is not valid.");
+                logger.error("Cannot remove response body in operation '{}' since location '{}' is not valid.", this.operation, parameter.getLocation());
                 break;
         }
     }
@@ -372,7 +384,7 @@ public class RequestManager {
             Set<LeafParameter> leavesRequired = ParameterUtils.getLeaves(source.getRequestBody()).stream()
                     .filter(Parameter::isRequired)
                     .collect(Collectors.toSet());
-            return (leavesRequired.size() == 0 || operation.getRequestBody() != null) &&
+            return (leavesRequired.isEmpty() || operation.getRequestBody() != null) &&
                     ParameterUtils.getLeaves(operation.getRequestBody()).containsAll(leavesRequired);
         }
 

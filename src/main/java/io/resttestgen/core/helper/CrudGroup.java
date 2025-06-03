@@ -26,7 +26,7 @@ public class CrudGroup {
             operations.addAll(openAPI.getOperations().stream()
                     .filter(o -> o.getInferredCrudResourceType().equals(resourceType)).collect(Collectors.toSet()));
         } else {
-            if (resourceType != null && !resourceType.trim().equals("")) {
+            if (resourceType != null && !resourceType.trim().isEmpty()) {
                 operations.addAll(openAPI.getOperations().stream()
                         .filter(o -> o.getCrudResourceType().equals(resourceType)).collect(Collectors.toSet()));
             }

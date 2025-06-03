@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import io.resttestgen.boot.ApiUnderTest;
 import io.resttestgen.core.datatype.HttpMethod;
-import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
 import io.resttestgen.core.helper.ObjectHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,701 +19,497 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class OpenApiParser {
 
-    private static final String INVALID_SPEC = "Failed to load spec at '%s'";
     private static final Logger logger = LogManager.getLogger(OpenApiParser.class);
 
-    private final Map<String, Object> openAPIMap; // Map parsed by GSON
+    private static Map<String, Object> openApiMap;
 
-    /**
-     * Constructor for creating an OpenAPI parser given an OpenAPI specification
-     * @param filePath Path to the OpenAPI specification file. If the given path does not exist throws a
-     * CannotParseOpenAPIException.
-     */
-    @Deprecated
-    public OpenApiParser(Path filePath) throws CannotParseOpenApiException {
-        if (filePath == null || !Files.exists(filePath)) {
-            throw new CannotParseOpenApiException(INVALID_SPEC);
-        }
+    private static OpenApi openApi = new OpenApi();
 
-        Gson gson = new Gson();
-        try {
-            Reader reader = Files.newBufferedReader(filePath);
-            this.openAPIMap = gson.fromJson(reader, Map.class);
-        } catch (Exception e) {
-            logger.error(e);
-            throw new CannotParseOpenApiException();
-        }
-
-        logger.debug("OpenAPI specification correctly loaded from file. Starting parsing.");
+    public static Map<String, Object> getOpenApiMap() {
+        return openApiMap;
     }
 
-    public OpenApiParser(ApiUnderTest apiUnderTest) throws CannotParseOpenApiException {
-        Path specificationPath = Path.of(apiUnderTest.getComputedJsonSpecificationPath());
+    /**
+     * The main function of the class that is used to parse the specification file of the API under test.
+     * @return An OpenApi object that contains the parsed structure of the parsed OpenAPI specification.
+     * @throws InvalidOpenApiException if the provided specification is invalid. Reason will be reported in the message.
+     */
+    public static OpenApi parse(ApiUnderTest apiUnderTest) throws InvalidOpenApiException {
 
-        if (!Files.exists(specificationPath)) {
-            throw new CannotParseOpenApiException(INVALID_SPEC);
+        // Reset previous parsing data
+        openApiMap = new HashMap<>();
+        openApi = new OpenApi();
+
+        // Parsing JSON document of the specification
+        logger.debug("Parsing JSON document of the specification.");
+        parseSpecificationAsJson(apiUnderTest);
+
+        // Processing info
+        logger.debug("Processing info.");
+        processInfo();
+
+        // Processing servers
+        logger.debug("Processing servers.");
+        processServers();
+
+        // Adding name and references to components
+        logger.debug("Adding name and references to components.");
+        addNameAndRefToComponents();
+
+        // Check if the specification contains at least one path
+        if (!openApiMap.containsKey("paths")) {
+            throw new InvalidOpenApiException("Missing 'paths' field in the OpenAPI specification. At least one path " +
+                    "or operation in required in your API specification.");
         }
 
+        // Expand all the refs (replace refs with their actual schema)
+        logger.debug("Expanding references.");
+        expandRefs(new LinkedList<>(), new HashSet<>(), (Map<String, Object>) openApiMap.get("paths"));
+
+        // Unfold parameters shared by operations in the same path
+        logger.debug("Unfolding parameters shared by operations in the same path.");
+        unfoldPathSharedParameters();
+
+        // Infer parameter types where missing
+        logger.debug("Inferring parameter types where missing.");
+        inferParameterTypes("paths", (Map<String, Object>) openApiMap.get("paths"));
+
+        // Unfolding 'required' attributes
+        logger.debug("Unfolding required attributes.");
+        unfoldRequired((Map<String, Object>) openApiMap.get("paths"));
+
+        // Instantiates Operation objects
+        logger.debug("Instantiating Operation objects.");
+        parseOperations();
+
+        logger.info("OpenAPI specification parsed.");
+        return openApi;
+    }
+
+    /**
+     * Parses the JSON specification file into a map using the GSON library.
+     * @param apiUnderTest the instance of API under test for which the specification has to be parsed.
+     */
+    private static void parseSpecificationAsJson(ApiUnderTest apiUnderTest) {
+
+        Path specificationPath = Path.of(apiUnderTest.getComputedJsonSpecificationPath());
+
+        // Check if the specification file exists
+        if (!Files.exists(specificationPath)) {
+            throw new InvalidOpenApiException("The OpenAPI specification file for " + apiUnderTest + " cannot be" +
+                    "found. Did you place it the in the proper directory? More info in the README file.");
+        }
+
+        // Parse the OpenAPI specification JSON file
         Gson gson = new Gson();
         try {
             Reader reader = Files.newBufferedReader(specificationPath);
-            this.openAPIMap = gson.fromJson(reader, Map.class);
+            openApiMap = gson.fromJson(reader, Map.class);
         } catch (Exception e) {
             logger.error(e);
-            throw new CannotParseOpenApiException();
+            String message = "Error while parsing the OpenAPI specification as JSON. Please check " +
+                    "that the provided specification is a valid JSON file.";
+            OpenApiIssueWriter.writeIssue(message);
+            throw new InvalidOpenApiException(message);
         }
-
-        logger.debug("OpenAPI specification correctly loaded from file. Starting parsing.");
     }
 
     /**
-     * Main function of the class that is used to parse the given specification file.
-     * This method resolves the '$ref' attributes within the specification, adds an extension field 'x-schemaName' to
-     * each resolved field and normalizes parameters defined at path level adding them to every path item.
-     * As a result, an OpenAPI object is instantiated.
-     * @return An OpenAPI object that contains the parsed structure of the parser OpenAPI specification.
-     * @throws InvalidOpenApiException if the provided specification is invalid.
+     * Processes the 'info' fields in the specification.
      */
-    public OpenApi parse() throws InvalidOpenApiException {
-
-        // The specification is invalid in case it does not contain servers or path properties
-        if (!this.openAPIMap.containsKey("servers")) {
-            throw new InvalidOpenApiException("Missing 'servers' field.");
-        }
-        if (!this.openAPIMap.containsKey("paths")) {
-            throw new InvalidOpenApiException("Missing 'paths' field.");
-        }
-
-        /*
-         * Add extension with schema names to enrich the specification and keep track of the specification fields
-         * that have exactly the same schema
-         */
-        addSchemasNames();
-        // Solve all the refs normalizing (replace refs with their actual schema)
-        solveOpenAPIrefs();
-        // Normalize common parameters
-        normalizeCommonParameters();
-        // Infer parameter type where missing
-        inferParameterTypes();
-        // Normalize 'required' attribute in request/response bodies
-        unfoldRequiredAttributes();
-
-        // Start parsing specification fields
-        OpenApi openAPI = new OpenApi();
-
-        // Read servers
-        List<Map<String, Object>> servers = (List<Map<String, Object>>) this.openAPIMap.get("servers");
-        servers.forEach(server -> {
-            try {
-                openAPI.addServer(new URL((String) server.get("url")));
-            } catch (MalformedURLException|ClassCastException e) {
-                logger.error(e);
-            }
-        });
-        if (openAPI.getServers().isEmpty()) {
-            throw new InvalidOpenApiException("No valid server found within the OpenAPI specification.");
-        }
-
-        // Read paths and create operations
-        Map<String, Object> paths = (Map<String, Object>) this.openAPIMap.get("paths");
-
-        // Fetch paths
-        for (Map.Entry<String, Object> path : paths.entrySet()) {
-
-            if (path.getKey().startsWith("x-")) {
-                continue;
-            }
-
-            // Fetch operations
-            for (Map.Entry<String, Object> operation : ((Map<String, Object>) path.getValue()).entrySet()) {
-
-                if (operation.getKey().startsWith("x-")) {
-                    continue;
-                }
-
-                Operation o = new Operation(path.getKey(),
-                        HttpMethod.getMethod(operation.getKey()),
-                        (Map<String, Object>) operation.getValue());
-                o.setReadOnly();
-                openAPI.addOperation(o);
-            }
-        }
-
-        // Finally, parse specification information
-        Map<String, Object> infoMap = safeGet(this.openAPIMap, "info", LinkedTreeMap.class);
+    private static void processInfo() {
+        Map<String, Object> infoMap = safeGet(openApiMap, "info", LinkedTreeMap.class);
         Map<String, Object> contactMap = safeGet(infoMap, "contact", LinkedTreeMap.class);
         Map<String, Object> licenseMap = safeGet(infoMap, "license", LinkedTreeMap.class);
-        openAPI.setTitle(safeGet(infoMap, "title", String.class));
-        openAPI.setSummary(safeGet(infoMap, "summary", String.class));
-        openAPI.setDescription(safeGet(infoMap, "description", String.class));
-        openAPI.setTermsOfService(safeGet(infoMap, "termsOfService", String.class));
-        openAPI.setContactName(safeGet(contactMap, "name", String.class));
-        openAPI.setContactUrl(safeGet(contactMap, "url", String.class));
-        openAPI.setContactEmail(safeGet(contactMap, "email", String.class));
-        openAPI.setLicenseName(safeGet(licenseMap, "name", String.class));
-        openAPI.setLicenseUrl(safeGet(licenseMap, "url", String.class));
-        openAPI.setVersion(safeGet(infoMap, "version", String.class));
-
-        logger.info("OpenAPI specification correctly parsed.");
-        return openAPI;
+        openApi.setTitle(safeGet(infoMap, "title", String.class));
+        openApi.setSummary(safeGet(infoMap, "summary", String.class));
+        openApi.setDescription(safeGet(infoMap, "description", String.class));
+        openApi.setTermsOfService(safeGet(infoMap, "termsOfService", String.class));
+        openApi.setContactName(safeGet(contactMap, "name", String.class));
+        openApi.setContactUrl(safeGet(contactMap, "url", String.class));
+        openApi.setContactEmail(safeGet(contactMap, "email", String.class));
+        openApi.setLicenseName(safeGet(licenseMap, "name", String.class));
+        openApi.setLicenseUrl(safeGet(licenseMap, "url", String.class));
+        openApi.setVersion(safeGet(infoMap, "version", String.class));
     }
 
     /**
-     * Function that infers types when missing. For every pathItem, parameter, request body and response is checked
-     * for missing 'type' field
+     * Processes the servers in the specification checking their validity.
      */
-    private void inferParameterTypes() {
-        logger.debug("Inferring parameter types where missing...");
+    private static void processServers() {
 
-        Map<String, Map<String, Map<String, Object>>> paths =
-                (Map<String, Map<String, Map<String, Object>>>) this.openAPIMap.get("paths");
-
-        paths.values().forEach(
-                operationMap -> operationMap.entrySet().stream().filter((entry -> !entry.getKey().startsWith("x-")))
-                        .forEach(entry -> {
-                            Map<String, Object> operation = entry.getValue();
-
-                            // Infer types for parameters filed
-                            safeGet(operation, "parameters", ArrayList.class).forEach(
-                                    parameter -> recursiveTypeInference((Map<String, Object>) parameter)
-                            );
-
-                            Map<String, Object> requestBody = safeGet(operation, "requestBody", LinkedTreeMap.class);
-                            Map<String, Object> content = safeGet(requestBody, "content", LinkedTreeMap.class);
-
-                            // At the moment we only support JSON and x-www-form-urlencoded
-                            Map<String, Object> jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
-
-                            // In case no JSON content is provided, we try to use x-www-form-urlencoded content
-                            if (jsonContent.isEmpty()) {
-                                jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
-                            }
-
-                            if (jsonContent.isEmpty()) {
-                                jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
-                            }
-
-                            Map<String, Object> schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
-                            if (!schema.isEmpty()) {
-                                recursiveTypeInference(schema);
-                            }
-
-                            Map<String, Object> responses = safeGet(operation, "responses", LinkedTreeMap.class);
-
-                            for (Map.Entry<String, Object> responseMap : responses.entrySet()) {
-                                Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
-                                content = safeGet(response, "content", LinkedTreeMap.class);
-
-                                // At the moment we only support JSON and x-www-form-urlencoded
-                                jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
-
-                                // In case no JSON content is provided, we try to use x-www-form-urlencoded content
-                                if (jsonContent.isEmpty()) {
-                                    jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
-                                }
-
-                                if (jsonContent.isEmpty()) {
-                                    jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
-                                }
-
-                                schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
-
-                                if (!schema.isEmpty()) {
-                                    recursiveTypeInference(schema);
-                                }
-                            }
-                        })
-        );
-    }
-
-    /**
-     * Function that recursively search for missing 'type' field in parameters schema. When a missing one is found,
-     * if the parameter is compatible with an object or an array, the type is added to the parameter schema.
-     * @param parameter the parameter for which the type should be inferred.
-     */
-    private void recursiveTypeInference(Map<String, Object> parameter) {
-        // distinction between standard parameters and request/response body parameters
-        Map<String, Object> targetMap = parameter.containsKey("schema") ?
-                (Map<String, Object>) parameter.get("schema") :
-                parameter;
-
-        // if type is missing, infer it
-        if (!targetMap.containsKey("type")) {
-            // Structured types
-            if (targetMap.containsKey("properties") || targetMap.get("required") instanceof List) {
-                targetMap.put("type", "object");
-            } else if (targetMap.containsKey("items")) {
-                targetMap.put("type", "array");
-            }
-
-            // Terminal types
-            if (targetMap.containsKey("multipleOf") || targetMap.containsKey("maximum") ||
-                    targetMap.containsKey("exclusiveMaximum") || targetMap.containsKey("minimum") ||
-                    targetMap.containsKey("exclusiveMinimum")
-            ) {
-                targetMap.put("type", "number");
-            }
-
-            if (targetMap.containsKey("maxLength") || targetMap.containsKey("minLength") ||
-                    targetMap.containsKey("pattern")
-            ) {
-                targetMap.put("type", "string");
-            }
-
+        // Check if the specification map has the 'server' property
+        if (!openApiMap.containsKey("servers")) {
+            throw new InvalidOpenApiException("Missing 'servers' field in the OpenAPI specification. This field is " +
+                    "mandatory as it is used as target for the requests generated by RestTestGen.");
         }
 
-        // Infer types also for combined schemas fields
-        for (String field : new String[]{"oneOf", "allOf", "anyOf"}) {
-            safeGet(targetMap, field, ArrayList.class).forEach(
-                    s -> recursiveTypeInference((Map<String, Object>) s)
-            );
+        List<Map<String, Object>> servers;
+
+        try {
+            servers = (List<Map<String, Object>>) openApiMap.get("servers");
+        } catch (ClassCastException e) {
+            throw new InvalidOpenApiException("The provided list of servers is in an unsupported format.");
         }
 
-        if (targetMap.containsKey("not")) {
-            recursiveTypeInference((Map<String, Object>) targetMap.get("not"));
+        for (Map<String, Object> server : servers) {
+            try {
+                openApi.addServer(new URL((String) server.get("url")));
+            } catch (MalformedURLException|ClassCastException e) {
+                logger.warn(e);
+            }
         }
 
-        // For structured types move downward in the structure to infer missing types
-        switch (ParameterType.getTypeFromString((String) targetMap.get("type"))) {
-            case OBJECT:
-                Map<String, Map<String, Object>> properties = safeGet(targetMap, "properties", LinkedTreeMap.class);
-                properties.values().forEach(this::recursiveTypeInference);
-            case ARRAY:
-                Map<String, Object> items = safeGet(targetMap, "items", LinkedTreeMap.class);
-                recursiveTypeInference(items);
-                break;
+        if (openApi.getServers().isEmpty()) {
+            throw new InvalidOpenApiException("No valid server found in the OpenAPI specification.");
         }
     }
 
     /**
-     * Enriches the specification with an extension to keep track, through the additional field 'x-schemaName', of
-     * the name of the schemas before their normalization
+     * Add the name and the reference path to components of the specification using the extensions 'x-componentName'
+     * and 'x-componentRef' for future use, e.g., when computing normalized parameter names.
      */
-    private void addSchemasNames() {
-        logger.debug("Enriching specification with schema names..");
+    private static void addNameAndRefToComponents() {
+        if (openApiMap.containsKey("components")) {
+            Map<String, Object> components = (Map<String, Object>) openApiMap.get("components");
 
-        if (this.openAPIMap.containsKey("components")) {
-            Map<String, Object> components = (Map<String, Object>) openAPIMap.get("components");
+            // Iterate on components' types
+            for (String componentType : components.keySet()) {
+                try {
 
-            Map<String, Map<String, Object>> schemas = safeGet(components, "schemas", LinkedTreeMap.class);
+                    // Get components of a given type
+                    Map<String, Object> componentsOfType = (Map<String, Object>) components.get(componentType);
 
-            for (Map.Entry<String, Map<String, Object>> schema : schemas.entrySet()) {
-                schema.getValue().put("x-schemaName", schema.getKey());
-            }
-        }
-    }
-
-    /**
-     * Normalizes the 'required' attribute in request/response bodies. In fact, within schemas the 'required' field
-     * is a list instead of a Boolean. Hence, we propagate the required values downwards in the structure
-     */
-    private void unfoldRequiredAttributes() {
-        Map<String, Object> paths = (Map<String, Object>) openAPIMap.get("paths");
-
-        // Iterate through path items and look for 'parameters'
-        for (Map.Entry<String, Object> pathItemMap : paths.entrySet()) {
-
-            if (pathItemMap.getKey().startsWith("x-")) {
-                continue;
-            }
-
-            Map<String, Object> pathItem = (Map<String, Object>) pathItemMap.getValue();
-
-            for (Map.Entry<String, Object> operation : pathItem.entrySet()) {
-
-                if (operation.getKey().startsWith("x-")) {
-                    continue;
-                }
-
-                Map<String, Object> operationMap = (Map<String, Object>) operation.getValue();
-
-                // Check every item in 'parameters' list
-                List<Map<String, Object>> parameters = safeGet(operationMap, "parameters", ArrayList.class);
-                parameters.forEach(parameter -> {
-                    if (parameter.containsKey("schema")) {
-                        recursiveUnfoldRequired((Map<String, Object>) parameter.get("schema"));
+                    // Iterate on components of that type
+                    for (String componentName : componentsOfType.keySet()) {
+                        try {
+                            Map<String, Object> component = (Map<String, Object>) componentsOfType.get(componentName);
+                            component.put("x-componentName", componentName);
+                            component.put("x-componentRef", "#/components/" + componentType + "/" + componentName);
+                        } catch (ClassCastException e) {
+                            String message = "Component " + componentName + " is declared in the wrong format.";
+                            logger.warn(message);
+                            OpenApiIssueWriter.writeIssue(message);
+                        }
                     }
-                });
-
-                // Check for body parameters
-                Map<String, Object> requestBody = safeGet(operationMap, "requestBody", LinkedTreeMap.class);
-                Map<String, Object> content = safeGet(requestBody, "content", LinkedTreeMap.class);
-
-                // At the moment we only support JSON and x-www-form-urlencoded
-                Map<String, Object> jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
-
-                // In case no JSON content is provided, we try to use x-www-form-urlencoded content
-                if (jsonContent.isEmpty()) {
-                    jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
+                } catch (ClassCastException e) {
+                    String message = "Component type " + componentType + " is declared in the wrong format.";
+                    logger.warn(message);
+                    OpenApiIssueWriter.writeIssue(message);
                 }
+            }
+        }
+    }
 
-                if (jsonContent.isEmpty()) {
-                    jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
-                }
+    /**
+     * Expands references in the specification by replacing '$ref' with the actual content of the reference. Expansion
+     * is halted in the case of cyclic references, e.g., A -> B -> C -> A.
+     * @param expansionPath the current expansion path, stored to stop expansion in case of cyclic references.
+     * @param haltedExpansionPaths list of already halted expansion paths, to prevent duplicate warning messages.
+     * @param map the map to process.
+     */
+    public static void expandRefs(LinkedList<String> expansionPath,
+                                  HashSet<LinkedList<String>> haltedExpansionPaths,
+                                  Map<String, Object> map) {
 
-                Map<String, Object> schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
+        // Check if the current map has a $ref key and expand (only it if no cycle is found)
+        while (map.containsKey("$ref")) {
 
-                if (!schema.isEmpty()) {
-                    recursiveUnfoldRequired(schema);
-                    // Required value is stored since it could be null. In this case, it should be considered 'false'
-                    Boolean isRequired = (Boolean) requestBody.get("required");
-                    requestBody.put("required", isRequired != null ? isRequired : false);
-                }
-
-                // Check for output parameters (response body)
-                Map<String, Object> responses = safeGet(operationMap, "responses", LinkedTreeMap.class);
-
-                for (Map.Entry<String, Object> responseMap : responses.entrySet()) {
-                    Map<String, Object> response = (Map<String, Object>) responseMap.getValue();
-                    content = safeGet(response, "content", LinkedTreeMap.class);
-
-                    // At the moment we only support JSON and x-www-form-urlencoded
-                    jsonContent = safeGet(content, "application/json", LinkedTreeMap.class);
-
-                    // In case no JSON content is provided, we try to use x-www-form-urlencoded content
-                    if (jsonContent.isEmpty()) {
-                        jsonContent = safeGet(content, "application/x-www-form-urlencoded", LinkedTreeMap.class);
-                    }
-
-                    if (jsonContent.isEmpty()) {
-                        jsonContent = safeGet(content, "*/*", LinkedTreeMap.class);
-                    }
-
-                    schema = safeGet(jsonContent, "schema", LinkedTreeMap.class);
-
-                    if (!schema.isEmpty()) {
-                        recursiveUnfoldRequired(schema);
-                        schema.put("required", true);
+            // Check if the $ref property is a string, and in case expand it
+            if (map.get("$ref") instanceof String) {
+                String elementReference = (String) map.get("$ref");
+                map.remove("$ref");
+                if (!expansionPath.contains(elementReference)) {
+                    Map<String, Object> element = getComponentCloneByRef(elementReference);
+                    map.putAll(element);
+                    expansionPath.add(elementReference);
+                } else {
+                    if (!haltedExpansionPaths.contains(expansionPath)) {
+                        haltedExpansionPaths.add(expansionPath);
+                        logger.warn("Found cyclic reference with expansion path {}. " +
+                                "Halting expansion of {}.", expansionPath, elementReference);
                     }
                 }
-
+            } else {
+                map.remove("$ref");
+                String message = "Found invalid (non-string) $ref property. Ignoring.";
+                logger.warn(message);
+                OpenApiIssueWriter.writeIssue(message);
             }
-
         }
 
+        // Propagate visit to children
+        for (String key : map.keySet()) {
+            Object value = map.get(key);
+            if (value instanceof LinkedTreeMap) {
+                LinkedList<String> updatedExpansionPath = new LinkedList<>(expansionPath);
+                expandRefs(updatedExpansionPath, haltedExpansionPaths, (Map<String, Object>) value);
+            } else if (value instanceof ArrayList) {
+                LinkedList<String> updatedExpansionPath = new LinkedList<>(expansionPath);
+                expandRefs(updatedExpansionPath, haltedExpansionPaths, (ArrayList<Object>) value);
+            }
+        }
     }
 
     /**
-     * This function recursively scans JSON Parameters to normalize the required attribute. In object parameters, the
-     * required field is provided as a list of required properties. The goal of the function is to bring these values
-     * inside the parameters to reflect the structure of path/query/header parameters with a boolean required field.
-     * @param map json schema of a parameter
+     * Propagates the expansion of references to all elements of a list.
+     * @param expansionPath the current expansion path, stored to stop expansion in case of cyclic references.
+     * @param haltedExpansionPaths list of already halted expansion paths, to prevent duplicate warning messages.
+     * @param list the list to propagate.
      */
-    private void recursiveUnfoldRequired(Map<String, Object> map) {
-        // Avoid crash for undefined schemas
-        if (map == null) {
-            return;
-        }
-
-        String type = safeGet(map, "type", String.class);
-
-        // Induction step 1: objects contain required as a list. Arrays can contain objects as elements
-        if (type.equals("object")) {
-            List<String> required = safeGet(map, "required", ArrayList.class);
-            map.remove("required");
-
-            Map<String, Map<String, Object>> properties = safeGet(map, "properties", LinkedTreeMap.class);
-
-            for (Map.Entry<String, Map<String, Object>> property : properties.entrySet()) {
-                // Call the recursion first, avoiding to overwriting the children required field
-                recursiveUnfoldRequired(property.getValue());
-                if (required.contains(property.getKey())) {
-                    property.getValue().put("required", true);
-                }
+    public static void expandRefs(LinkedList<String> expansionPath,
+                                  HashSet<LinkedList<String>> haltedExpansionPaths,
+                                  ArrayList<Object> list) {
+        for (Object element : list) {
+            if (element instanceof LinkedTreeMap) {
+                LinkedList<String> updatedExpansionPath = new LinkedList<>(expansionPath);
+                expandRefs(updatedExpansionPath, haltedExpansionPaths, (Map<String, Object>) element);
+            } else if (element instanceof ArrayList) {
+                LinkedList<String> updatedExpansionPath = new LinkedList<>(expansionPath);
+                expandRefs(updatedExpansionPath, haltedExpansionPaths, (ArrayList<Object>) element);
             }
-
-        } else if (type.equals("array")) {
-            recursiveUnfoldRequired((Map<String, Object>) map.get("items"));
         }
-
-        // Induction step 2: if the parameter contains combined schemas, check for unsolved required
-        List<Map<String, Object>> allOf = OpenApiParser.safeGet(map, "allOf", ArrayList.class);
-        allOf.forEach(this::recursiveUnfoldRequired);
-        List<Map<String, Object>> anyOf = OpenApiParser.safeGet(map, "anyOf", ArrayList.class);
-        anyOf.forEach(this::recursiveUnfoldRequired);
-        List<Map<String, Object>> oneOf = OpenApiParser.safeGet(map, "oneOf", ArrayList.class);
-        oneOf.forEach(this::recursiveUnfoldRequired);
-
-        // Base step: simple parameter, so required can only be a boolean field
-
     }
 
     /**
-     * This function normalizes the location of common parameters. In fact, parameters that are common to every
-     * path item defined within a path can be defined globally at path level. This function moves such values into each
-     * path item.
+     * When paths share common parameters (defined at path level), this method will copy parameters to each operation
+     * under that path.
      */
-    // TODO: rename, I do not like it
-    private void normalizeCommonParameters() {
-        Map<String, Object> paths = (Map<String, Object>) openAPIMap.get("paths");
+    public static void unfoldPathSharedParameters() {
+        Map<String, Object> paths = (Map<String, Object>) openApiMap.get("paths");
 
-        // iterate through path items and look for 'parameters'
-        for (Map.Entry<String, Object> pathItemMap : paths.entrySet()) {
-            Map<String, Object> pathItem = (Map<String, Object>) pathItemMap.getValue();
+        // Iterate through the paths and look for 'parameters'
+        for (String path : paths.keySet()) {
+            Map<String, Object> pathItem = (Map<String, Object>) paths.get(path);
 
-            // retrieve parameters if present
+            // Retrieve parameters for the path (different from path parameters!) if present
             List<Map<String, Object>> parameters = (List<Map<String, Object>>) pathItem.get("parameters");
             pathItem.remove("parameters");
 
-            if (parameters == null) {
+            // Skip to the next path if no parameters for the path are declared
+            if (parameters == null || parameters.isEmpty()) {
                 continue;
             }
 
-            Map<Pair<String, String>, Map<String, Object>> parametersMap = new HashMap<>();
-            parameters.forEach(parameter ->
-                    parametersMap.put(new Pair<>((String) parameter.get("name"), (String) parameter.get("in")), parameter)
-            );
+            // Index parameters by name and location (this information is used to prevent overriding of parameters
+            // declared for the operation with the parameters declared for the path)
+            Map<Pair<String, String>, Map<String, Object>> parametersIndexMap = new HashMap<>();
+            for (Map<String, Object> parameter : parameters) {
+                parametersIndexMap.put(new Pair<>((String) parameter.get("name"), (String) parameter.get("in")), parameter);
+            }
 
-            // copy all the parameters in the 'parameters' list (if exists) inside each operation
-            // DO NOT OVERRIDE ALREADY DEFINED PARAMETERS!
+            // Iterate on operations of the path
+            for (String httpMethod : pathItem.keySet()) {
 
-            for (Map.Entry<String, Object> operationMap : pathItem.entrySet()) {
-                // Parse iff the key is a supported HTTP method
-                try {
-                    HttpMethod.getMethod(operationMap.getKey());
-                } catch (IllegalArgumentException e) {
+                // Continue only if the string is an actual HTTP method and not 'parameters',
+                // 'summary', or other supported keys
+                if (!HttpMethod.isHttpMethod(httpMethod)) {
                     continue;
                 }
 
-                Map<String, Object> operation = (Map<String, Object>) operationMap.getValue();
-                List<Map<String, Object>> operationParameters = safeGet(operation, "parameters", ArrayList.class);
+                // Get the operation map
+                Map<String, Object> operation = (Map<String, Object>) pathItem.get(httpMethod);
 
-                if (operationParameters.isEmpty()) {
-                    operation.put("parameters", operationParameters);
+                // If there is no 'parameters' key in the operation, or if the list is empty, put the list in the map
+                if (!operation.containsKey("parameters") || (operation.get("parameters") instanceof List && ((List<?>) operation.get("parameters")).isEmpty())) {
+                    operation.put("parameters", ObjectHelper.deepCloneObject(parameters));
+                    continue;
                 }
 
-                Set<Pair<String, String>> operationParameterSet = new HashSet<>();
+                // If, instead, the operation has already a 'parameters' list, fill it with the parameters from the
+                // path, unless parameters with the same name and location are already defined for the operation
+
+                List<Map<String, Object>> operationParameters = (List<Map<String, Object>>) operation.get("parameters");
+
+                Set<Pair<String, String>> operationParametersIndex = new HashSet<>();
                 operationParameters.forEach(parameter ->
-                        operationParameterSet.add(new Pair<>((String) parameter.get("name"), (String) parameter.get("in")))
+                        operationParametersIndex.add(new Pair<>((String) parameter.get("name"), (String) parameter.get("in")))
                 );
 
-                // For each parameter, if not duplicate, add to operation parameters
-                for (Map.Entry<Pair<String, String>, Map<String, Object>> parameter : parametersMap.entrySet()) {
-                    if (!operationParameterSet.contains(parameter.getKey())) {
-                        operationParameters.add(parameter.getValue());
+                // Add each parameter of the path to the operation, unless already defined there
+                for (Pair<String, String> parameter : parametersIndexMap.keySet()) {
+                    if (!operationParametersIndex.contains(parameter)) {
+                        operationParameters.add(ObjectHelper.deepCloneObject(parametersIndexMap.get(parameter)));
                     }
                 }
+            }
+        }
+    }
 
+    /**
+     * Infers parameter types based on other keys found in the map.
+     * @param parentKey the name of the key of the parent object.
+     * @param map the map to process.
+     */
+    public static void inferParameterTypes(String parentKey, Map<String, Object> map) {
+
+        // Proceed only if the map has no 'type' key defined and if we are not in the 'properties' item, which can
+        // contain keys that are user-defined and could match our checks
+        if (!parentKey.equals("properties") && !map.containsKey("type")) {
+
+            // An object will contain 'properties' and, possibly, a list of required properties
+            if (map.containsKey("properties") || map.get("required") instanceof List) {
+                map.put("type", "object");
             }
 
+            // An array will describe the schema of the 'items'
+            else if (map.containsKey("items")) {
+                map.put("type", "array");
+            }
+
+            // A number can contain 'multipleOf', 'minimum', etc.
+            else if (map.containsKey("multipleOf") || map.containsKey("maximum") ||
+                    map.containsKey("exclusiveMaximum") || map.containsKey("minimum") ||
+                    map.containsKey("exclusiveMinimum")) {
+                map.put("type", "number");
+            }
+
+            // A string can contain 'maxLength', 'minLength', and 'pattern'
+            else if (map.containsKey("maxLength") || map.containsKey("minLength") ||
+                    map.containsKey("pattern")) {
+                map.put("type", "string");
+            }
         }
 
+        // Propagate visit to children
+        for (String key : map.keySet()) {
+            Object value = map.get(key);
+            if (value instanceof LinkedTreeMap) {
+                inferParameterTypes(key, (Map<String, Object>) value);
+            } else if (value instanceof ArrayList) {
+                inferParameterTypes(key, (ArrayList<Object>) value);
+            }
+        }
     }
 
     /**
-     * This function normalizes the specification w.r.t. the '$ref' values, replacing references with their actual
-     * value.
+     * Propagates type inference to all elements of a list.
+     * @param parentKey the name of the key of the parent object.
+     * @param list the list to propagate.
      */
-    public void solveOpenAPIrefs() {
+    public static void inferParameterTypes(String parentKey, ArrayList<Object> list) {
 
-        LinkedList<Pair<ArrayList<String>, Map<String, Object>>> queue = new LinkedList<>();
-
-        // Resolve first components since they are the targets of the refs
-        if (openAPIMap.containsKey("components")) {
-            Map<String, Object> components = (Map<String, Object>) openAPIMap.get("components");
-
-            logger.debug("Solving components/schemas refs..");
-            Map<String, Map<String, Object>> schemas = safeGet(components, "schemas", LinkedTreeMap.class);
-
-            resolveSchemaRef(schemas);
-
-            // Once resolved parameters schema refs, resolve schema items refs
-            schemas.values().forEach(this::resolvePropertyItemRef);
-
-            // Parse responses
-            logger.debug("Solving components/responses refs..");
-            Map<String, Object> responses = safeGet(components, "responses", LinkedTreeMap.class);
-            responses.values().forEach(response -> replaceContentRef((Map<String, Object>) response));
-
-            // Parse parameters
-            logger.debug("Solving components/parameters refs..");
-            Map<String, Object> parameters = safeGet(components, "parameters", LinkedTreeMap.class);
-            parameters.values().forEach(parameter -> replaceSchemaRef((Map<String, Object>) parameter));
-
-            // Parse requestBodies
-            logger.debug("Solving components/requestBodies refs..");
-            Map<String, Object> bodies = safeGet(components, "requestBodies", LinkedTreeMap.class);
-            bodies.values().forEach(body -> replaceContentRef((Map<String, Object>) body));
-
+        // Propagate the visit to all the elements of the list
+        for (Object element : list) {
+            if (element instanceof LinkedTreeMap) {
+                inferParameterTypes(parentKey, (Map<String, Object>) element);
+            } else if (element instanceof ArrayList) {
+                inferParameterTypes(parentKey, (ArrayList<Object>) element);
+            }
         }
-
-        // Once components are solved, solve all refs inside pathItems
-        recursiveReplaceRef((Map<String, Object>) openAPIMap.get("paths"));
-
-        logger.debug("Specification references solved.");
     }
 
     /**
-     * Resolves schema refs using a queue, since every schema ref can potentially contain many other schema refs.
-     * @param schemas Map with the schemas defined in 'components/schemas'
+     * Unfolds required attributes to individual parameters, i.e., when an Object Parameter has a list of required
+     * properties, this method will move the required attribute within the individual properties.
+     * Visit of children of the map is performed before unfolding to avoid unintentional overwriting of the values of
+     * the 'required' key in the map.
+     * @param map the map to analyze.
      */
-    private void resolveSchemaRef(Map<String, Map<String, Object>> schemas) {
+    public static void unfoldRequired(Map<String, Object> map) {
 
-        // Queue of the schemas to be solved.
-        LinkedList<Pair<
-                List<String>, // List of all the schemas that have already been solved along the path
-                Map<String, Object> // Map containing the actual schema
-                >> queue = new LinkedList<>();
-
-        // Iterate through each schema and them to the queue to resolve refs
-        for (Map<String, Object> schema : schemas.values()) {
-            ArrayList<String> pathSolvedSchemas = new ArrayList<>(1);
-            pathSolvedSchemas.add((String) schema.get("x-schemaName")); // set as solved the root schema along the part starting from itself
-            queue.addLast(new Pair<>(pathSolvedSchemas, schema)); // add to queue the path and its schema
+        // Propagate the visit to all the elements of the map
+        for (String key : map.keySet()) {
+            Object value = map.get(key);
+            if (value instanceof LinkedTreeMap) {
+                unfoldRequired((LinkedTreeMap<String, Object>) value);
+            } else if (value instanceof ArrayList) {
+                unfoldRequired((ArrayList<Object>) value);
+            }
         }
 
-        // Resolve components refs
-        while (!queue.isEmpty()) {
-            Pair<List<String>, Map<String, Object>> top = queue.pollFirst();
-            List<String> pathSolvedSchemas = top.getFirst();
-            Map<String, Object> schema = top.getSecond();
+        // In objects, 'required' is a list of strings in this map. Unfold it to the object's properties
+        // This is done after visiting the children, to prevent replacing the list of required fields with required=true
+        if (map.containsKey("required") && map.get("required") instanceof List) {
+            List<String> required = (List<String>) map.get("required");
+            map.remove("required");
+            for (String requiredItem : required) {
+                Map<String, Object> properties = (Map<String, Object>) map.get("properties");
 
-            // Check whether schema is only a ref
-            if (schema.containsKey("$ref")) {
-                Map<String, Object> solvedRef = getElementByRef((String) schema.get("$ref"));
-                String refSchemaName = (String) solvedRef.get("x-schemaName");
-                schema.remove("$ref"); // Remove ref field from specification
-
-                // Check if the referred schema has already been solved along this path. If so, skip it (recursive ref)
-                if (!pathSolvedSchemas.contains(refSchemaName)) {
-                    schema.putAll(solvedRef); // Update the actual schema with the values in the referenced schema
-                    ArrayList<String> extendedPathSolvedSchemas = new ArrayList<>(pathSolvedSchemas);
-                    extendedPathSolvedSchemas.add(refSchemaName);
-                    // Add the actual, resolved schema to the queue again, since it could contain other references in its subfields
-                    queue.addLast(new Pair<>(extendedPathSolvedSchemas, schema));
-                } else {
-                    logger.warn("Recursive references found: " + pathSolvedSchemas + ", " + refSchemaName);
-                }
-            } else {
-                // if combined schemas are present, solve them too
-                List<Map<String, Object>> allOf = safeGet(schema, "allOf", ArrayList.class);
-                allOf.forEach(element -> queue.addLast(new Pair<>(pathSolvedSchemas, element)));
-                List<Map<String, Object>> oneOf = safeGet(schema, "oneOf", ArrayList.class);
-                oneOf.forEach(element -> queue.addLast(new Pair<>(pathSolvedSchemas, element)));
-                List<Map<String, Object>> anyOf = safeGet(schema, "anyOf", ArrayList.class);
-                anyOf.forEach(element -> queue.addLast(new Pair<>(pathSolvedSchemas, element)));
-                Map<String, Object> not = safeGet(schema, "not", LinkedTreeMap.class);
-                if (!not.isEmpty()) {
-                    queue.addLast(new Pair<>(pathSolvedSchemas, not));
+                // Check if the object parameter has properties declared
+                if (properties == null) {
+                    String message = "Found an object parameter that has no properties declared.";
+                    logger.warn(message);
+                    OpenApiIssueWriter.writeIssue(message);
+                    continue;
                 }
 
-                // Check if the schema describes something structured (i.e. arrays or objects)
-                if ("object".equals(schema.get("type")) || schema.containsKey("properties")) {
-                    Map<String, Map<String, Object>> properties = safeGet(schema, "properties", LinkedTreeMap.class);
-                    properties.forEach((key, value) -> queue.addLast(new Pair<>(pathSolvedSchemas, value)));
-                } else if ("array".equals(schema.get("type")) || schema.containsKey("items")) {
-                    Map<String, Object> items = safeGet(schema, "items", LinkedTreeMap.class);
-                    queue.addLast(new Pair<>(pathSolvedSchemas, items));
+
+                Map<String, Object> requiredProperty = (Map<String, Object>) ((Map<String, Object>) map.get("properties")).get(requiredItem);
+                if (requiredProperty == null) {
+                    String message = "Property '" + requiredItem + "' is declared as required, but is not a property in the object.";
+                    logger.warn(message);
+                    OpenApiIssueWriter.writeIssue(message);
+                    continue;
+                }
+
+                // TODO: do not overwrite if required is false!
+                requiredProperty.put("required", true);
+            }
+        }
+
+        // In requestBody, propagate the required=true to the root items of the body
+        if (map.containsKey("requestBody")) {
+            Map<String, Object> requestBodyMap = safeGet(map, "requestBody", LinkedTreeMap.class);
+
+            if (requestBodyMap.containsKey("required") && requestBodyMap.get("required") instanceof Boolean &&
+                    requestBodyMap.get("required").equals(true)) {
+                Map<String, Object> contentMap = safeGet(requestBodyMap, "content", LinkedTreeMap.class);
+
+                // Iterate con content types
+                for (String contentType : contentMap.keySet()) {
+                    Map<String, Object> contentTypeMap = safeGet(contentMap, contentType, LinkedTreeMap.class);
+                    Map<String, Object> schemaMap = safeGet(contentTypeMap, "schema", LinkedTreeMap.class);
+                    schemaMap.put("required", true);
                 }
             }
-
-            // If no ref is present and the schema describes something unstructured, then there can be no other refs in this path
-
         }
     }
 
     /**
-     * Resolve refs for structured parameters (i.e. objects and arrays) recursively.
-     * @param propertiesMap Map containing the description of the parameter
+     * Propagated the unfolding of required parameters to all elements of a list.
+     * @param list the list to propagate.
      */
-    private void resolvePropertyItemRef(Map<String, Object> propertiesMap) {
+    public static void unfoldRequired(ArrayList<Object> list) {
 
-        // Induction step 1: properties can contain referred items
-        if (propertiesMap.containsKey("properties")) {
-            ((Map<String, Object>) propertiesMap.get("properties")).values().forEach(
-                    property -> resolvePropertyItemRef((Map<String, Object>) property)
-            );
-        }
-
-        else if (propertiesMap.containsKey("items")) {
-            Map<String, Object> itemValue = (Map<String, Object>) propertiesMap.get("items");
-            if (itemValue.containsKey("$ref")) {
-                propertiesMap.put("items", getElementByRef((String) itemValue.get("$ref")));
-                // Induction step 2: items can contain referred items
-                resolvePropertyItemRef((Map<String, Object>) propertiesMap.get("items"));
-            }
-            // Base step
-            // items field do not contain refs
-        }
-    }
-
-    /**
-     * Replaces the reference to a schema with its actual value
-     * @param map Map that could potentially contain a schema reference
-     */
-    private void replaceSchemaRef(Map<String, Object> map) {
-        if (map.containsKey("schema")) {
-            Map<String, Object> schema = (Map<String, Object>) map.get("schema");
-
-            if (schema.containsKey("$ref")) {
-                Map<String, Object> solvedRef = getElementByRef((String) schema.get("$ref"));
-                map.put("schema", solvedRef);
+        // Propagate the visit to all the elements of the list
+        for (Object element : list) {
+            if (element instanceof LinkedTreeMap) {
+                unfoldRequired((Map<String, Object>) element);
+            } else if (element instanceof ArrayList) {
+                unfoldRequired((ArrayList<Object>) element);
             }
         }
     }
 
     /**
-     * Replaces the reference to a content schema with its actual value
-     * @param map Content map that could potentially contain a schema reference
+     * The operations in the OpenAPI map will be turned into instances of the Operation class.
      */
-    private void replaceContentRef(Map<String, Object> map) {
-        Map<String, Object> content = safeGet(map, "content", LinkedTreeMap.class);
+    public static void parseOperations() {
 
-        for (Map.Entry<String, Object> mediaType : content.entrySet()) {
-            Map<String, Object> mediaTypeMap = (Map<String, Object>) mediaType.getValue();
+        // Read paths
+        Map<String, Object> paths = (Map<String, Object>) openApiMap.get("paths");
 
-            replaceSchemaRef(mediaTypeMap);
-        }
-    }
+        // Iterate on the paths
+        for (String path : paths.keySet()) {
 
-    /**
-     * Recursively replace references in a given map searching for map/list children.
-     * @param map Map that could contain references to replace
-     */
-    private void recursiveReplaceRef(Map<String, Object> map) {
-
-        // Scan each child looking for a ref to solve
-        for (Map.Entry<String, Object> child : map.entrySet()) {
-
-            // base step 3: the value is null
-            if (child.getValue() == null) {
-                return;
+            // Skip paths that are OpenAPI extensions
+            if (path.startsWith("x-")) {
+                continue;
             }
 
-            // Induction steps
-            if (Map.class.isAssignableFrom(child.getValue().getClass())) {
-                recursiveReplaceRef((Map<String, Object>) child.getValue());
-            }
-            else if (List.class.isAssignableFrom(child.getValue().getClass())) {
-                recursiveReplaceRef((List<Object>) child.getValue());
-            }
+            Map<String, Object> pathOperations = (Map<String, Object>) paths.get(path);
 
-            // base step 1: ref found
-            else if (child.getKey().equals("$ref")) {
-                Map<String, Object> referencedElement = getElementByRef((String) child.getValue());
-                map.clear();
-                map.putAll(referencedElement);
-                return; // When a ref is present, no other field should be used
-            }
+            // Fetch operations
+            for (String operation : pathOperations.keySet()) {
 
-            // base step 2: a simple value instead of a map/list is found. No action needed
-        }
-    }
+                if (!HttpMethod.isHttpMethod(operation)) {
+                    continue;
+                }
 
-    /**
-     * Recursively replace references in a given list searching for map/list children.
-     * @param list List that could contain references to replace
-     */
-    private void recursiveReplaceRef(List<Object> list) {
-
-        // Scan each child looking for a ref to solve
-        for (Object child : list) {
-
-            if (Map.class.isAssignableFrom(child.getClass())) {
-                recursiveReplaceRef((Map<String, Object>) child);
-            }
-            else if (List.class.isAssignableFrom(child.getClass())) {
-                recursiveReplaceRef((List<Object>) child);
+                Operation o = new Operation(path, HttpMethod.getMethod(operation), (Map<String, Object>) pathOperations.get(operation));
+                o.setReadOnly();
+                openApi.addOperation(o);
             }
         }
     }
@@ -725,32 +520,24 @@ public class OpenApiParser {
      * @param ref path of the referenced resource
      * @return Deep clone of the referenced object
      */
-    private Map<String, Object> getElementByRef(String ref) {
-        Map<String, Object> map = this.openAPIMap;
+    private static Map<String, Object> getComponentCloneByRef(String ref) {
+        Map<String, Object> map = openApiMap;
         String[] componentPath = ref.split("/");
 
         // Skip the first element, since it is a '#'
         for (int i = 1; i < componentPath.length; ++i) {
             map = (Map<String, Object>) map.get(componentPath[i]);
             if (map == null) {
-                throw new InvalidOpenApiException("Reference to '" + ref + "' cannot be resolved since the element" +
-                        "is missing in the specification.");
+                String message = "Component " + ref + " not found. Cannot expand the reference.";
+                logger.warn(message);
+                OpenApiIssueWriter.writeIssue(message);
+                return new HashMap<>();
             }
         }
 
         // Copy object instead of put it directly to avoid unexpected behaviors
         // Used to avoid unintentional modifications to the map passed as parameter
         return ObjectHelper.deepCloneObject(map);
-    }
-
-    /**
-     * This function returns the name of the object referenced by the string passed as parameter
-     * @param ref path of the referenced resource
-     * @return Name of the referenced resource
-     */
-    private String getObjectNameByRef(String ref) {
-        String[] componentPath = ref.split("/");
-        return componentPath[componentPath.length -1];
     }
 
     // TODO: move to ObjectHelper?

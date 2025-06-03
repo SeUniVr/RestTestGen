@@ -35,7 +35,7 @@ public enum ParameterLocation {
             case "response_body":
                 return RESPONSE_BODY;
             default:
-                logger.warn("Unsupported location \"" + location + "\" for parameters.");
+                logger.warn("Unsupported location \"{}\" for parameters.", location);
                 return UNKNOWN;
         }
     }

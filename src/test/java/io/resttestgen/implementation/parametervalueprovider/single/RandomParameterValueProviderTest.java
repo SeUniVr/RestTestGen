@@ -6,7 +6,6 @@ import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.leaves.NumberParameter;
 import io.resttestgen.core.datatype.parameter.leaves.StringParameter;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.testing.parametervalueprovider.ParameterValueProviderCachedFactory;
 import io.resttestgen.implementation.parametervalueprovider.ParameterValueProviderType;
 import org.junit.jupiter.api.Assertions;
@@ -44,7 +43,7 @@ public class RandomParameterValueProviderTest {
 
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static void setUp() throws IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
         randomParameterValueProvider = (RandomParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
         Gson gson = new Gson();

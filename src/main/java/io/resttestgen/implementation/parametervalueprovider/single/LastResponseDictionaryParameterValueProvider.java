@@ -38,7 +38,7 @@ public class LastResponseDictionaryParameterValueProvider extends CountableParam
 
         orderedEntries.sort(Comparator.comparing(DictionaryEntry::getDiscoveryTime));
 
-        return Set.of(orderedEntries.get(entries.size() - 1));
+        return Set.of(orderedEntries.get(entries.size() - 1).getSource());
     }
 
     /**

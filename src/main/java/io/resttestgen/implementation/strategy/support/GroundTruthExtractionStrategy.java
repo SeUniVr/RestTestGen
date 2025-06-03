@@ -21,7 +21,7 @@ public class GroundTruthExtractionStrategy extends Strategy {
         // For each operation in the specification
         for (Operation operation : Environment.getInstance().getOpenAPI().getOperations()) {
 
-            // If operation has description, add it
+            // If the operation has a description, add it
             if (operation.getDescription() != null && operation.getDescription().length() > 3) {
                 addDescriptionToMap("#operationdescription", operation.getDescription());
             }
@@ -30,7 +30,7 @@ public class GroundTruthExtractionStrategy extends Strategy {
                 addDescriptionToMap("#requestbodydescription", operation.getRequestBodyDescription());
             }
 
-            // For each parameter in the specification, if it has description, add it
+            // For each parameter in the specification, if it has a description, add it
             for (Parameter parameter : operation.getAllRequestParameters()) {
                 if (parameter.getDescription() != null && parameter.getDescription().length() > 3) {
                     addDescriptionToMap(parameter.getName().toString(), parameter.getDescription());

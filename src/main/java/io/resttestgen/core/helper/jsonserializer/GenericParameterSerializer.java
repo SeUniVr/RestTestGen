@@ -25,7 +25,7 @@ public class GenericParameterSerializer implements JsonSerializer<GenericParamet
         JsonObject result = new JsonObject();
 
         // Add description, if defined
-        if (!src.getDescription().trim().equals("")) {
+        if (!src.getDescription().trim().isEmpty()) {
             result.addProperty("description", src.getDescription());
         }
 

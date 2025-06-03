@@ -39,7 +39,7 @@ public class MinimumRule extends Rule {
     @Override
     public boolean isApplicable(Operation operation, List<Rule> combination) {
         List<Parameter> parameters = getParametersInOperation(operation);
-        return parameters.size() > 0 && parameters.stream()
+        return !parameters.isEmpty() && parameters.stream()
                 .allMatch(p -> p instanceof NumberParameter || p instanceof StringParameter || p instanceof ArrayParameter);
     }
 
@@ -61,7 +61,7 @@ public class MinimumRule extends Rule {
     @Override
     public boolean isApplied(Operation operation) {
         List<Parameter> parameters = getParametersInOperation(operation);
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             Parameter parameter = parameters.get(0);
             return isAppliedToParameter(parameter);
         }
@@ -93,7 +93,7 @@ public class MinimumRule extends Rule {
         List<Parameter> parameters = getParametersInOperation(minValueOperation);
 
         // At the moment, only number parameter are supported
-        if (parameters.size() > 0 && parameters.get(0) instanceof NumberParameter) {
+        if (!parameters.isEmpty() && parameters.get(0) instanceof NumberParameter) {
 
             NumberParameter parameter = (NumberParameter) parameters.get(0);
             parameter.setValueManually(minimum + 1);
@@ -114,7 +114,7 @@ public class MinimumRule extends Rule {
         TestSequence clonedSequence = sequence.deepClone().reset();
         Operation operation = sequence.getFirst().getFuzzedOperation();
         List<Parameter> parameters = getParametersInOperation(operation);
-        if (parameters.size() == 0) {
+        if (parameters.isEmpty()) {
             return Set.of();
         }
 

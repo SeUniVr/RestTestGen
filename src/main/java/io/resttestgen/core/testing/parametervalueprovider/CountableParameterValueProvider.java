@@ -35,7 +35,7 @@ public abstract class CountableParameterValueProvider extends ParameterValueProv
 
     public Pair<ParameterValueProvider, Object> provideValueFor(LeafParameter leafParameter) throws ValueNotAvailableException {
         Collection<Object> values = collectValuesFor(leafParameter);
-        if (values.size() == 0) {
+        if (values.isEmpty()) {
             throw new ValueNotAvailableException(this, leafParameter);
         } else if (values.size() == 1) {
             return new Pair<>(this, values.stream().findFirst().get());

@@ -40,7 +40,7 @@ public class EnumRule extends Rule {
      */
     @Override
     public boolean isApplicable(Operation operation, List<Rule> combination) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             if (parameter instanceof LeafParameter) {
                 return parameter.isObjectTypeCompliant(enumValue);
@@ -51,7 +51,7 @@ public class EnumRule extends Rule {
 
     @Override
     public void apply(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
 
             Parameter parameter = getParametersInOperation(operation).get(0);
 
@@ -68,7 +68,7 @@ public class EnumRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
 
             Parameter parameter = getParametersInOperation(operation).get(0);
 
@@ -94,7 +94,7 @@ public class EnumRule extends Rule {
         fineValidationTestSequence.reset();
         Operation fineValidationOperation = fineValidationTestSequence.getFirst().getFuzzedOperation();
 
-        if (getParametersInOperation(fineValidationOperation).size() > 0) {
+        if (!getParametersInOperation(fineValidationOperation).isEmpty()) {
             Parameter parameter = getParametersInOperation(fineValidationOperation).get(0);
             if (parameter instanceof LeafParameter) {
                 try {
@@ -125,7 +125,7 @@ public class EnumRule extends Rule {
         fineValidationTestSequence.reset();
         Operation fineValidationOperation = fineValidationTestSequence.getFirst().getFuzzedOperation();
 
-        if (getParametersInOperation(fineValidationOperation).size() > 0) {
+        if (!getParametersInOperation(fineValidationOperation).isEmpty()) {
             Parameter parameter = getParametersInOperation(fineValidationOperation).get(0);
             if (parameter instanceof LeafParameter) {
                 try {

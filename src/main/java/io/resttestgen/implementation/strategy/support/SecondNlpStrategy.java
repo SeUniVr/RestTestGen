@@ -192,7 +192,7 @@ public class SecondNlpStrategy extends Strategy {
                                                                             Set<Rule> newServerMessageRules = NLP_INTERACTION_PROCESSOR.getRulesAndReset();
 
                                                                             // If new rules are available, restart combinatorial validation
-                                                                            if (newServerMessageRules.size() > 0 && Sets.difference(newServerMessageRules, rulesToValidate).size() > 0) {
+                                                                            if (!newServerMessageRules.isEmpty() && !Sets.difference(newServerMessageRules, rulesToValidate).isEmpty()) {
                                                                                 serverMessageRulesForThisOperation.addAll(newServerMessageRules);
                                                                                 newServerMessageRulesFound = true;
                                                                                 System.out.println("FOUND NEW SERVER RULES: RESETTING STATIC VALIDATION");
@@ -335,11 +335,11 @@ public class SecondNlpStrategy extends Strategy {
         Set<ParameterName> removedParameterNames =  combination.stream()
                 .filter(r -> r.getRuleType() == RuleType.REMOVE && ((RemoveRule) r).getRemove())
                 .map(r -> r.getParameterNames().stream().findFirst().get()).collect(Collectors.toSet());
-        if (removedParameterNames.size() > 0) {
+        if (!removedParameterNames.isEmpty()) {
             Set<ParameterName> requiredParameterNames = combination.stream()
                     .filter(r -> r.getRuleType() == RuleType.REQUIRED && ((RequiredRule) r).getRequired())
                     .map(r -> r.getParameterNames().stream().findFirst().get()).collect(Collectors.toSet());
-            return Sets.intersection(removedParameterNames, requiredParameterNames).size() == 0;
+            return Sets.intersection(removedParameterNames, requiredParameterNames).isEmpty();
         }
         return true;
     }
@@ -369,7 +369,7 @@ public class SecondNlpStrategy extends Strategy {
         for (Rule rule : combination) {
 
             // If a new rule uses parameter that have been already used by other rules, the combination is invalid
-            if (Sets.intersection(usedParameterNames, rule.getParameterNames()).size() > 0) {
+            if (!Sets.intersection(usedParameterNames, rule.getParameterNames()).isEmpty()) {
                 return false;
             }
 

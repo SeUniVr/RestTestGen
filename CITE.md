@@ -13,7 +13,7 @@ Our nominal and error testing automated black-box testing strategies for RESTful
 }
 ```
 
-## RestTestGen: An Extensible Framework for Automated Black-box Testing of RESTful APIs (ICSME 2022)
+## RestTestGen: An Extensible Framework for Automated Black-box Testing of RESTful APIs (ICSME 2022, tool track)
 Our extensible framework RestTestGen to quickly implement novel automated black-box testing strategies for REST APIs.
 ```
 @inproceedings{corradini2022resttestgen,
@@ -38,7 +38,7 @@ Our security testing approach to automatically detect mass assignment vulnerabil
 ```
 
 ## Enhancing REST API Testing with NLP Techniques (ISSTA 2023)
-Our approach to enhance OpenAPI specifications and REST API testing by extracting relevant information (e.g., example value, constraints, etc.) form natual language descriptions.
+Our approach to enhance OpenAPI specifications and REST API testing by extracting relevant information (e.g., example value, constraints, etc.) from natural language descriptions.
 ```
 @inproceedings{kim2023enhancing,
     doi={10.1145/3597926.3598131}
@@ -46,5 +46,17 @@ Our approach to enhance OpenAPI specifications and REST API testing by extractin
     author={Kim, Myeongsoo, and Corradini, Davide and Sinha, Saurabh and Orso, Alessandro and Pasqua, Michele and Tzoref-Brill, Rachel and Ceccato, Mariano},
     booktitle={32nd International Symposium on Software Testing and Analysis (ISSTA)},
     year={2023}
+}
+```
+
+## DeepREST: Automated Test Case Generation for REST APIs Exploiting Deep Reinforcement Learning (ASE 2024)
+Our automated test generation approach leveraging deep reinforcement learning to guide test generation.
+```
+@inproceedings{corradini2024deeprest,
+  title={DeepREST: Automated Test Case Generation for REST APIs Exploiting Deep Reinforcement Learning},
+  author={Corradini, Davide and Montolli, Zeno and Pasqua, Michele and Ceccato, Mariano},
+  booktitle={Proceedings of the 39th IEEE/ACM International Conference on Automated Software Engineering},
+  pages={1383--1394},
+  year={2024}
 }
 ```

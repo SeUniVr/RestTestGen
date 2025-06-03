@@ -5,7 +5,6 @@ import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.parameter.Parameter;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import io.resttestgen.core.openapi.InvalidOpenApiException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class  OperationDependencyGraphTest {
     private static Environment environment;
 
     @BeforeAll
-    public static void setUp() throws InvalidOpenApiException, CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static void setUp() throws InvalidOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
     }
 

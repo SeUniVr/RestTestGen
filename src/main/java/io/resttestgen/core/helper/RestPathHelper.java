@@ -30,7 +30,7 @@ public class RestPathHelper {
     /**
      * Computes the REST path of a parameter element.
      * @param parameter the subject parameter element.
-     * @return the computed REST path as string.
+     * @return the computed REST path as a string.
      */
     public static String getRestPath(Parameter parameter) {
 
@@ -94,7 +94,7 @@ public class RestPathHelper {
             }
         }
 
-        // If the parameter is in the response, or in response schemas
+        // If the parameter is in the response or in response schemas
         else if (editableRestPath.startsWith(response)) {
             editableRestPath = editableRestPath.substring(response.length());
 
@@ -131,7 +131,7 @@ public class RestPathHelper {
 
         String editableRestPath = restPath;
 
-        // Check the name of the parameter, unless root element in body, or array element (or reference element) in body
+        // Check the name of the parameter, unless root element in the body, or array element (or reference element) in the body
         if (!ParameterUtils.isArrayElement(parameter) && !ParameterUtils.isReferenceElement(parameter) &&
                 !((parameter.getLocation() == ParameterLocation.REQUEST_BODY || parameter.getLocation() == ParameterLocation.RESPONSE_BODY) && parameter.getParent() == null)) {
 
@@ -143,7 +143,7 @@ public class RestPathHelper {
             editableRestPath = removeFirstEncapsulatedData(editableRestPath);
         }
 
-        if (editableRestPath.length() < 1) {
+        if (editableRestPath.isEmpty()) {
             return parameter;
         } else {
             if (ParameterUtils.isObject(parameter)) {
@@ -174,7 +174,7 @@ public class RestPathHelper {
 
     private static String getRestPathPrefixForRootElement(Parameter parameter) {
 
-        // Proceed only in case of a root element
+        // Proceed only in the case of a root element
         if (parameter.getParent() == null) {
             switch (parameter.getLocation()) {
                 case PATH:

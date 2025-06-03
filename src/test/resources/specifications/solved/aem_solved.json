@@ -1245,7 +1245,7 @@
                     }
                   },
                   "type": "object",
-                  "x-schemaName": "InstallStatus"
+                  "x-componentName": "InstallStatus"
                 }
               }
             },
@@ -2537,7 +2537,7 @@
                           }
                         },
                         "type": "object",
-                        "x-schemaName": "TruststoreItems"
+                        "x-componentName": "TruststoreItems"
                       },
                       "type": "array"
                     },
@@ -2547,7 +2547,7 @@
                     }
                   },
                   "type": "object",
-                  "x-schemaName": "TruststoreInfo"
+                  "x-componentName": "TruststoreInfo"
                 }
               }
             },
@@ -2934,7 +2934,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                          "x-componentName": "SamlConfigurationPropertyItemsBoolean"
                         },
                         "assertionConsumerServiceURL": {
                           "description": "The (optional) AssertionConsumerServiceURL attribute of an Authn request specifies the location to which a  message MUST be sent to the requester.",
@@ -2965,7 +2965,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "clockTolerance": {
                           "description": "Time tolerance in seconds to compensate clock skew between IDP and SP when validating Assertions.",
@@ -2996,7 +2996,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsLong"
+                          "x-componentName": "SamlConfigurationPropertyItemsLong"
                         },
                         "createUser": {
                           "description": "Whether or not to autocreate nonexisting users in the repository.",
@@ -3027,7 +3027,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                          "x-componentName": "SamlConfigurationPropertyItemsBoolean"
                         },
                         "defaultGroups": {
                           "description": "A list of default CRX groups users are added to after successful authentication.",
@@ -3061,7 +3061,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsArray"
+                          "x-componentName": "SamlConfigurationPropertyItemsArray"
                         },
                         "defaultRedirectUrl": {
                           "description": "The default location to redirect to after successful authentication.",
@@ -3092,7 +3092,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "digestMethod": {
                           "description": "The digest algorithm to use when signing a SAML message.",
@@ -3123,7 +3123,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "groupMembershipAttribute": {
                           "description": "The name of the attribute containing a list of CRX groups this user should be added to.",
@@ -3154,7 +3154,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "handleLogout": {
                           "description": "Whether or not logout (dropCredentials) requests will be processed by this handler.",
@@ -3185,7 +3185,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                          "x-componentName": "SamlConfigurationPropertyItemsBoolean"
                         },
                         "idpCertAlias": {
                           "description": "The alias of the IdP\u0027s certificate in the global truststore. If this property is empty the authentication handler is disabled.",
@@ -3216,7 +3216,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "idpHttpRedirect": {
                           "description": "Use an HTTP Redirect to the IDP URL instead of sending an AuthnRequest-message to request credentials. Use this for IDP initiated authentication.",
@@ -3247,7 +3247,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                          "x-componentName": "SamlConfigurationPropertyItemsBoolean"
                         },
                         "idpUrl": {
                           "description": "URL of the IDP where the SAML Authentication Request should be sent to. If this property is empty the authentication handler is disabled. (idpUrl)",
@@ -3278,7 +3278,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "keyStorePassword": {
                           "description": "The password of the key-store of the \u0027authentication-service\u0027 system user.",
@@ -3309,7 +3309,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "logoutUrl": {
                           "description": "URL of the IDP where the SAML Logout Request should be sent to. If this property is empty the authentication handler won\u0027t handle logouts.",
@@ -3340,7 +3340,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "nameIdFormat": {
                           "description": "The value of the NameIDPolicy format parameter to send in the AuthnRequest message.",
@@ -3371,7 +3371,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "path": {
                           "description": "Repository path for which this authentication handler should be used by Sling. If this is empty, the authentication handler will be disabled.",
@@ -3405,7 +3405,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsArray"
+                          "x-componentName": "SamlConfigurationPropertyItemsArray"
                         },
                         "service.ranking": {
                           "description": "OSGi Framework Service Ranking value to indicate the order in which to call this service. This is an int value where higher values designate higher precedence. Default value is 0.",
@@ -3436,7 +3436,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsLong"
+                          "x-componentName": "SamlConfigurationPropertyItemsLong"
                         },
                         "serviceProviderEntityId": {
                           "description": "ID which uniquely identifies this service provider with the identity provider. If this property is empty the authentication handler is disabled.",
@@ -3467,7 +3467,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "signatureMethod": {
                           "description": "The signature algorithm to use when signing a SAML message.",
@@ -3498,7 +3498,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "spPrivateKeyAlias": {
                           "description": "The alias of the SP\u0027s private key in the key-store of the \u0027authentication-service\u0027 system user. If this property is empty the handler will not be able to sign or decrypt messages.",
@@ -3529,7 +3529,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "synchronizeAttributes": {
                           "description": "A list of attribute mappings (in the format \\attributename\u003dpath/relative/to/user/node\\) which should be stored in the repository on user-synchronization.",
@@ -3563,7 +3563,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsArray"
+                          "x-componentName": "SamlConfigurationPropertyItemsArray"
                         },
                         "useEncryption": {
                           "description": "Whether or not this authentication handler expects encrypted SAML assertions. If this is enabled the SP\u0027s private key must be provided in the key-store of the \u0027authentication-service\u0027 system user (see SP Private Key Alias above).",
@@ -3594,7 +3594,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                          "x-componentName": "SamlConfigurationPropertyItemsBoolean"
                         },
                         "userIDAttribute": {
                           "description": "The name of the attribute containing the user ID used to authenticate and create the user in the CRX repository. Leave empty to use the Subject:NameId.",
@@ -3625,7 +3625,7 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         },
                         "userIntermediatePath": {
                           "description": "User intermediate path to store created users.",
@@ -3656,11 +3656,11 @@
                             }
                           },
                           "type": "object",
-                          "x-schemaName": "SamlConfigurationPropertyItemsString"
+                          "x-componentName": "SamlConfigurationPropertyItemsString"
                         }
                       },
                       "type": "object",
-                      "x-schemaName": "SamlConfigurationProperties"
+                      "x-componentName": "SamlConfigurationProperties"
                     },
                     "service_location": {
                       "description": "needed for configuraiton binding",
@@ -3672,7 +3672,7 @@
                     }
                   },
                   "type": "object",
-                  "x-schemaName": "SamlConfigurationInfo"
+                  "x-componentName": "SamlConfigurationInfo"
                 }
               }
             },
@@ -3946,7 +3946,7 @@
                                 }
                               },
                               "type": "object",
-                              "x-schemaName": "KeystoreChainItems"
+                              "x-componentName": "KeystoreChainItems"
                             },
                             "type": "array"
                           },
@@ -3960,7 +3960,7 @@
                           }
                         },
                         "type": "object",
-                        "x-schemaName": "KeystoreItems"
+                        "x-componentName": "KeystoreItems"
                       },
                       "type": "array"
                     },
@@ -3970,7 +3970,7 @@
                     }
                   },
                   "type": "object",
-                  "x-schemaName": "KeystoreInfo"
+                  "x-componentName": "KeystoreInfo"
                 }
               }
             },
@@ -4055,7 +4055,7 @@
                                 }
                               },
                               "type": "object",
-                              "x-schemaName": "KeystoreChainItems"
+                              "x-componentName": "KeystoreChainItems"
                             },
                             "type": "array"
                           },
@@ -4069,7 +4069,7 @@
                           }
                         },
                         "type": "object",
-                        "x-schemaName": "KeystoreItems"
+                        "x-componentName": "KeystoreItems"
                       },
                       "type": "array"
                     },
@@ -4079,7 +4079,7 @@
                     }
                   },
                   "type": "object",
-                  "x-schemaName": "KeystoreInfo"
+                  "x-componentName": "KeystoreInfo"
                 }
               }
             },
@@ -4356,7 +4356,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "InstallStatus"
+        "x-componentName": "InstallStatus"
       },
       "KeystoreChainItems": {
         "properties": {
@@ -4382,7 +4382,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "KeystoreChainItems"
+        "x-componentName": "KeystoreChainItems"
       },
       "KeystoreInfo": {
         "properties": {
@@ -4422,7 +4422,7 @@
                       }
                     },
                     "type": "object",
-                    "x-schemaName": "KeystoreChainItems"
+                    "x-componentName": "KeystoreChainItems"
                   },
                   "type": "array"
                 },
@@ -4436,7 +4436,7 @@
                 }
               },
               "type": "object",
-              "x-schemaName": "KeystoreItems"
+              "x-componentName": "KeystoreItems"
             },
             "type": "array"
           },
@@ -4446,7 +4446,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "KeystoreInfo"
+        "x-componentName": "KeystoreInfo"
       },
       "KeystoreItems": {
         "properties": {
@@ -4483,7 +4483,7 @@
                 }
               },
               "type": "object",
-              "x-schemaName": "KeystoreChainItems"
+              "x-componentName": "KeystoreChainItems"
             },
             "type": "array"
           },
@@ -4497,7 +4497,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "KeystoreItems"
+        "x-componentName": "KeystoreItems"
       },
       "SamlConfigurationInfo": {
         "properties": {
@@ -4544,7 +4544,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                "x-componentName": "SamlConfigurationPropertyItemsBoolean"
               },
               "assertionConsumerServiceURL": {
                 "description": "The (optional) AssertionConsumerServiceURL attribute of an Authn request specifies the location to which a  message MUST be sent to the requester.",
@@ -4575,7 +4575,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "clockTolerance": {
                 "description": "Time tolerance in seconds to compensate clock skew between IDP and SP when validating Assertions.",
@@ -4606,7 +4606,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsLong"
+                "x-componentName": "SamlConfigurationPropertyItemsLong"
               },
               "createUser": {
                 "description": "Whether or not to autocreate nonexisting users in the repository.",
@@ -4637,7 +4637,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                "x-componentName": "SamlConfigurationPropertyItemsBoolean"
               },
               "defaultGroups": {
                 "description": "A list of default CRX groups users are added to after successful authentication.",
@@ -4671,7 +4671,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsArray"
+                "x-componentName": "SamlConfigurationPropertyItemsArray"
               },
               "defaultRedirectUrl": {
                 "description": "The default location to redirect to after successful authentication.",
@@ -4702,7 +4702,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "digestMethod": {
                 "description": "The digest algorithm to use when signing a SAML message.",
@@ -4733,7 +4733,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "groupMembershipAttribute": {
                 "description": "The name of the attribute containing a list of CRX groups this user should be added to.",
@@ -4764,7 +4764,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "handleLogout": {
                 "description": "Whether or not logout (dropCredentials) requests will be processed by this handler.",
@@ -4795,7 +4795,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                "x-componentName": "SamlConfigurationPropertyItemsBoolean"
               },
               "idpCertAlias": {
                 "description": "The alias of the IdP\u0027s certificate in the global truststore. If this property is empty the authentication handler is disabled.",
@@ -4826,7 +4826,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "idpHttpRedirect": {
                 "description": "Use an HTTP Redirect to the IDP URL instead of sending an AuthnRequest-message to request credentials. Use this for IDP initiated authentication.",
@@ -4857,7 +4857,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                "x-componentName": "SamlConfigurationPropertyItemsBoolean"
               },
               "idpUrl": {
                 "description": "URL of the IDP where the SAML Authentication Request should be sent to. If this property is empty the authentication handler is disabled. (idpUrl)",
@@ -4888,7 +4888,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "keyStorePassword": {
                 "description": "The password of the key-store of the \u0027authentication-service\u0027 system user.",
@@ -4919,7 +4919,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "logoutUrl": {
                 "description": "URL of the IDP where the SAML Logout Request should be sent to. If this property is empty the authentication handler won\u0027t handle logouts.",
@@ -4950,7 +4950,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "nameIdFormat": {
                 "description": "The value of the NameIDPolicy format parameter to send in the AuthnRequest message.",
@@ -4981,7 +4981,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "path": {
                 "description": "Repository path for which this authentication handler should be used by Sling. If this is empty, the authentication handler will be disabled.",
@@ -5015,7 +5015,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsArray"
+                "x-componentName": "SamlConfigurationPropertyItemsArray"
               },
               "service.ranking": {
                 "description": "OSGi Framework Service Ranking value to indicate the order in which to call this service. This is an int value where higher values designate higher precedence. Default value is 0.",
@@ -5046,7 +5046,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsLong"
+                "x-componentName": "SamlConfigurationPropertyItemsLong"
               },
               "serviceProviderEntityId": {
                 "description": "ID which uniquely identifies this service provider with the identity provider. If this property is empty the authentication handler is disabled.",
@@ -5077,7 +5077,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "signatureMethod": {
                 "description": "The signature algorithm to use when signing a SAML message.",
@@ -5108,7 +5108,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "spPrivateKeyAlias": {
                 "description": "The alias of the SP\u0027s private key in the key-store of the \u0027authentication-service\u0027 system user. If this property is empty the handler will not be able to sign or decrypt messages.",
@@ -5139,7 +5139,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "synchronizeAttributes": {
                 "description": "A list of attribute mappings (in the format \\attributename\u003dpath/relative/to/user/node\\) which should be stored in the repository on user-synchronization.",
@@ -5173,7 +5173,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsArray"
+                "x-componentName": "SamlConfigurationPropertyItemsArray"
               },
               "useEncryption": {
                 "description": "Whether or not this authentication handler expects encrypted SAML assertions. If this is enabled the SP\u0027s private key must be provided in the key-store of the \u0027authentication-service\u0027 system user (see SP Private Key Alias above).",
@@ -5204,7 +5204,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+                "x-componentName": "SamlConfigurationPropertyItemsBoolean"
               },
               "userIDAttribute": {
                 "description": "The name of the attribute containing the user ID used to authenticate and create the user in the CRX repository. Leave empty to use the Subject:NameId.",
@@ -5235,7 +5235,7 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               },
               "userIntermediatePath": {
                 "description": "User intermediate path to store created users.",
@@ -5266,11 +5266,11 @@
                   }
                 },
                 "type": "object",
-                "x-schemaName": "SamlConfigurationPropertyItemsString"
+                "x-componentName": "SamlConfigurationPropertyItemsString"
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationProperties"
+            "x-componentName": "SamlConfigurationProperties"
           },
           "service_location": {
             "description": "needed for configuraiton binding",
@@ -5282,7 +5282,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "SamlConfigurationInfo"
+        "x-componentName": "SamlConfigurationInfo"
       },
       "SamlConfigurationProperties": {
         "properties": {
@@ -5315,7 +5315,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+            "x-componentName": "SamlConfigurationPropertyItemsBoolean"
           },
           "assertionConsumerServiceURL": {
             "description": "The (optional) AssertionConsumerServiceURL attribute of an Authn request specifies the location to which a  message MUST be sent to the requester.",
@@ -5346,7 +5346,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "clockTolerance": {
             "description": "Time tolerance in seconds to compensate clock skew between IDP and SP when validating Assertions.",
@@ -5377,7 +5377,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsLong"
+            "x-componentName": "SamlConfigurationPropertyItemsLong"
           },
           "createUser": {
             "description": "Whether or not to autocreate nonexisting users in the repository.",
@@ -5408,7 +5408,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+            "x-componentName": "SamlConfigurationPropertyItemsBoolean"
           },
           "defaultGroups": {
             "description": "A list of default CRX groups users are added to after successful authentication.",
@@ -5442,7 +5442,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsArray"
+            "x-componentName": "SamlConfigurationPropertyItemsArray"
           },
           "defaultRedirectUrl": {
             "description": "The default location to redirect to after successful authentication.",
@@ -5473,7 +5473,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "digestMethod": {
             "description": "The digest algorithm to use when signing a SAML message.",
@@ -5504,7 +5504,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "groupMembershipAttribute": {
             "description": "The name of the attribute containing a list of CRX groups this user should be added to.",
@@ -5535,7 +5535,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "handleLogout": {
             "description": "Whether or not logout (dropCredentials) requests will be processed by this handler.",
@@ -5566,7 +5566,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+            "x-componentName": "SamlConfigurationPropertyItemsBoolean"
           },
           "idpCertAlias": {
             "description": "The alias of the IdP\u0027s certificate in the global truststore. If this property is empty the authentication handler is disabled.",
@@ -5597,7 +5597,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "idpHttpRedirect": {
             "description": "Use an HTTP Redirect to the IDP URL instead of sending an AuthnRequest-message to request credentials. Use this for IDP initiated authentication.",
@@ -5628,7 +5628,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+            "x-componentName": "SamlConfigurationPropertyItemsBoolean"
           },
           "idpUrl": {
             "description": "URL of the IDP where the SAML Authentication Request should be sent to. If this property is empty the authentication handler is disabled. (idpUrl)",
@@ -5659,7 +5659,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "keyStorePassword": {
             "description": "The password of the key-store of the \u0027authentication-service\u0027 system user.",
@@ -5690,7 +5690,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "logoutUrl": {
             "description": "URL of the IDP where the SAML Logout Request should be sent to. If this property is empty the authentication handler won\u0027t handle logouts.",
@@ -5721,7 +5721,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "nameIdFormat": {
             "description": "The value of the NameIDPolicy format parameter to send in the AuthnRequest message.",
@@ -5752,7 +5752,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "path": {
             "description": "Repository path for which this authentication handler should be used by Sling. If this is empty, the authentication handler will be disabled.",
@@ -5786,7 +5786,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsArray"
+            "x-componentName": "SamlConfigurationPropertyItemsArray"
           },
           "service.ranking": {
             "description": "OSGi Framework Service Ranking value to indicate the order in which to call this service. This is an int value where higher values designate higher precedence. Default value is 0.",
@@ -5817,7 +5817,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsLong"
+            "x-componentName": "SamlConfigurationPropertyItemsLong"
           },
           "serviceProviderEntityId": {
             "description": "ID which uniquely identifies this service provider with the identity provider. If this property is empty the authentication handler is disabled.",
@@ -5848,7 +5848,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "signatureMethod": {
             "description": "The signature algorithm to use when signing a SAML message.",
@@ -5879,7 +5879,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "spPrivateKeyAlias": {
             "description": "The alias of the SP\u0027s private key in the key-store of the \u0027authentication-service\u0027 system user. If this property is empty the handler will not be able to sign or decrypt messages.",
@@ -5910,7 +5910,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "synchronizeAttributes": {
             "description": "A list of attribute mappings (in the format \\attributename\u003dpath/relative/to/user/node\\) which should be stored in the repository on user-synchronization.",
@@ -5944,7 +5944,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsArray"
+            "x-componentName": "SamlConfigurationPropertyItemsArray"
           },
           "useEncryption": {
             "description": "Whether or not this authentication handler expects encrypted SAML assertions. If this is enabled the SP\u0027s private key must be provided in the key-store of the \u0027authentication-service\u0027 system user (see SP Private Key Alias above).",
@@ -5975,7 +5975,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+            "x-componentName": "SamlConfigurationPropertyItemsBoolean"
           },
           "userIDAttribute": {
             "description": "The name of the attribute containing the user ID used to authenticate and create the user in the CRX repository. Leave empty to use the Subject:NameId.",
@@ -6006,7 +6006,7 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           },
           "userIntermediatePath": {
             "description": "User intermediate path to store created users.",
@@ -6037,11 +6037,11 @@
               }
             },
             "type": "object",
-            "x-schemaName": "SamlConfigurationPropertyItemsString"
+            "x-componentName": "SamlConfigurationPropertyItemsString"
           }
         },
         "type": "object",
-        "x-schemaName": "SamlConfigurationProperties"
+        "x-componentName": "SamlConfigurationProperties"
       },
       "SamlConfigurationPropertyItemsArray": {
         "properties": {
@@ -6074,7 +6074,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "SamlConfigurationPropertyItemsArray"
+        "x-componentName": "SamlConfigurationPropertyItemsArray"
       },
       "SamlConfigurationPropertyItemsBoolean": {
         "properties": {
@@ -6104,7 +6104,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "SamlConfigurationPropertyItemsBoolean"
+        "x-componentName": "SamlConfigurationPropertyItemsBoolean"
       },
       "SamlConfigurationPropertyItemsLong": {
         "properties": {
@@ -6134,7 +6134,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "SamlConfigurationPropertyItemsLong"
+        "x-componentName": "SamlConfigurationPropertyItemsLong"
       },
       "SamlConfigurationPropertyItemsString": {
         "properties": {
@@ -6164,7 +6164,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "SamlConfigurationPropertyItemsString"
+        "x-componentName": "SamlConfigurationPropertyItemsString"
       },
       "TruststoreInfo": {
         "properties": {
@@ -6200,7 +6200,7 @@
                 }
               },
               "type": "object",
-              "x-schemaName": "TruststoreItems"
+              "x-componentName": "TruststoreItems"
             },
             "type": "array"
           },
@@ -6210,7 +6210,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "TruststoreInfo"
+        "x-componentName": "TruststoreInfo"
       },
       "TruststoreItems": {
         "properties": {
@@ -6243,7 +6243,7 @@
           }
         },
         "type": "object",
-        "x-schemaName": "TruststoreItems"
+        "x-componentName": "TruststoreItems"
       }
     },
     "securitySchemes": {

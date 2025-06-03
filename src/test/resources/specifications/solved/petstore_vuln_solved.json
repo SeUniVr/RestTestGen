@@ -73,7 +73,7 @@
                         "xml": {
                           "name": "Category"
                         },
-                        "x-schemaName": "Category"
+                        "x-componentName": "Category"
                       },
                       "name": {
                         "type": "string",
@@ -109,7 +109,7 @@
                           "xml": {
                             "name": "Tag"
                           },
-                          "x-schemaName": "Tag"
+                          "x-componentName": "Tag"
                         }
                       },
                       "status": {
@@ -125,7 +125,7 @@
                     "xml": {
                       "name": "Pet"
                     },
-                    "x-schemaName": "Pet"
+                    "x-componentName": "Pet"
                   }
                 }
               }
@@ -180,7 +180,7 @@
                     "xml": {
                       "name": "Category"
                     },
-                    "x-schemaName": "Category"
+                    "x-componentName": "Category"
                   },
                   "name": {
                     "type": "string",
@@ -216,7 +216,7 @@
                       "xml": {
                         "name": "Tag"
                       },
-                      "x-schemaName": "Tag"
+                      "x-componentName": "Tag"
                     }
                   },
                   "status": {
@@ -232,7 +232,7 @@
                 "xml": {
                   "name": "Pet"
                 },
-                "x-schemaName": "Pet"
+                "x-componentName": "Pet"
               }
             }
           },
@@ -268,7 +268,7 @@
                       "xml": {
                         "name": "Category"
                       },
-                      "x-schemaName": "Category"
+                      "x-componentName": "Category"
                     },
                     "name": {
                       "type": "string",
@@ -304,7 +304,7 @@
                         "xml": {
                           "name": "Tag"
                         },
-                        "x-schemaName": "Tag"
+                        "x-componentName": "Tag"
                       }
                     },
                     "status": {
@@ -320,7 +320,7 @@
                   "xml": {
                     "name": "Pet"
                   },
-                  "x-schemaName": "Pet"
+                  "x-componentName": "Pet"
                 }
               }
             }
@@ -383,7 +383,7 @@
                     "xml": {
                       "name": "Category"
                     },
-                    "x-schemaName": "Category"
+                    "x-componentName": "Category"
                   },
                   "name": {
                     "type": "string",
@@ -419,7 +419,7 @@
                       "xml": {
                         "name": "Tag"
                       },
-                      "x-schemaName": "Tag"
+                      "x-componentName": "Tag"
                     }
                   },
                   "status": {
@@ -435,7 +435,7 @@
                 "xml": {
                   "name": "Pet"
                 },
-                "x-schemaName": "Pet"
+                "x-componentName": "Pet"
               }
             }
           },
@@ -471,7 +471,7 @@
                       "xml": {
                         "name": "Category"
                       },
-                      "x-schemaName": "Category"
+                      "x-componentName": "Category"
                     },
                     "name": {
                       "type": "string",
@@ -507,7 +507,7 @@
                         "xml": {
                           "name": "Tag"
                         },
-                        "x-schemaName": "Tag"
+                        "x-componentName": "Tag"
                       }
                     },
                     "status": {
@@ -523,7 +523,7 @@
                   "xml": {
                     "name": "Pet"
                   },
-                  "x-schemaName": "Pet"
+                  "x-componentName": "Pet"
                 }
               }
             }
@@ -610,7 +610,7 @@
                         "xml": {
                           "name": "Category"
                         },
-                        "x-schemaName": "Category"
+                        "x-componentName": "Category"
                       },
                       "name": {
                         "type": "string",
@@ -646,7 +646,7 @@
                           "xml": {
                             "name": "Tag"
                           },
-                          "x-schemaName": "Tag"
+                          "x-componentName": "Tag"
                         }
                       },
                       "status": {
@@ -662,7 +662,7 @@
                     "xml": {
                       "name": "Pet"
                     },
-                    "x-schemaName": "Pet"
+                    "x-componentName": "Pet"
                   }
                 }
               }
@@ -743,7 +743,7 @@
                         "xml": {
                           "name": "Category"
                         },
-                        "x-schemaName": "Category"
+                        "x-componentName": "Category"
                       },
                       "name": {
                         "type": "string",
@@ -779,7 +779,7 @@
                           "xml": {
                             "name": "Tag"
                           },
-                          "x-schemaName": "Tag"
+                          "x-componentName": "Tag"
                         }
                       },
                       "status": {
@@ -795,7 +795,7 @@
                     "xml": {
                       "name": "Pet"
                     },
-                    "x-schemaName": "Pet"
+                    "x-componentName": "Pet"
                   }
                 }
               }
@@ -871,7 +871,7 @@
                       "xml": {
                         "name": "Category"
                       },
-                      "x-schemaName": "Category"
+                      "x-componentName": "Category"
                     },
                     "name": {
                       "type": "string",
@@ -907,7 +907,7 @@
                         "xml": {
                           "name": "Tag"
                         },
-                        "x-schemaName": "Tag"
+                        "x-componentName": "Tag"
                       }
                     },
                     "status": {
@@ -923,7 +923,7 @@
                   "xml": {
                     "name": "Pet"
                   },
-                  "x-schemaName": "Pet"
+                  "x-componentName": "Pet"
                 }
               }
             }
@@ -1013,7 +1013,7 @@
         "xml": {
           "name": "Category"
         },
-        "x-schemaName": "Category"
+        "x-componentName": "Category"
       },
       "Tag": {
         "type": "object",
@@ -1029,7 +1029,7 @@
         "xml": {
           "name": "Tag"
         },
-        "x-schemaName": "Tag"
+        "x-componentName": "Tag"
       },
       "Pet": {
         "required": [
@@ -1056,7 +1056,7 @@
             "xml": {
               "name": "Category"
             },
-            "x-schemaName": "Category"
+            "x-componentName": "Category"
           },
           "name": {
             "type": "string",
@@ -1092,7 +1092,7 @@
               "xml": {
                 "name": "Tag"
               },
-              "x-schemaName": "Tag"
+              "x-componentName": "Tag"
             }
           },
           "status": {
@@ -1108,7 +1108,7 @@
         "xml": {
           "name": "Pet"
         },
-        "x-schemaName": "Pet"
+        "x-componentName": "Pet"
       }
     },
     "securitySchemes": {

@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * This abstract class is used to write a test interaction or a test sequence to file. Different implementations provide
- * different formats (e.g. reports in JSON, JUnit test cases, Postman).
+ * different formats (e.g., reports in JSON, JUnit test cases, Postman).
  */
 public abstract class Writer {
 
@@ -41,7 +41,7 @@ public abstract class Writer {
         String finalExtension = "";
 
         // Compute actual extension based on the user input
-        if (extension != null && !extension.equals("")) {
+        if (extension != null && !extension.isEmpty()) {
             if (extension.startsWith(".")) {
                 finalExtension = extension;
             } else {
@@ -49,6 +49,6 @@ public abstract class Writer {
             }
         }
 
-        return testSequence.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + finalExtension;
+        return testSequence.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + "-" + testSequence.getId() + finalExtension;
     }
 }

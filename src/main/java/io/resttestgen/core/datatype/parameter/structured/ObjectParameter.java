@@ -60,8 +60,7 @@ public class ObjectParameter extends StructuredParameter {
                     }
                 }
             } catch (UnsupportedSpecificationFeature e) {
-                logger.warn("Skipping property '" + propertyMap.getKey() + "' in object '" + name + "' due to " +
-                        "an unsupported feature in OpenAPI specification.");
+                logger.warn("Skipping property '{}' in object '{}' due to an unsupported feature in OpenAPI specification.", propertyMap.getKey(), name);
             }
         }
     }
@@ -387,7 +386,7 @@ public class ObjectParameter extends StructuredParameter {
                 return stringBuilder.toString();
 
             default:
-                logger.warn(getName() + ": Style not consistent with parameter type. Returning " + getStyle() + " style.");
+                logger.warn("{}: Style not consistent with parameter type. Returning {} style.", getName(), getStyle());
                 return getValueAsFormattedString();
         }
     }
@@ -400,7 +399,7 @@ public class ObjectParameter extends StructuredParameter {
         }
 
         if (!hasValue) {
-            logger.warn("Parameter " + getName() + " has an invalid value.");
+            logger.warn("Parameter {} has an invalid value.", getName());
         }
 
         return hasValue;

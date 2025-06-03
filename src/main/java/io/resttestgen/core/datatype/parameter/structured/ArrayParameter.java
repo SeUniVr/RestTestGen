@@ -451,7 +451,7 @@ public class ArrayParameter extends StructuredParameter {
 
             case DEEP_OBJECT:
             default:
-                logger.warn(getName() + ": Style not consistent with parameter type. Returning 'simple' style.");
+                logger.warn("{}: Style not consistent with parameter type. Returning 'simple' style.", getName());
                 return this.getValueAsFormattedString(ParameterStyle.SIMPLE);
         }
     }
@@ -464,7 +464,7 @@ public class ArrayParameter extends StructuredParameter {
         }
 
         if (!hasValue) {
-            logger.warn("Parameter " + getName() + " has an invalid value.");
+            logger.warn("Parameter {} has an invalid value.", getName());
         }
 
         return hasValue;
@@ -490,7 +490,7 @@ public class ArrayParameter extends StructuredParameter {
 
     @Override
     public String toString() {
-        if (elements != null && elements.size() > 0) {
+        if (elements != null && !elements.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(getName()).append(": [");
             elements.forEach(e -> stringBuilder.append(e.toString()).append(", "));
@@ -516,7 +516,7 @@ public class ArrayParameter extends StructuredParameter {
 
     @Override
     public boolean isSet() {
-        return elements.size() > 0;
+        return !elements.isEmpty();
     }
 
     /**

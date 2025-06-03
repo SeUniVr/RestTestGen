@@ -26,22 +26,22 @@
       "SimpleString": {
         "type": "string",
         "maxLength": 10.0,
-        "x-schemaName": "SimpleString"
+        "x-componentName": "SimpleString"
       },
       "SimpleStringS": {
         "items": {
           "type": "string",
           "maxLength": 10.0,
-          "x-schemaName": "SimpleString"
+          "x-componentName": "SimpleString"
         },
-        "x-schemaName": "SimpleStringS"
+        "x-componentName": "SimpleStringS"
       },
       "SimpleStringSAlias": {
-        "x-schemaName": "SimpleStringS",
+        "x-componentName": "SimpleStringS",
         "items": {
           "type": "string",
           "maxLength": 10.0,
-          "x-schemaName": "SimpleString"
+          "x-componentName": "SimpleString"
         }
       },
       "Person": {
@@ -51,19 +51,19 @@
             "items": {
               "type": "string",
               "maxLength": 10.0,
-              "x-schemaName": "SimpleString"
+              "x-componentName": "SimpleString"
             }
           },
           "lastNames": {
             "items": {
               "type": "string",
               "maxLength": 10.0,
-              "x-schemaName": "SimpleString"
+              "x-componentName": "SimpleString"
             },
-            "x-schemaName": "SimpleStringS"
+            "x-componentName": "SimpleStringS"
           }
         },
-        "x-schemaName": "Person"
+        "x-componentName": "Person"
       }
     }
   }

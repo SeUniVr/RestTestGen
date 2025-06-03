@@ -77,7 +77,7 @@ public class OperationDependencyGraph {
 
         // Get all the documented operations that have output parameters
         Set<Operation> sourceOperations = openAPI.getOperations().stream()
-                .filter(operation -> operation.getOutputParametersSet().size() > 0)
+                .filter(operation -> !operation.getOutputParametersSet().isEmpty())
                 .collect(Collectors.toSet());
 
         // For each documented operation
@@ -85,7 +85,7 @@ public class OperationDependencyGraph {
 
             // Get all the operations with input parameters, excluding the current source operation
             Set<Operation> targetOperations = openAPI.getOperations().stream()
-                    .filter(operation -> operation.getReferenceLeaves().size() > 0).collect(Collectors.toSet());
+                    .filter(operation -> !operation.getReferenceLeaves().isEmpty()).collect(Collectors.toSet());
             targetOperations.remove(sourceOperation);
 
             // For each combination of "source -> target" operations
@@ -118,7 +118,7 @@ public class OperationDependencyGraph {
                     }
                 }
 
-                logger.debug("Dependencies for " + sourceOperation + " -> " + targetOperation + ": " + commonParametersNames);
+                logger.debug("Dependencies for {} -> {}: {}", sourceOperation, targetOperation, commonParametersNames);
             }
         }
     }

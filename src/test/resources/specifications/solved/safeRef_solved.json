@@ -20,7 +20,7 @@
             "type": "string"
           }
         },
-        "x-schemaName": "MyBaseSchema"
+        "x-componentName": "MyBaseSchema"
       },
       "MyReferredSchema": {
         "properties": {
@@ -30,10 +30,10 @@
                 "type": "string"
               }
             },
-            "x-schemaName": "MyBaseSchema"
+            "x-componentName": "MyBaseSchema"
           }
         },
-        "x-schemaName": "MyReferredSchema"
+        "x-componentName": "MyReferredSchema"
       }
     }
   }

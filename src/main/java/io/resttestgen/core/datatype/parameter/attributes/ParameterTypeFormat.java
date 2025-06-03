@@ -99,7 +99,7 @@ public enum ParameterTypeFormat {
             case ("email"):
                 return EMAIL;
             default:
-                logger.warn("Unknown type format \"" + formatName + "\".");
+                logger.warn("Unknown type format \"{}\".", formatName);
                 return UNKNOWN;
         }
     }

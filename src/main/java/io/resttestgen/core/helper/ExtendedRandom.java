@@ -445,7 +445,7 @@ public class ExtendedRandom extends Random {
     }
 
     public <E> Optional<E> nextElement(Collection<E> e) {
-        if (e.size() == 0) {
+        if (e.isEmpty()) {
             return Optional.empty();
         }
         return e.stream().skip(nextInt(e.size())).findFirst();

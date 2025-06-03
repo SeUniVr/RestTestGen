@@ -52,28 +52,36 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
 
     private String generateCompliantString(StringParameter parameter) {
 
-        // If pattern (regex) is provided for the string, use it
-        if (parameter.getPattern() != null && !parameter.getPattern().isEmpty()) {
+        // If pattern (regex) is provided for the string, use it with 80% probability
+        if (parameter.getPattern() != null && !parameter.getPattern().isEmpty() && random.nextInt(10) < 8) {
 
             String pattern = parameter.getPattern();
 
-            // Clean pattern if it starts with ~ and ends with $
+            // Clean pattern if it starts with ^ and ends with $
             if (pattern.startsWith("^") && pattern.endsWith("$")) {
-                pattern = pattern.substring(1, pattern.length() - 1) + "\\d{3";
+                pattern = pattern.substring(1, pattern.length() - 1);
             }
 
             // Compute values of minLength and maxLength in the case they are null
             int min = parameter.getMinLength() == null || parameter.getMinLength() < 0 ? 0 : parameter.getMinLength();
             int max = parameter.getMaxLength() == null || parameter.getMaxLength() < min ? min + random.nextInt(20) : parameter.getMaxLength();
 
+
             try {
                 Generex generex = new Generex(pattern);
-                return generex.random(min, max);
+                String generated = generex.random(min, max);
+                System.out.println("GENERATED: " + generated);
+                return generated;
             }
 
             // If the pattern is invalid, ignore it and continue with standard random generation
             catch (IllegalArgumentException e) {
-                logger.warn("The specified pattern (" + parameter.getPattern() + ") for parameter " + parameter + " is invalid. Ignoring it.");
+                logger.warn("The specified pattern ({}) for parameter {} is invalid. Ignoring it.", parameter.getPattern(), parameter);
+            }
+
+            // Catch stack overflows
+            catch (StackOverflowError e) {
+                logger.warn("Generating a value for pattern {} cause a StackOverflowError. Generating now a random string.", pattern);
             }
         }
 
@@ -152,13 +160,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
     private Number generateCompliantNumber(NumberParameter parameter) {
 
         // Get the actual format, or infer it
-        ParameterTypeFormat format = parameter.inferFormat();
-
-        // With 0.5 probability, restrict the range of the generated value. This is done because values in the
-        // restricted range (0 - 120 in this case) are used more commonly than other random values.
-        boolean restrictRange = false;
-        double RESTRICTED_MIN = 0.;
-        double RESTRICTED_MAX = 120.;
+        ParameterTypeFormat format = parameter.getOrInferFormat();
 
         // If the parameter is a double
         if (format == ParameterTypeFormat.DOUBLE) {
@@ -166,6 +168,10 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             // Set min and max value, if defined
             double min = parameter.getMinimum() != null ? parameter.getMinimum() : -Double.MAX_VALUE;
             double max = parameter.getMaximum() != null ? parameter.getMaximum() : Double.MAX_VALUE;
+
+            // Exclude values if minimum or maximum are exclusive
+            min = parameter.isExclusiveMinimum() ? min + Double.MIN_VALUE : min;
+            max = parameter.isExclusiveMaximum() ? max - Double.MIN_VALUE : max;
 
             // If min is not less than max, reset one of the two variables randomly
             if (min > max) {
@@ -175,14 +181,6 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                     max = Double.MAX_VALUE;
                 }
             }
-
-            // Exclude values if minimum or maximum are exclusive
-            min = parameter.isExclusiveMinimum() ? min + Double.MIN_VALUE : min;
-            max = parameter.isExclusiveMaximum() ? max - Double.MIN_VALUE : max;
-
-            // Restrict the boundaries
-            min = restrictRange && RESTRICTED_MIN > min ? RESTRICTED_MIN : min;
-            max = restrictRange && RESTRICTED_MAX < max ? RESTRICTED_MAX : max;
 
             // Generate and return the value
             return random.nextDouble(min, max);
@@ -195,6 +193,10 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             float min = parameter.getMinimum() != null ? parameter.getMinimum().floatValue() : -Float.MAX_VALUE;
             float max = parameter.getMaximum() != null ? parameter.getMaximum().floatValue() : Float.MAX_VALUE;
 
+            // Exclude values if minimum or maximum are exclusive
+            min = parameter.isExclusiveMinimum() ? min + Float.MIN_VALUE : min;
+            max = parameter.isExclusiveMaximum() ? max - Float.MIN_VALUE : max;
+
             // If min is not less than max, reset one of the two variables randomly
             if (min > max) {
                 if (random.nextBoolean()) {
@@ -204,73 +206,26 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                 }
             }
 
-            // Exclude values if minimum or maximum are exclusive
-            min = parameter.isExclusiveMinimum() ? min + Float.MIN_VALUE : min;
-            max = parameter.isExclusiveMaximum() ? max - Float.MIN_VALUE : max;
-
-            // Restrict the boundaries
-            min = restrictRange && (float) RESTRICTED_MIN > min ? (float) RESTRICTED_MIN : min;
-            max = restrictRange && (float) RESTRICTED_MAX < max ? (float) RESTRICTED_MAX : max;
-
             return random.nextFloat(min, max);
         }
 
         // If the parameter is an integer or long
         else {
 
-            boolean isLong = true; // Is the parameter a long or an integer?
+            // Is the parameter a long or an integer?
+            boolean isLong = format == ParameterTypeFormat.INT64 || format == ParameterTypeFormat.UINT64;
 
             // Default
-            long min = Long.MIN_VALUE;
-            long max = Long.MAX_VALUE;
-
-            // Changed based on the format
-            switch (format) {
-                case INT8:
-                    min = -128;
-                    max = 127;
-                    isLong = false;
-                    break;
-                case INT16:
-                    min = -32768;
-                    max = 32767;
-                    isLong = false;
-                    break;
-                case INT32:
-                    min = Integer.MIN_VALUE;
-                    max = Integer.MAX_VALUE;
-                    isLong = false;
-                    break;
-                case UINT8:
-                    min = 0;
-                    max = 255;
-                    isLong = false;
-                    break;
-                case UINT16:
-                    min = 0;
-                    max = 65535;
-                    isLong = false;
-                    break;
-                case UINT32:
-                    min = 0;
-                    isLong = false;
-                    max = 4294967295L;
-                    break;
-                case UINT64:
-                    min = 0;
-                    break;
-                case LATITUDE:
-                    min = -90;
-                    max = 90;
-                    break;
-                case LONGITUDE:
-                    min = -180;
-                    max = 180;
-            }
+            long min = (long) parameter.getMinimumRepresentableValue();
+            long max = (long) parameter.getMaximumRepresentableValue();
 
             // Set min and max value, if defined
             min = parameter.getMinimum() != null ? parameter.getMinimum().longValue() : min;
             max = parameter.getMaximum() != null ? parameter.getMaximum().longValue() : max;
+
+            // Exclude values if minimum or maximum are exclusive
+            min = parameter.isExclusiveMinimum() ? min + 1 : min;
+            max = parameter.isExclusiveMaximum() ? max - 1 : max;
 
             // If min is not less than max, reset one of the two variables randomly
             if (min > max) {
@@ -280,14 +235,6 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                     max = Long.MAX_VALUE;
                 }
             }
-
-            // Exclude values if minimum or maximum are exclusive
-            min = parameter.isExclusiveMinimum() ? min + 1 : min;
-            max = parameter.isExclusiveMaximum() ? max - 1 : max;
-
-            // Restrict the boundaries
-            min = restrictRange && (long) RESTRICTED_MIN > min ? (long) RESTRICTED_MIN : min;
-            max = restrictRange && (long) RESTRICTED_MAX < max ? (long) RESTRICTED_MAX : max;
 
             if (isLong) {
                 return random.nextLong(min, max);

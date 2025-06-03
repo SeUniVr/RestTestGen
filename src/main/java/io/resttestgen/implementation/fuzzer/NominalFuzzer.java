@@ -51,8 +51,7 @@ public class NominalFuzzer extends Fuzzer {
             }
             return testSequences;
         }
-        logger.warn("You asked for a list of sequences with " + numberOfSequences
-                + "elements. Returned an empty list.");
+        logger.warn("You asked for a list of sequences with {}elements. Returned an empty list.", numberOfSequences);
         return testSequences;
     }
 
@@ -76,7 +75,7 @@ public class NominalFuzzer extends Fuzzer {
 
         // Encapsulate test interaction into test sequence
         TestSequence testSequence = new TestSequence(this, testInteraction);
-        String sequenceName = editableOperation.getOperationId().length() > 0 ?
+        String sequenceName = !editableOperation.getOperationId().isEmpty() ?
                 editableOperation.getOperationId() :
                 editableOperation.getMethod().toString() + "-" + editableOperation.getEndpoint();
         testSequence.setName(sequenceName);
@@ -109,7 +108,7 @@ public class NominalFuzzer extends Fuzzer {
                 arrayParameter.setValuesFromCommaSeparatedString(parameterValueProvider.provideValueFor((LeafParameter) arrayParameter.getReferenceElement()).toString());
             }
         } catch (ValueNotAvailableException e) {
-            logger.warn("Parameter value provider could not find a value for parameter: " + parameter);
+            logger.warn("Parameter value provider could not find a value for parameter: {}", parameter);
         }
     }
 

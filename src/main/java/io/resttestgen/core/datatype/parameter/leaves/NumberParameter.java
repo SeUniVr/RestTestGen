@@ -100,7 +100,7 @@ public class NumberParameter extends LeafParameter {
 
     public void setType(ParameterType type) {
         if (!type.equals(ParameterType.NUMBER) && !type.equals(ParameterType.INTEGER)) {
-            throw new IllegalArgumentException("type of number parameter can't be " + type);
+            throw new IllegalArgumentException("Type of number parameter can't be " + type);
         }
         this.type = type;
     }
@@ -128,6 +128,68 @@ public class NumberParameter extends LeafParameter {
         merged.exclusiveMinimum = this.exclusiveMinimum || numberParameter.exclusiveMinimum;
 
         return merged;
+    }
+
+    public double getMaximumRepresentableValue() {
+        switch (format) {
+            case INT8:
+                return 127.0;
+            case INT16:
+                return 32767.0;
+            case INT32:
+                return Integer.MAX_VALUE;
+            case INT64:
+                return Long.MAX_VALUE;
+            case UINT8:
+                return 255.0;
+            case UINT16:
+                return 65535.0;
+            case UINT32:
+                return 4294967295.0;
+            case UINT64:
+                return 18446744073709551615.0;
+            case DECIMAL:
+            case FLOAT:
+                return Float.MAX_VALUE;
+            case DOUBLE:
+                return Double.MAX_VALUE;
+            case LATITUDE:
+                return 90.0;
+            case LONGITUDE:
+                return 180.0;
+            default: // Case INT64 and others
+                return Integer.MAX_VALUE;
+        }
+    }
+
+    public double getMinimumRepresentableValue() {
+        // Changed based on the format
+        switch (format) {
+            case INT8:
+                return -128;
+            case INT16:
+                return -32768;
+            case INT32:
+                return Integer.MIN_VALUE;
+            case INT64:
+                return Long.MIN_VALUE;
+            case DECIMAL:
+            case FLOAT:
+                return -Float.MAX_VALUE;
+            case DOUBLE:
+                return -Double.MAX_VALUE;
+            case LATITUDE:
+                return -90;
+            case LONGITUDE:
+                return -180;
+            case UINT8:
+            case UINT16:
+            case UINT32:
+            case UINT64:
+                return 0;
+            default: // Case INT64 and others
+                return Integer.MIN_VALUE;
+        }
     }
 
     public boolean isMaximum() {
@@ -197,7 +259,7 @@ public class NumberParameter extends LeafParameter {
             // TODO: check format
 
             // Check if value is in enum set, if set is defined
-            if (getEnumValues().size() == 0 || getEnumValues().contains(doubleValue)) {
+            if (getEnumValues().isEmpty() || getEnumValues().contains(doubleValue)) {
 
                 // Check if minimum and maximum constraints are met
                 if (((maximum == null || doubleValue <= maximum) && (maximum == null || !exclusiveMaximum || doubleValue < maximum)) &&
@@ -219,7 +281,7 @@ public class NumberParameter extends LeafParameter {
      * Infers a format from format, type, and name of the parameter.
      * @return the inferred format.
      */
-    public ParameterTypeFormat inferFormat() {
+    public ParameterTypeFormat getOrInferFormat() {
         ExtendedRandom random = Environment.getInstance().getRandom();
 
         switch (format) {

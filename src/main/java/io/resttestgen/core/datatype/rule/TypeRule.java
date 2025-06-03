@@ -52,7 +52,7 @@ public class TypeRule extends Rule {
             return;
         }
 
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
 
             // If the parameter is of the same type already, return
@@ -83,7 +83,7 @@ public class TypeRule extends Rule {
 
     @Override
     public boolean isApplied(Operation operation) {
-        if (getParametersInOperation(operation).size() > 0) {
+        if (!getParametersInOperation(operation).isEmpty()) {
             Parameter parameter = getParametersInOperation(operation).get(0);
             return parameter.getType() == parameterType;
         }
@@ -102,7 +102,7 @@ public class TypeRule extends Rule {
         TestSequence clonedSequence = sequence.deepClone().reset();
         Operation operation = clonedSequence.getFirst().getFuzzedOperation();
         List<Parameter> parameters = getParametersInOperation(operation);
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             Parameter parameter = parameters.get(0);
 
             // Object type can be only applied to objects

@@ -4,7 +4,6 @@ package io.resttestgen.core.datatype.parameter;
 import io.resttestgen.boot.ApiUnderTest;
 import io.resttestgen.boot.Starter;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.openapi.CannotParseOpenApiException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +21,7 @@ public class TestJsonPath {
 
 
     @BeforeAll
-    public static void setUp() throws CannotParseOpenApiException, IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static void setUp() throws IOException, InterruptedException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         environment = Starter.initEnvironment(ApiUnderTest.loadApiFromFile("petstore"));
     }
 
