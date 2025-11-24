@@ -206,7 +206,7 @@ public class TestRunner {
                     new Timestamp(response.sentRequestAtMillis()),
                     new Timestamp(response.receivedResponseAtMillis()));
             testInteraction.setTestStatus(TestStatus.EXECUTED);
-            coverage.updateCoverage(testInteraction);
+            coverage.updateAllCoverage(testInteraction);
             logger.info("Executed test interaction: {} [{}]", testInteraction.getFuzzedOperation(), testInteraction.getResponseStatusCode());
         } catch (IOException e) {
             logger.warn("Request execution failed: connectivity problem or timeout.");

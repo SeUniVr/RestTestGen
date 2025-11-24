@@ -151,9 +151,9 @@ public abstract class CombinedSchemaParameter extends Parameter {
     }
 
     @Override
-    public String getJSONString() {
+    public String getJsonString() {
         if (outputParameterSchema != null) {
-            return outputParameterSchema.getJSONString();
+            return outputParameterSchema.getJsonString();
         }
         logger.error("Requested JSON string for parameter '{}(operation '{}'), but no schema was selected. Returning an empty string.", getName(), getOperation());
         return "";

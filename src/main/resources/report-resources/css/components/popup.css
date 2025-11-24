@@ -1,0 +1,282 @@
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popupEntry {
+    from { transform: translate(-50%, -60%); opacity: 0; }
+    to { transform: translate(-50%, -50%); opacity: 1; }
+}
+
+.popup-overlay {
+    animation: overlayFadeIn 100ms ease-out forwards;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.details-popup {
+    animation: popupEntry 100ms ease-out forwards;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: clamp(300px, 90vw, 900px);
+    max-height: 90vh;
+    background-color: rgb(var(--background-white));
+    border-radius: 1rem;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+
+    .popup-header, .popup-content {
+        padding: 1rem 1.5rem;
+    }
+
+    /* Code block inside the popup */
+    pre {
+        font-family: monospace;
+        margin-top: .5rem;
+        background-color: rgba(var(--light-gray), .2);
+        padding: 1rem;
+        border-radius: var(--label-border-radius);
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgb(var(--rtg-blue-darker));
+        margin-bottom: .8rem;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+
+        h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: rgb(var(--default-white));
+            font-weight: 600;
+        }
+
+        .close-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgb(var(--rtg-blue));
+            cursor: pointer;
+            transition: all 0.2s, transform 0.2s;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: none;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+
+            &:active {
+                transform: scale(0.95);
+            }
+
+            svg {
+                fill: rgb(var(--default-white));
+                width: 1.2rem;
+                height: 1.2rem;
+            }
+        }
+    }
+
+    .popup-content {
+        overflow: auto;
+
+        .item-documented-true svg,
+        .item-tested-true svg {
+            color: rgb(var(--green-success));
+        }
+
+        .item-documented-false svg,
+        .item-tested-false svg {
+            color: rgba(var(--red-error));
+        }
+
+        .popup-content__actions {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+
+            .popup-content__action-button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgb(var(--rtg-blue));
+                color: rgb(var(--default-white));
+                padding: .5rem 1rem;
+                border-radius: var(--buttons-border-radius);
+                box-shadow: var(--default-box-shadow);
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s, transform 0.2s;
+
+                &:hover {
+                    transform: scale(1.05);
+                }
+
+                &:active {
+                    transform: scale(0.95);
+                }
+            }
+        }
+
+        .popup-content__label {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 1rem;
+            gap: .7rem;
+
+            .popup-content__label--key {
+                font-weight: bold;
+                max-width: 40%;
+            }
+
+            .popup-content__label--value {
+                color: rgb(var(--default-black));
+                word-wrap: break-word;
+                background-color: rgba(var(--light-gray), .3);
+                padding: .2rem .5rem;
+                border-radius: var(--label-border-radius);
+            }
+        }
+
+        .coverage-item {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            width: 100%;
+
+            /* Widths */
+            .coverage-item__title { flex-basis: 30%; }
+            .coverage-item__value { flex-basis: 60%; }
+            .coverage-item__documented { flex-basis: 5%; }
+            .coverage-item__tested { flex-basis: 5%; }
+
+            .coverage-item__title {
+                font-weight: bold;
+            }
+
+            .coverage-item__key {
+                max-width: 60%;
+                word-wrap: break-word;
+            }
+        }
+
+        .query-parameters-list-container, .path-parameters-list-container {
+            margin-top: 1rem;
+
+            .parameters-list__title {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 1rem;
+            }
+
+            .item-query-parameters-list, .item-path-parameters-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                .no-parameters {
+                    color: rgba(var(--default-black), 0.6);
+                    font-style: italic;
+                    padding: .5rem 0;
+                }
+
+                .item-parameter {
+                    margin-bottom: .8rem;
+
+                    .item-parameter-header {
+                        display: flex;
+                        align-items: center;
+                        gap: .5rem;
+                        margin-bottom: .4rem;
+
+                        .param-name {
+                            font-weight: 600;
+                            color: rgb(var(--default-black));
+                            background-color: rgba(var(--light-gray), .3);
+                            padding: .2rem .5rem;
+                            border-radius: var(--label-border-radius);
+                        }
+
+                        .param-is-documented,
+                        .param-is-tested {
+                            display: flex;
+                            align-items: center;
+                        }
+                    }
+
+                    .item-parameter-values {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0 0 0 2rem;
+
+                        .no-values {
+                            color: rgba(var(--default-black), 0.6);
+                            font-style: italic;
+                            font-size: 0.9rem;
+                            padding: .3rem 0;
+                        }
+
+                        .item-parameter-value {
+                            display: flex;
+                            align-items: center;
+                            gap: .5rem;
+                            padding: .3rem 0;
+
+                            .param-value {
+                                color: rgb(var(--default-black));
+                                background-color: rgba(var(--light-gray), .2);
+                                padding: .15rem .4rem;
+                                border-radius: var(--label-border-radius);
+                                font-family: monospace;
+                                font-size: 0.9rem;
+                                word-break: break-all;
+                            }
+
+                            .param-value-is-documented,
+                            .param-value-is-tested {
+                                display: flex;
+                                align-items: center;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .request-headers-container,
+        .request-body-container,
+        .response-headers-container,
+        .response-body-container {
+            margin-top: 1rem;
+            
+            .request-headers__title,
+            .request-body__title,
+            .response-headers__title,
+            .response-body__title {
+                font-weight: bold;
+            }
+        }
+    }
+}

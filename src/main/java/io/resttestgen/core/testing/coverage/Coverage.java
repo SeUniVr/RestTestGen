@@ -1,6 +1,7 @@
-package io.resttestgen.core.testing;
+package io.resttestgen.core.testing.coverage;
 
 import com.google.gson.JsonObject;
+import io.resttestgen.core.testing.TestInteraction;
 
 public abstract class Coverage {
 

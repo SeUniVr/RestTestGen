@@ -32,9 +32,9 @@ public class ExtendedRandom extends Random {
     }
     /**
      * Generates a random length (integer) value according to the minimum and maximum values provided. Useful for
-     * strings or arrays lengths.
+     * string or array lengths.
      * @param minLength minimum length, null = 0
-     * @param maxLength maximum length, if null no maximum value is used
+     * @param maxLength maximum length, if null, no maximum value is used
      * @return an integer value among minLength (or 0 if null) and maxLength, or without bound if maxLength == null
      */
     public int nextLength(Integer minLength, Integer maxLength) {
@@ -451,7 +451,8 @@ public class ExtendedRandom extends Random {
         return e.stream().skip(nextInt(e.size())).findFirst();
     }
 
-    public Double nextDouble(Double min, Double max) {
+    // INFO: name changed to nextDoubl to avoid conflicts with Java 17+ method nextDouble
+    public Double nextDoubl(Double min, Double max) {
         min = min != null ? min : -Double.MAX_VALUE;
         max = max != null ? max : Double.MAX_VALUE;
         if (min <= max) {
@@ -707,14 +708,14 @@ public class ExtendedRandom extends Random {
     }
 
     public double nextLatitude() {
-        double nextDouble = nextDouble(-90., 90.);
+        double nextDouble = nextDoubl(-90., 90.);
 
         // keeping 8 decimal digits
         return (int) (nextDouble * 100_000_000) / 100_000_000.0;
     }
 
     public double nextLongitude() {
-        double nextDouble = nextDouble(-180., 180.);
+        double nextDouble = nextDoubl(-180., 180.);
 
         // keeping 8 decimal digits
         return (int) (nextDouble * 100_000_000) / 100_000_000.0;

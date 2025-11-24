@@ -274,7 +274,9 @@ public class NumberParameter extends LeafParameter {
     @Override
     public boolean isObjectTypeCompliant(Object o) {
         return o != null
-                && (o instanceof NumberParameter || Number.class.isAssignableFrom(o.getClass()));
+                && (o instanceof NumberParameter ||
+                Number.class.isAssignableFrom(o.getClass()) ||
+                (o instanceof String && isNumeric((String) o)));
     }
 
     /**
@@ -328,7 +330,7 @@ public class NumberParameter extends LeafParameter {
     }
 
     @Override
-    public String getJSONString() {
+    public String getJsonString() {
         String stringValue = getConcreteValue().toString();
 
         // If the numeric value is integer (mathematical meaning, i.e., no decimal digits), print it without the .0
@@ -336,7 +338,16 @@ public class NumberParameter extends LeafParameter {
             stringValue = Long.toString(((Double) getConcreteValue()).longValue());
         }
 
-        return getJSONHeading() + stringValue;
+        return getJsonHeading() + stringValue;
     }
 
+    private static boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) return false;
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

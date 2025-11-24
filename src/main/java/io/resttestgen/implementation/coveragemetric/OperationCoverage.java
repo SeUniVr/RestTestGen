@@ -1,11 +1,11 @@
-package io.resttestgen.core.testing.coverage;
+package io.resttestgen.implementation.coveragemetric;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
-import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.coverage.Coverage;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,9 +21,9 @@ public class OperationCoverage extends Coverage {
     }
     @Override
     public void updateCoverage(TestInteraction testInteraction) {
-        if(operationsToTest.contains(testInteraction.getFuzzedOperation())){
+        if (operationsToTest.contains(testInteraction.getFuzzedOperation())) {
             operationsDocumentedTested.add(testInteraction.getFuzzedOperation());
-        }else{
+        } else {
             operationsNotDocumentedTested.add(testInteraction.getFuzzedOperation());
         }
     }
@@ -69,5 +69,14 @@ public class OperationCoverage extends Coverage {
         return report;
     }
 
+    public Set<Operation> getDocumentedOperations() {
+        return new HashSet<>(operationsDocumentedTested);
+    }
 
+    public Set<Operation> getTestedOperations() {
+        HashSet<Operation> allOperations = new HashSet<>();
+        allOperations.addAll(operationsDocumentedTested);
+        allOperations.addAll(operationsNotDocumentedTested);
+        return allOperations;
+    }
 }

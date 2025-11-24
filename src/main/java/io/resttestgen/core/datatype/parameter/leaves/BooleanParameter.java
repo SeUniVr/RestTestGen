@@ -80,8 +80,8 @@ public class BooleanParameter extends LeafParameter {
     }
 
     @Override
-    public String getJSONString() {
-        return getJSONHeading() + getConcreteValue().toString();
+    public String getJsonString() {
+        return getJsonHeading() + getConcreteValue().toString();
     }
 
     @Override

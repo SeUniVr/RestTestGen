@@ -3,7 +3,8 @@ package io.resttestgen.implementation.writer;
 import com.google.gson.JsonObject;
 import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.Environment;
-import io.resttestgen.core.testing.Coverage;
+import io.resttestgen.core.testing.Writer;
+import io.resttestgen.core.testing.coverage.Coverage;
 import io.resttestgen.core.testing.coverage.CoverageManager;
 
 import java.io.File;
@@ -20,7 +21,7 @@ public class CoverageReportWriter {
     }
 
     public String getOutputFormatName() {
-        return "CoverageReports";
+        return "coverage-reports";
     }
 
     private String getOutputPath(){
@@ -33,11 +34,11 @@ public class CoverageReportWriter {
 
         file.mkdirs();
 
-        FileWriter writer = new FileWriter(getOutputPath() + "CoverageStats.json");
+        FileWriter writer = new FileWriter(getOutputPath() + "stats.json");
         JsonObject jsonRoot = new JsonObject();
 
-        for(Coverage coverage: coverageManager.getCoverages()){
-            FileWriter singleCoverageReportWriter = new FileWriter(getOutputPath() + coverage.getClass().getSimpleName() + (".json"));
+        for(Coverage coverage: coverageManager.getCoverageMetrics()){
+            FileWriter singleCoverageReportWriter = new FileWriter(getOutputPath() + Writer.toKebabCase(coverage.getClass().getSimpleName()) + (".json"));
             singleCoverageReportWriter.write(String.valueOf(coverage.getReportAsJsonObject()));
             singleCoverageReportWriter.close();
             JsonObject simpleCoverageReport = new JsonObject();

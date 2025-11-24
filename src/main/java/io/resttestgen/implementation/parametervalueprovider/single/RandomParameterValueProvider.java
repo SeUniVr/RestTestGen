@@ -41,7 +41,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                 case 1:
                     return random.nextInt();
                 case 2:
-                    return random.nextDouble(-100000., 100000.);
+                    return random.nextDoubl(-100000., 100000.);
                 case 3:
                     return random.nextBoolean();
                 default:
@@ -183,7 +183,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             }
 
             // Generate and return the value
-            return random.nextDouble(min, max);
+            return random.nextDoubl(min, max);
         }
 
         // If the parameter is a float

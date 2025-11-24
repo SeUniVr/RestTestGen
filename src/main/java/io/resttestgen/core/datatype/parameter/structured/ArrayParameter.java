@@ -284,9 +284,9 @@ public class ArrayParameter extends StructuredParameter {
     }
 
     @Override
-    public String getJSONString() {
-        StringBuilder stringBuilder = new StringBuilder(getJSONHeading() + "[");
-        elements.forEach(e -> stringBuilder.append(e.getJSONString()).append(", "));
+    public String getJsonString() {
+        StringBuilder stringBuilder = new StringBuilder(getJsonHeading() + "[");
+        elements.forEach(e -> stringBuilder.append(e.getJsonString()).append(", "));
         int index = stringBuilder.lastIndexOf(",");
         return stringBuilder.substring(0, index > 0 ? index : stringBuilder.length()) + "]";
     }

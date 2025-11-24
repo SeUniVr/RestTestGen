@@ -17,7 +17,7 @@ public class ReportWriter extends Writer {
 
     @Override
     public String getOutputFormatName() {
-        return "Report";
+        return "json-reports";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

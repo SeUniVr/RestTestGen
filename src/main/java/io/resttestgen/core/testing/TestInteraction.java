@@ -52,6 +52,8 @@ public class TestInteraction extends Taggable {
         this.fuzzedOperation = fuzzedOperation;
     }
 
+    public Operation getReferenceOperation() { return referenceOperation; }
+
     public Operation getFuzzedOperation() {
         return fuzzedOperation;
     }

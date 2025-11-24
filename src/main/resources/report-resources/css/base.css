@@ -1,0 +1,63 @@
+:root {
+    --default-white: 254, 254, 255; /* #fefeff */
+    --default-black: 32, 43, 54; /* #202b36 */
+
+    --background-white: 249, 248, 251; /* #f9f8fb */
+
+    --border-gray: 214, 222, 225; /* #d6dee1 */
+    --light-gray: 170, 184, 190; /* #aab8be */
+
+    --postman-orange: 239, 91, 37; /* #ef5b25 */
+
+    --rtg-blue: 67, 126, 175; /* #437eaf */
+    --rtg-blue-darker: 17, 53, 91; /* #11355b */
+
+    --green-success: 76, 175, 80; /* #4caf50 */
+    --red-error: 244, 67, 54; /* #f44336 */
+
+    --bg-method-get: 32, 156, 238; /* #209cee */
+    --bg-method-post: 76, 175, 80; /* #4caf50 */
+    --bg-method-put: 255, 193, 7; /* #ffc107 */
+    --bg-method-delete: 244, 67, 54; /* #f44336 */
+    --bg-method-patch: 156, 39, 176; /* #9c27b0 */
+    --bg-method-head: 255, 87, 34; /* #ff5722 */
+    --bg-method-options: 103, 58, 183; /* #673ab7 */
+
+    --bg-method-transparency: 0.2;
+
+    --c-method-get: 30, 136, 229; /* #1e88e5 */
+    --c-method-post: 67, 160, 71; /* #43a047 */
+    --c-method-put: 255, 160, 0; /* #ffa000 */
+    --c-method-delete: 229, 57, 53; /* #e53935 */
+    --c-method-patch: 142, 36, 170; /* #8e24aa */
+    --c-method-head: 57, 73, 171; /* #3949ab */
+    --c-method-options: 109, 76, 65; /* #6d4c41 */
+
+    /* HTTP Status Code Colors */
+    --bg-status-200: 76, 175, 80; /* #4caf50 */
+    --bg-status-300: 33, 150, 243; /* #2196f3 */
+    --bg-status-400: 255, 152, 0; /* #ff9800 */
+    --bg-status-500: 244, 67, 54; /* #f44336 */
+
+    --bg-status-transparency: 0.2;
+
+    --c-status-200: 67, 160, 71; /* #43a047 */
+    --c-status-300: 30, 136, 229; /* #1e88e5 */
+    --c-status-400: 239, 108, 0; /* #ef6c00 */
+    --c-status-500: 211, 47, 47; /* #d32f2f */
+
+    --buttons-border-radius: 2rem;
+    --label-border-radius: .5rem;
+
+    --default-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}

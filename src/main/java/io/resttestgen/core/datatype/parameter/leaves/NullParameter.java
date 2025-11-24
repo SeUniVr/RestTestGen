@@ -58,8 +58,8 @@ public class NullParameter extends LeafParameter {
     }
 
     @Override
-    public String getJSONString() {
-        return getJSONHeading() + "null";
+    public String getJsonString() {
+        return getJsonHeading() + "null";
     }
 
     @Override

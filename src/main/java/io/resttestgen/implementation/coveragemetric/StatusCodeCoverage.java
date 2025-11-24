@@ -1,12 +1,12 @@
-package io.resttestgen.core.testing.coverage;
+package io.resttestgen.implementation.coveragemetric;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.HttpStatusCode;
 import io.resttestgen.core.openapi.Operation;
-import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.coverage.Coverage;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -119,5 +119,16 @@ public class StatusCodeCoverage  extends Coverage {
             }
         }
         return notTested;
+    }
+
+    public HashMap<Operation, Set<HttpStatusCode>> getDocumentedStatusCodes() {
+        return new HashMap<>(statusCodeToTest);
+    }
+
+    public HashMap<Operation, Set<HttpStatusCode>> getTestedStatusCodes() {
+        HashMap<Operation, Set<HttpStatusCode>> testedStatusCodes = new HashMap<>();
+        testedStatusCodes.putAll(statusCodeDocumentedTested);
+        testedStatusCodes.putAll(statusCodeNotDocumentedTested);
+        return testedStatusCodes;
     }
 }

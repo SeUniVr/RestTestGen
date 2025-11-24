@@ -40,7 +40,7 @@ public class ProducerConsumerOracle extends Oracle {
                 AtomicInteger notFound = new AtomicInteger();
 
                 consumerInteraction.getFuzzedOperation().getLeaves().forEach(parameterLeaf -> {
-                    String compressedJSONString = parameterLeaf.getJSONString()
+                    String compressedJSONString = parameterLeaf.getJsonString()
                             .replaceAll("\\s", "")
                             .replaceAll("\\r\\n", "")
                             .replaceAll("\\n", "");

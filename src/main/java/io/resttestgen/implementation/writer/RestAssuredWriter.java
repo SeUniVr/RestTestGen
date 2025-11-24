@@ -38,7 +38,7 @@ public class RestAssuredWriter extends Writer {
 
     @Override
     public String getOutputFormatName() {
-        return "REST-assured";
+        return "rest-assured";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

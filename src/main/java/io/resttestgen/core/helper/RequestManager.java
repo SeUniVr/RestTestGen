@@ -164,7 +164,7 @@ public class RequestManager {
                     formParametersMap.values().forEach(formUrlEncoded::add);
                     requestBody = RequestBody.create(formUrlEncoded.toString(), FORM);
                 } else {
-                    requestBody = RequestBody.create(operation.getRequestBody().getJSONString(), JSON);
+                    requestBody = RequestBody.create(operation.getRequestBody().getJsonString(), JSON);
                 }
             } else {
                 requestBody = RequestBody.create(new byte[0], null);

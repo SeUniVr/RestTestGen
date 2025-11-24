@@ -28,7 +28,7 @@ public abstract class Writer {
     // FIXME: make path compatible with Windows
     public String getOutputPath() {
         return configuration.getOutputPath() + configuration.getTestingSessionName() + "/" + getOutputFormatName() +
-                "/" + testSequence.getGenerator() + "/";
+                "/" + toKebabCase(testSequence.getGenerator()) + "/";
     }
 
     /**
@@ -51,4 +51,21 @@ public abstract class Writer {
 
         return testSequence.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + "-" + testSequence.getId() + finalExtension;
     }
+
+    public static String toKebabCase(String input) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0) {
+                    result.append('-');
+                }
+                result.append(Character.toLowerCase(c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
 }

@@ -27,6 +27,7 @@ public class Configuration {
     private Level logVerbosity;
     private String apiUnderTest;
     private String strategyClassName;
+    private LocalDateTime timestamp;
     private String testingSessionName;
     private final List<String> qualifiableParameterNames;
     private boolean globalOutputPath;
@@ -43,8 +44,8 @@ public class Configuration {
 
         // Choose random testing session name with date and random number
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
-        LocalDateTime now = LocalDateTime.now();
-        testingSessionName = "testing-session-" + dtf.format(now);
+        timestamp = LocalDateTime.now();
+        testingSessionName = "testing-session-" + dtf.format(timestamp);
 
         // Use the local path (API path) by default
         globalOutputPath = false;
@@ -72,6 +73,10 @@ public class Configuration {
 
     public void setTestingSessionName(String testingSessionName) {
         this.testingSessionName = testingSessionName;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 
     public String getOutputPath() {

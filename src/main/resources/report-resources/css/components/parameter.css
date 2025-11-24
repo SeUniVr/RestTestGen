@@ -1,0 +1,20 @@
+.parameter-name {
+    font-weight: bold;
+    color: darkblue;
+}
+
+.parameter-value {
+    color: darkred;
+}
+
+.parameter-separator {
+    font-weight: bold;
+    color: black;
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+}
+
+.parameter-equals {
+    font-weight: bold;
+    color: darkgreen;
+}

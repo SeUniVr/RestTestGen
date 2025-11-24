@@ -1,4 +1,4 @@
-package io.resttestgen.core.testing.coverage;
+package io.resttestgen.implementation.coveragemetric;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -6,8 +6,8 @@ import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.parameter.Parameter;
 import io.resttestgen.core.datatype.parameter.leaves.LeafParameter;
 import io.resttestgen.core.openapi.Operation;
-import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.coverage.Coverage;
 
 import java.util.*;
 
@@ -121,5 +121,16 @@ public class ParameterCoverage extends Coverage {
                 }
         }
         return notTested;
+    }
+
+    public HashMap<Operation, Set<ParameterElementWrapper>> getDocumentedParameters() {
+        return new HashMap<>(parametersToTest);
+    }
+
+    public HashMap<Operation, Set<ParameterElementWrapper>> getTestedParameters() {
+        HashMap<Operation, Set<ParameterElementWrapper>> testedParameters = new HashMap<>();
+        testedParameters.putAll(parametersDocumentedTested);
+        testedParameters.putAll(parametersNotDocumentedTested);
+        return testedParameters;
     }
 }

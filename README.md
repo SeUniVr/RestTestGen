@@ -19,6 +19,7 @@ This framework empowers users to tailor their testing approach to specific requi
 - Nominal and error testing: performs nominal and error testing of the selected API. This is the default strategy.
 - Mass assignment security testing: tests the selected API for mass assignment vulnerabilities.
 - NLP-based enhancement of OpenAPI specifications: enhances the OpenAPI specification of the selected API by extracting constraints and example values from textual descriptions in natural language. Requires Rule Extraction service to be running at [http://localhost:4000/](). Download and deploy the Rule Extractor service from the [NLP2REST repository](https://github.com/codingsoo/nlp2rest/).
+- DeepREST: deep reinforcement learning-based strategy. See here: [https://github.com/SeUniVr/DeepREST-Docker](https://github.com/SeUniVr/DeepREST-Docker)
 
 ## Framework features
 - Custom parser for OpenAPI (v3) specifications (JSON and YAML).
@@ -37,18 +38,14 @@ This framework empowers users to tailor their testing approach to specific requi
 
 ## Changelog
 
-### v25.06
-- OpenAPI parser was fully rewritten for improved stability and performance.
-- Issues with the parsed OpenAPI specification are now saved to a file in the result folder.
-- Optimized deep cloning of objects, leading to general performance improvements (for example, RestTestGen is now up to 50% faster in generating HTTP requests).
-- Improved computation of normalized parameter names.
-- Support for host overriding. Users can now specify a host or IP where the API under test is reachable overriding the one in the OpenAPI specification.
-- Added strategy configuration via file.
-- Fixed a crash caused by OkHttp when provided with unsupported characters (such as à, è, ì, etc.) in header parameters.
-- Fixed a crash in the OpenAPI parser occurring when an OpenAPI specification had children for a path item that were not HTTP methods (such as "summary" instead of "get," "post," etc.).
-- Fixed a crash in the OpenAPI parser that in some instances did not recognize cyclic references in the specification being parsed, causing a quick fill of the heap.
-- Fixed a bug that caused some test cases and test reports to be overwritten.
-- Upgraded Gradle to v8.14 (both Gradle Wrapper and Docker).
+### v25.11
+- Added new HTML report with GUI. The report will be written in the testing session folder under `html-report/report.html`.
+- Added support for newer Java versions (17+) by removing a conflict with the `Random` class.
+- - Added computation of successful operation coverage.
+- Fixed a bug in request and response dictionary value providers that prevented the reading of multiple values from the dictionary.
+- Fixed a bug in `NumberParameter` that prevented string values that represented numbers (e.g., the string "10.1") to be considered as valid values for the parameter (of course, after casting).
+- Fixed a bug in `StringParameter` when the JSON value contained double quotes. These double quotes were not encoded properly, causing structural problems in the rendered request.
+- Fixed a bug in `NarrowRandomParameterValueProvider` that caused the minimum value for integers to be used as maximum value.
 
 For the changelog of past versions, please see the [CHANGELOG.md](CHANGELOG.md) file.
 

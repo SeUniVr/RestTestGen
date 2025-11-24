@@ -60,7 +60,7 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
             max = parameter.isExclusiveMaximum() ? max - Double.MIN_VALUE : max;
 
             // Generate and return the value
-            return random.nextDouble(min, max);
+            return random.nextDoubl(min, max);
         }
 
         // If the parameter is a float
@@ -74,7 +74,7 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
             min = Math.max((float) NUMBER_LOWER_BOUND, min);
             max = Math.min((float) NUMBER_UPPER_BOUND, max);
 
-            Double value = random.nextDouble(min, max);
+            Double value = random.nextDoubl(min, max);
 
             // Cut decimal digits with 50% probability
             if (random.nextBoolean()) {
@@ -98,7 +98,7 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
             if (isLong) {
                 return random.nextLong(min.longValue(), max.longValue());
             } else {
-                return random.nextInt(min.intValue(), min.intValue());
+                return random.nextInt(min.intValue(), max.intValue());
             }
         }
     }

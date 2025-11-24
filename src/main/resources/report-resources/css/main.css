@@ -1,0 +1,20 @@
+@import 'base.css';
+@import 'components/header.css';
+@import 'components/list.css';
+@import 'components/toast.css';
+@import 'components/popup.css';
+@import 'components/parameter.css';
+
+body {
+    background-color: rgb(var(--background-white));
+}
+
+.page-content {
+    opacity: 0;
+    min-width: 1200px;
+    transition: opacity 0.3s ease-in;
+}
+
+.page-content.visible {
+    opacity: 1;
+}

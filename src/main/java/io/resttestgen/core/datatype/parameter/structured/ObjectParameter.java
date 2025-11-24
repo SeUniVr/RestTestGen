@@ -193,16 +193,16 @@ public class ObjectParameter extends StructuredParameter {
     }
 
     @Override
-    public String getJSONString() {
+    public String getJsonString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // If object is inside an array, no heading is printed
+        // If the object is inside an array, no heading is printed
         if (getParent() instanceof ArrayParameter) {
             stringBuilder.append("{");
         } else {
-            stringBuilder.append(getJSONHeading()).append("{");
+            stringBuilder.append(getJsonHeading()).append("{");
         }
-        properties.forEach(p -> stringBuilder.append(p.getJSONString()).append(", "));
+        properties.forEach(p -> stringBuilder.append(p.getJsonString()).append(", "));
         int index = stringBuilder.lastIndexOf(",");
         return stringBuilder.substring(0, index > 0 ? index : stringBuilder.length()) + "}";
     }

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{API_NAME}} | {{TESTING_SESSION_ID}} | RestTestGen Coverage Report</title>
+
+    <link rel="stylesheet" href="report-resources/css/main.css">
+
+    <script src="report-resources/js/constants.js" defer></script>
+    <script src="report-resources/js/dom-utils.js" defer></script>
+    <script src="report-resources/js/postman-utils.js" defer></script>
+    <script src="report-resources/js/parameter-utils.js" defer></script>
+    <script src="report-resources/js/list.js" defer></script>
+    <script src="report-resources/js/list-manager.js" defer></script>
+    <script src="report-resources/js/popup.js" defer></script>
+    <script src="report-resources/js/main.js" defer></script>
+</head>
+
+<body>
+    <section class="page-content">
+        <!-- Header Section -->
+        <header class="report-header">
+
+            <img src="report-resources/img/rtg-logo-light.svg" alt="RestTestGen" width="300" />
+
+            <div class="report-header__meta">
+
+                <div class="report-header__meta-item">
+                    <h2 class="report-header__meta-label">API:</h2>
+                    <p class="report-header__meta-value api-name"></p>
+                </div>
+
+                <!--div class="report-header__meta-item">
+                    <h2 class="report-header__meta-label">Testing session:</h2>
+                    <p class="report-header__meta-value session-id"></p>
+                </div-->
+
+                <div class="report-header__meta-item">
+                    <h2 class="report-header__meta-label">Testing started on:</h2>
+                    <p class="report-header__meta-value timestamp"></p>
+                </div>
+
+            </div>
+
+            <button class="report-header__button" id="download-report">Download Postman collection</button>
+        </header>
+
+        <!-- Main Content Section (list and filter) -->
+        <main class="report-content">
+            <div class="report-content__filter-bar">
+                <input type="text" class="report-content__filter-input filter-id" placeholder="Filter by ID">
+                <input type="text" class="report-content__filter-input filter-method" placeholder="Filter by method">
+                <input type="text" class="report-content__filter-input filter-endpoint"
+                    placeholder="Filter by path">
+                <input type="text" class="report-content__filter-input filter-status-code"
+                    placeholder="Filter by status code">
+                <input type="text" class="report-content__filter-input filter-test-type"
+                       placeholder="Filter by validity">
+                <!--input type="text" class="report-content__filter-input filter-parameters"
+                    placeholder="Filter by parameters"-->
+
+                <button class="report-content__filter-button filter-reset">Clear filters</button>
+            </div>
+            <div class="report-content__table-container">
+                <table class="report-content__table">
+                    <thead>
+                        <tr>
+                            <th class="table-col col-checkbox"><input type="checkbox" id="select-all-checkbox" name="select-all-checkbox" title="Select/Deselect All"></th>
+                            <th class="table-col col-id table-header-id">ID</th>
+                            <th class="table-col col-method table-header-method">Method</th>
+                            <th class="table-col col-endpoint table-header-endpoint">Path</th>
+                            <th class="table-col col-status-code table-header-status-code">Status code</th>
+                            <th class="table-col col-test-type table-header-test-type">Validity</th>
+                            <!--th class="table-col col-parameters table-header-parameters">Parameters</th-->
+                            <th class="table-col col-actions table-header-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="list"></tbody>
+                </table>
+            </div>
+        </main>
+    </section>
+</body>
+
+</html>

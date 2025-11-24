@@ -8,6 +8,7 @@ import io.resttestgen.core.testing.parametervalueprovider.CountableParameterValu
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,9 +26,18 @@ public class RequestDictionaryParameterValueProvider extends CountableParameterV
 
     @Override
     protected Collection<Object> collectValuesFor(LeafParameter leafParameter) {
-        Set<DictionaryEntry> entries = new HashSet<>(requestDictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
+        Set<DictionaryEntry> entries = new HashSet<>(
+                requestDictionary.getEntriesByParameterName(leafParameter.getName(), leafParameter.getType()));
         entries.addAll(requestDictionary.getEntriesByNormalizedParameterName(leafParameter.getNormalizedName(), leafParameter.getType()));
-        Set<Object> values = entries.stream().map(DictionaryEntry::getSource).collect(Collectors.toSet());
+        Set<Object> concreteValuesCache = new HashSet<>();
+        LinkedList<Object> values = new LinkedList<>();
+        for (DictionaryEntry entry : entries) {
+            Object concreteValue = entry.getSource().getConcreteValue();
+            if (!concreteValuesCache.contains(concreteValue)) {
+                concreteValuesCache.add(concreteValue);
+                values.add(entry.getSource());
+            }
+        }
         return strict ? filterNonCompliantValues(values, leafParameter) : values;
     }
 

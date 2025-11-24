@@ -1,36 +1,30 @@
 package io.resttestgen.core.testing.coverage;
 
-import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.implementation.coveragemetric.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class CoverageManager{
+public class CoverageManager {
 
-    private final List<Coverage> listCoverages = new LinkedList<>();
+    private final List<Coverage> coverageMetrics = new LinkedList<>();
+
     public CoverageManager(){
-        OperationCoverage operationCoverage = new OperationCoverage();
-        PathCoverage pathCoverage = new PathCoverage();
-        ParameterCoverage parameterCoverage = new ParameterCoverage();
-        StatusCodeCoverage statusCodeCoverage = new StatusCodeCoverage();
-        ParameterValueCoverage parameterValueCoverage = new ParameterValueCoverage();
-        this.listCoverages.add(parameterValueCoverage);
-        this.listCoverages.add(statusCodeCoverage);
-        this.listCoverages.add(operationCoverage);
-        this.listCoverages.add(pathCoverage);
-        this.listCoverages.add(parameterCoverage);
+        coverageMetrics.add(new OperationCoverage());
+        coverageMetrics.add(new PathCoverage());
+        coverageMetrics.add(new ParameterCoverage());
+        coverageMetrics.add(new StatusCodeCoverage());
+        coverageMetrics.add(new ParameterValueCoverage());
+        coverageMetrics.add(new SuccessfulOperationCoverage());
     }
 
+    public void updateAllCoverage(TestInteraction testInteraction) {
+        coverageMetrics.forEach(cm -> cm.updateCoverage(testInteraction));
 
-    public void updateCoverage(TestInteraction testInteraction) {
-        for(Coverage coverage: listCoverages){
-            coverage.updateCoverage(testInteraction);
-        }
     }
 
-
-    public List<Coverage> getCoverages(){
-        return this.listCoverages;
+    public List<Coverage> getCoverageMetrics(){
+        return this.coverageMetrics;
     }
 }

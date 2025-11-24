@@ -1,4 +1,4 @@
-package io.resttestgen.core.testing.coverage;
+package io.resttestgen.implementation.coveragemetric;
 
 import io.resttestgen.core.datatype.parameter.Parameter;
 

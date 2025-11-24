@@ -1,5 +1,14 @@
 # RestTestGen Changelog
 
+### v25.11
+- Added new HTML report with GUI. The report will be written in the testing session folder under `html-report/report.html`.
+- Added support for newer Java versions (17+) by removing a conflict with the `Random` class.
+- Added computation of successful operation coverage.
+- Fixed a bug in request and response dictionary value providers that prevented the reading of multiple values from the dictionary.
+- Fixed a bug in `NumberParameter` that prevented string values that represented numbers (e.g., the string "10.1") to be considered as valid values for the parameter (of course, after casting).
+- Fixed a bug in `StringParameter` when the JSON value contained double quotes. These double quotes were not encoded properly, causing structural problems in the rendered request.
+- Fixed a bug in `NarrowRandomParameterValueProvider` that caused the minimum value for integers to be used as maximum value.
+
 ### v25.06
 - OpenAPI parser was fully rewritten for improved stability and performance.
 - Issues with the parsed OpenAPI specification are now saved to a file in the result folder.

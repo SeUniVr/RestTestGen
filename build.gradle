@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'io.resttestgen'
-version '25.06'
+version '25.11'
 
 application {
     mainClass.set('io.resttestgen.boot.cli.App')

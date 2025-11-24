@@ -120,10 +120,10 @@ public class ConstraintViolationParameterMutator extends ParameterMutator {
 
         List<Double> values = new ArrayList<>();
         if (parameter.getMinimum() != null && parameter.getMinimum() > Double.MIN_VALUE) {
-            values.add(random.nextDouble(Double.MIN_VALUE, parameter.getMinimum()));
+            values.add(random.nextDoubl(Double.MIN_VALUE, parameter.getMinimum()));
         }
         if (parameter.getMaximum() != null && parameter.getMaximum() < Double.MAX_VALUE) {
-            values.add(random.nextDouble(parameter.getMaximum(), Double.MAX_VALUE));
+            values.add(random.nextDoubl(parameter.getMaximum(), Double.MAX_VALUE));
         }
 
         Optional<Double> chosenValue = random.nextElement(values);

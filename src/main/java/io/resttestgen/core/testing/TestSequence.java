@@ -149,6 +149,10 @@ public class TestSequence extends Taggable implements List<TestInteraction> {
         return testInteractions.get(index);
     }
 
+    public List<TestInteraction> getTestInteractions() {
+        return testInteractions;
+    }
+
     @Override
     public TestInteraction set(int i, TestInteraction testInteraction) {
         return testInteractions.set(i, testInteraction);

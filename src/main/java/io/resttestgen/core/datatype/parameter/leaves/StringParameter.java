@@ -13,6 +13,7 @@ import io.resttestgen.core.helper.ObjectHelper;
 import io.resttestgen.core.openapi.EditReadOnlyOperationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.google.gson.Gson;
 
 import java.util.Map;
 import java.util.Objects;
@@ -258,13 +259,18 @@ public class StringParameter extends LeafParameter {
     }
 
     @Override
-    public String getJSONString() {
+    public String getJsonString() {
 
-        // If leaf is inside an array, don't print the leaf name
+        String concreteStringValue = getConcreteValue().toString();
+
+        // Encode special characters in JSON string
+        concreteStringValue = new Gson().toJson(concreteStringValue).replaceAll("^\"|\"$", "");
+
+        // If the leaf is inside an array, don't print the leaf name
         if (this.getParent() instanceof ArrayParameter) {
-            return "\"" + getConcreteValue() + "\"";
+            return "\"" + concreteStringValue + "\"";
         } else {
-            return getJSONHeading() + "\"" + getConcreteValue() + "\"";
+            return getJsonHeading() + "\"" + concreteStringValue + "\"";
         }
     }
 }

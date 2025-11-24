@@ -1,11 +1,11 @@
-package io.resttestgen.core.testing.coverage;
+package io.resttestgen.implementation.coveragemetric;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.resttestgen.core.Environment;
 import io.resttestgen.core.openapi.Operation;
-import io.resttestgen.core.testing.Coverage;
 import io.resttestgen.core.testing.TestInteraction;
+import io.resttestgen.core.testing.coverage.Coverage;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,5 +69,14 @@ public class PathCoverage extends Coverage {
         return report;
     }
 
+    public Set<String> getDocumentedPaths() {
+        return new HashSet<>(pathsToTest);
+    }
 
+    public Set<String> getTestedPaths() {
+        HashSet<String> testedPaths = new HashSet<>();
+        testedPaths.addAll(pathsDocumentedTested);
+        testedPaths.addAll(pathsNotDocumentedTested);
+        return testedPaths;
+    }
 }
