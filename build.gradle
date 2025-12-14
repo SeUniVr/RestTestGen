@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'io.resttestgen'
-version '25.11'
+version '25.12'
 
 application {
     mainClass.set('io.resttestgen.boot.cli.App')
@@ -35,6 +35,11 @@ dependencies {
     implementation 'org.iban4j:iban4j:3.2.3-RELEASE'
 
     implementation 'nz.ac.waikato.cms.weka:weka-stable:3.8.6'
+
+    implementation 'dev.langchain4j:langchain4j-open-ai:1.9.1'
+    implementation 'dev.langchain4j:langchain4j:1.9.1'
+    implementation 'dev.langchain4j:langchain4j-http-client-jdk:1.9.1'
+    implementation 'org.slf4j:slf4j-nop:2.0.17'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'

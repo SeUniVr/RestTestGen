@@ -23,6 +23,12 @@ public class ParameterValueProviderCachedFactory {
                 case DEFAULT:
                     provider = new DefaultParameterValueProvider();
                     break;
+                case DESCRIPTION:
+                    provider = new DescriptionParameterValueProvider();
+                    break;
+                case LLM:
+                    provider = new LlmParameterValueProvider();
+                    break;
                 case REQUEST_DICTIONARY:
                     provider = new RequestDictionaryParameterValueProvider();
                     break;
@@ -52,6 +58,9 @@ public class ParameterValueProviderCachedFactory {
                     break;
                 case ENUM_AND_EXAMPLE_PRIORITY:
                     provider = new EnumAndExamplePriorityParameterValueProvider();
+                    break;
+                case EXPERIENCE:
+                    provider = new ExperienceDrivenMultiParameterValueProvider();
                     break;
                 default:
                     provider = new RandomParameterValueProvider();

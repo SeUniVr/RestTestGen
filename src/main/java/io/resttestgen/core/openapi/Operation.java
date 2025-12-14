@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class Operation {
     private final String endpoint;
-    private final HttpMethod method;
+    private HttpMethod method;
     private final String operationId;
 
     private final String description;
@@ -277,6 +277,10 @@ public class Operation {
 
     public HttpMethod getMethod() {
         return method;
+    }
+
+    public void setMethod(HttpMethod method) {
+        this.method = method;
     }
 
     public String getOperationId() {

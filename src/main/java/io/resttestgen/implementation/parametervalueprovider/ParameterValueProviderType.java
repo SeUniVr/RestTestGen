@@ -15,17 +15,20 @@ public enum ParameterValueProviderType {
     ENUM,
     EXAMPLES,
     DEFAULT,
+    DESCRIPTION,
+    LLM,
     REQUEST_DICTIONARY,
     RESPONSE_DICTIONARY,
     LAST_REQUEST_DICTIONARY,
     LAST_RESPONSE_DICTIONARY,
 
-    //MULTI
+    // MULTI
     RANDOM_PROVIDER,
     GLOBAL_DICTIONARY_PRIORITY,
     LOCAL_DICTIONARY_PRIORITY,
     KEEP_LAST_ID,
-    ENUM_AND_EXAMPLE_PRIORITY;
+    ENUM_AND_EXAMPLE_PRIORITY,
+    EXPERIENCE;
 
     public static ParameterValueProviderType getTypeFromProvider(ParameterValueProvider provider) {
         if (provider instanceof RandomParameterValueProvider) {
@@ -38,6 +41,10 @@ public enum ParameterValueProviderType {
             return EXAMPLES;
         } else if (provider instanceof DefaultParameterValueProvider) {
             return DEFAULT;
+        } else if (provider instanceof DescriptionParameterValueProvider) {
+            return DESCRIPTION;
+        }else if (provider instanceof LlmParameterValueProvider) {
+            return LLM;
         } else if (provider instanceof RequestDictionaryParameterValueProvider) {
             return REQUEST_DICTIONARY;
         } else if (provider instanceof ResponseDictionaryParameterValueProvider) {
@@ -54,8 +61,10 @@ public enum ParameterValueProviderType {
             return LOCAL_DICTIONARY_PRIORITY;
         } else if (provider instanceof KeepLastIdParameterValueProvider) {
             return KEEP_LAST_ID;
-        } else {
+        } else if (provider instanceof EnumAndExamplePriorityParameterValueProvider) {
             return ENUM_AND_EXAMPLE_PRIORITY;
+        } else {
+            return EXPERIENCE;
         }
     }
 }

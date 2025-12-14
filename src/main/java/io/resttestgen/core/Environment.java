@@ -4,6 +4,7 @@ import io.resttestgen.boot.ApiUnderTest;
 import io.resttestgen.boot.Configuration;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.dictionary.Dictionary;
+import io.resttestgen.core.helper.Experience;
 import io.resttestgen.core.helper.ExtendedRandom;
 import io.resttestgen.core.openapi.OpenApi;
 import io.resttestgen.core.openapi.OpenApiParser;
@@ -29,7 +30,9 @@ public class Environment {
     private OperationDependencyGraph operationDependencyGraph;
     private Dictionary globalResponseDictionary;
     private Dictionary globalRequestDictionary;
+    private Dictionary partialDictionary;
     private ExtendedRandom random;
+    private Experience experience;
 
     private Environment() {}
 
@@ -49,7 +52,9 @@ public class Environment {
         this.operationDependencyGraph = new OperationDependencyGraph(openAPI);
         this.globalResponseDictionary = new Dictionary();
         this.globalRequestDictionary = new Dictionary();
+        this.partialDictionary = new Dictionary();
         this.random = new ExtendedRandom();
+        this.experience = new Experience();
 
         return this;
     }
@@ -97,12 +102,24 @@ public class Environment {
         return globalRequestDictionary;
     }
 
+    public Dictionary getPartialDictionary() {
+        return partialDictionary;
+    }
+
+    public void setPartialDictionary(Dictionary partialDictionary) {
+        this.partialDictionary = partialDictionary;
+    }
+
     public ExtendedRandom getRandom() {
         return random;
     }
 
     public void setRandom(ExtendedRandom random) {
         this.random = random;
+    }
+
+    public Experience getExperience() {
+        return experience;
     }
 
     /**

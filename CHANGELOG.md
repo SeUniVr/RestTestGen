@@ -1,5 +1,14 @@
 # RestTestGen Changelog
 
+### v25.12
+- Included DeepREST Python implementation in the source code.
+- New Dockerfiles available for RestTestGen and DeepREST, with build and runtime stages.
+- Reimplemented LLM parameter value provider to better handle the LLM dictionary and contact LLM at runtime.
+- DeepRestStrategy is highly configurable and saves reports to file, including the HTML report, JSON reports, coverage reports, and saves REST-assured test cases.
+- Fixed a crash caused by the HTML report writer when an HTTP interaction did not get a response, e.g., because of a timeout.
+- Fixed a crash caused by the HTML report writer when executed in JAR.
+- Fixed an IllegalArgumentException caused by the random number generator with some particular version of Java. 
+
 ### v25.11
 - Added new HTML report with GUI. The report will be written in the testing session folder under `html-report/report.html`.
 - Added support for newer Java versions (17+) by removing a conflict with the `Random` class.

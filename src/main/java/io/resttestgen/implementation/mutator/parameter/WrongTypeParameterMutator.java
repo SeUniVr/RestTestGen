@@ -22,8 +22,8 @@ public class WrongTypeParameterMutator extends ParameterMutator {
 
     @Override
     public boolean isParameterMutable(Parameter parameter) {
-        return parameter instanceof StringParameter || parameter instanceof NumberParameter ||
-                parameter instanceof BooleanParameter;
+        return (parameter instanceof StringParameter || parameter instanceof NumberParameter ||
+                parameter instanceof BooleanParameter) && ((LeafParameter) parameter).getConcreteValue() != null;
     }
 
     @Override

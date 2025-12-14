@@ -54,6 +54,15 @@ public class EnumAndExamplePriorityParameterValueProvider extends ParameterValue
         candidateProviders.add(responseDictionaryParameterValueProvider);
         LastResponseDictionaryParameterValueProvider lastResponseDictionaryParameterValueProvider = (LastResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_RESPONSE_DICTIONARY);
         candidateProviders.add(lastResponseDictionaryParameterValueProvider);
+        RequestDictionaryParameterValueProvider requestDictionaryParameterValueProvider = (RequestDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.REQUEST_DICTIONARY);
+        candidateProviders.add(requestDictionaryParameterValueProvider);
+        LastRequestDictionaryParameterValueProvider lastRequestDictionaryParameterValueProvider = (LastRequestDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LAST_REQUEST_DICTIONARY);
+        candidateProviders.add(lastRequestDictionaryParameterValueProvider);
+        DescriptionParameterValueProvider descriptionParameterValueProvider = (DescriptionParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DESCRIPTION);
+        candidateProviders.add(descriptionParameterValueProvider);
+        LlmParameterValueProvider llmParameterValueProvider = (LlmParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LLM);
+        candidateProviders.add(llmParameterValueProvider);
+
 
         candidateProviders.forEach(p -> p.setStrict(this.strict));
 

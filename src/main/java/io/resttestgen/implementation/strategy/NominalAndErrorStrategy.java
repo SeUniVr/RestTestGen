@@ -112,12 +112,12 @@ public class NominalAndErrorStrategy extends Strategy {
     }
 
     private void injectTestSequenceData(HtmlReportWriter htmlReportWriter, List<TestSequence> testSequencesToReport) {
-        logger.info("Injecting test sequences into JS constants file");
+        logger.debug("Injecting test sequences into JS constants file.");
         try {
             htmlReportWriter.injectTestSequenceData(testSequencesToReport);
         } catch (IOException e) {
             logger.warn("Could not write test sequence data to JavaScript constants file.", e);
         }
-        logger.info("DONE Injecting test sequences into JS constants file");
+        logger.debug("Done injecting test sequences into JS constants file.");
     }
 }

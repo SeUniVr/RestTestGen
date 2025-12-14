@@ -29,6 +29,10 @@ public class ConstraintViolationParameterMutator extends ParameterMutator {
             return false;
         }
 
+        if (parameter instanceof LeafParameter && ((LeafParameter) parameter).getConcreteValue() == null) {
+            return false;
+        }
+
         // Check if parameter is an enum
         if (parameter.isEnum() && !parameter.getEnumValues().isEmpty()) {
             return true;

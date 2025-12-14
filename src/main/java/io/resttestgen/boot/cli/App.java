@@ -16,7 +16,7 @@ import java.io.IOException;
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class);
-    private static final String toolVersion = "25.11";
+    private static final String toolVersion = "25.12";
     private static final String messageHeader = "RestTestGen CLI " + toolVersion;
     private static final String helpMessage = messageHeader + "\n"
             + "Arguments:\n"
@@ -53,7 +53,7 @@ public class App {
         // Start RestTestGen using the starter class
         try {
             Starter.start(configuration);
-            logger.info("RestTestGen execution completed successfully.");
+            logger.info("RestTestGen execution completed successfully. Results are available in the results folder.");
         } catch (InvalidOpenApiException e) {
             logger.error("The provided OpenAPI specification is not valid. {}", e.getMessage());
             System.exit(-1);

@@ -70,7 +70,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             try {
                 Generex generex = new Generex(pattern);
                 String generated = generex.random(min, max);
-                System.out.println("GENERATED: " + generated);
+                logger.debug("Generated this string from regex: {}", generated);
                 return generated;
             }
 
@@ -182,6 +182,11 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                 }
             }
 
+            // If min and max are still the same, just use that value
+            if (min == max) {
+                return min;
+            }
+
             // Generate and return the value
             return random.nextDoubl(min, max);
         }
@@ -198,7 +203,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             max = parameter.isExclusiveMaximum() ? max - Float.MIN_VALUE : max;
 
             // If min is not less than max, reset one of the two variables randomly
-            if (min > max) {
+            if (min >= max) {
                 if (random.nextBoolean()) {
                     min = -Float.MAX_VALUE;
                 } else {
@@ -206,7 +211,12 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
                 }
             }
 
-            return random.nextFloat(min, max);
+            // If min and max are still the same, just use that value
+            if (min == max) {
+                return min;
+            }
+
+            return random.nextFloa(min, max);
         }
 
         // If the parameter is an integer or long
@@ -228,7 +238,7 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             max = parameter.isExclusiveMaximum() ? max - 1 : max;
 
             // If min is not less than max, reset one of the two variables randomly
-            if (min > max) {
+            if (min >= max) {
                 if (random.nextBoolean()) {
                     min = Long.MIN_VALUE;
                 } else {
@@ -237,8 +247,16 @@ public class RandomParameterValueProvider extends ParameterValueProvider {
             }
 
             if (isLong) {
+                // If min and max are still the same, just use that value
+                if (min == max) {
+                    return min;
+                }
                 return random.nextLong(min, max);
             } else {
+                // If min and max are still the same, just use that value
+                if (min == max) {
+                    return (int) min;
+                }
                 return random.nextInt((int) min, (int) max);
             }
         }

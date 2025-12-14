@@ -55,7 +55,11 @@ public class KeepLastIdParameterValueProvider extends ParameterValueProvider {
             }
 
             // If no other value is available, randomly generate it
-            ParameterValueProvider randomProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
+            ParameterValueProviderType type = ParameterValueProviderType.NARROW_RANDOM;
+            if (Environment.getInstance().getRandom().nextInt(10) < 3) {
+                type = ParameterValueProviderType.RANDOM;
+            }
+            ParameterValueProvider randomProvider = ParameterValueProviderCachedFactory.getParameterValueProvider(type);
             return randomProvider.provideValueFor(leafParameter);
 
         } else {

@@ -129,25 +129,48 @@ public abstract class Parameter extends Taggable {
             }
         }
 
-        @SuppressWarnings("unchecked")
-        Map<String, Map<String, Object>> examples = OpenApiParser.safeGet(parameterMap, "examples", LinkedTreeMap.class);
-        examples.values().forEach(example -> {
-            if (example.containsKey("value")) {
-                Object value = example.get("value");
-                if (isObjectTypeCompliant(value)) {
-                    this.examples.add(value);
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Object>> examples = OpenApiParser.safeGet(parameterMap, "examples", LinkedTreeMap.class);
+            examples.values().forEach(example -> {
+                if (example.containsKey("value")) {
+                    Object value = example.get("value");
+                    if (isObjectTypeCompliant(value)) {
+                        this.examples.add(value);
+                    } else {
+                        try {
+                            this.examples.add(ObjectHelper.castToParameterValueType(value, type));
+                            logger.warn("Example value {}" + castedWarn, value);
+                        } catch (ClassCastException e) {
+                            logger.warn("Example value {}" + discardedWarn, value);
+                        }
+                    }
+                } else if (example.containsKey("externalValue")) {
+                    logger.warn("Examples containing external values are not currently supported.");
+                }
+            });
+        } catch (ClassCastException ignored) {
+
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            ArrayList<Object> examples = OpenApiParser.safeGet(parameterMap, "examples", ArrayList.class);
+            examples.forEach(example -> {
+                if (isObjectTypeCompliant(example)) {
+                    this.examples.add(example);
                 } else {
                     try {
-                        this.examples.add(ObjectHelper.castToParameterValueType(value, type));
-                        logger.warn("Example value {}" + castedWarn, value);
+                        this.examples.add(ObjectHelper.castToParameterValueType(example, type));
+                        logger.warn("Example value {}" + castedWarn, example);
                     } catch (ClassCastException e) {
-                        logger.warn("Example value {}" + discardedWarn, value);
+                        logger.warn("Example value {}" + discardedWarn, example);
                     }
                 }
-            } else if (example.containsKey("externalValue")) {
-                logger.warn("Examples containing external values are not currently supported.");
-            }
-        });
+            });
+        } catch (ClassCastException ignored) {
+
+        }
     }
 
     /*

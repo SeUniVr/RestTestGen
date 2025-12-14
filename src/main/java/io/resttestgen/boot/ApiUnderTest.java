@@ -176,7 +176,7 @@ public class ApiUnderTest {
         this.wildcard = wildcard;
     }
 
-    private File getDir() {
+    public File getDir() {
         return dir;
     }
 

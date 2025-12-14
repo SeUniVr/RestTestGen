@@ -31,6 +31,8 @@ public class RandomProviderParameterValueProvider extends ParameterValueProvider
         // List of candidate providers, that will be used only if they have values available
         Set<CountableParameterValueProvider> candidateProviders = new HashSet<>();
         candidateProviders.add((DefaultParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DEFAULT));
+        candidateProviders.add((DescriptionParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.DESCRIPTION));
+        candidateProviders.add((LlmParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.LLM));
         candidateProviders.add((EnumParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.ENUM));
         candidateProviders.add((ExamplesParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.EXAMPLES));
         candidateProviders.add((ResponseDictionaryParameterValueProvider) ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RESPONSE_DICTIONARY));

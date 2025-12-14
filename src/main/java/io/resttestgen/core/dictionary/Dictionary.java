@@ -1,5 +1,6 @@
 package io.resttestgen.core.dictionary;
 
+import io.resttestgen.core.Environment;
 import io.resttestgen.core.datatype.NormalizedParameterName;
 import io.resttestgen.core.datatype.ParameterName;
 import io.resttestgen.core.datatype.parameter.attributes.ParameterType;
@@ -60,5 +61,13 @@ public class Dictionary {
 
     public List<DictionaryEntry> getEntriesByValueLength(int length) {
         return dictionary.stream().filter(e -> e.getValue().toString().length() == length).collect(Collectors.toList());
+    }
+
+    public void clear() {
+        if (this == Environment.getInstance().getGlobalResponseDictionary() || this == Environment.getInstance().getGlobalRequestDictionary()) {
+            logger.warn("You are not allowed to clear the global dictionary. Please use the partial or a local dictionary.");
+        } else {
+            dictionary.clear();
+        }
     }
 }

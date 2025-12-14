@@ -6,8 +6,6 @@
 
 > **RestTestGen Wiki:** learn how to use RestTestGen Framework to implement your own testing strategy, or to test your API with the built-in testing approaches, by referring to the Wiki available at [https://seunivr.github.io/RestTestGen-Wiki/](https://seunivr.github.io/RestTestGen-Wiki/).
 
-> **DeepREST?:** the Python source code of DeepREST is going to be published in this repository soon. Meanwhile, we crated an ad hoc repository with the source code and the instructions to run DeepREST with Docker here: [https://github.com/SeUniVr/DeepREST-Docker](https://github.com/SeUniVr/DeepREST-Docker).
-
 RestTestGen is a robust tool and framework designed for automated black-box testing of RESTful web APIs.
 As a testing tool, it incorporates various testing strategies that prove valuable in identifying bugs and vulnerabilities within the API being tested.
 Operating exclusively as a black-box end-to-end testing tool, it interacts with the API solely through HTTP, without requiring access to the source code. The only requirement is an OpenAPI specification of the API being tested.
@@ -19,7 +17,7 @@ This framework empowers users to tailor their testing approach to specific requi
 - Nominal and error testing: performs nominal and error testing of the selected API. This is the default strategy.
 - Mass assignment security testing: tests the selected API for mass assignment vulnerabilities.
 - NLP-based enhancement of OpenAPI specifications: enhances the OpenAPI specification of the selected API by extracting constraints and example values from textual descriptions in natural language. Requires Rule Extraction service to be running at [http://localhost:4000/](). Download and deploy the Rule Extractor service from the [NLP2REST repository](https://github.com/codingsoo/nlp2rest/).
-- DeepREST: deep reinforcement learning-based strategy. See here: [https://github.com/SeUniVr/DeepREST-Docker](https://github.com/SeUniVr/DeepREST-Docker)
+- DeepREST: deep reinforcement learning-based strategy. Comes with dedicated Dockerfile.
 
 ## Framework features
 - Custom parser for OpenAPI (v3) specifications (JSON and YAML).
@@ -38,14 +36,14 @@ This framework empowers users to tailor their testing approach to specific requi
 
 ## Changelog
 
-### v25.11
-- Added new HTML report with GUI. The report will be written in the testing session folder under `html-report/report.html`.
-- Added support for newer Java versions (17+) by removing a conflict with the `Random` class.
-- - Added computation of successful operation coverage.
-- Fixed a bug in request and response dictionary value providers that prevented the reading of multiple values from the dictionary.
-- Fixed a bug in `NumberParameter` that prevented string values that represented numbers (e.g., the string "10.1") to be considered as valid values for the parameter (of course, after casting).
-- Fixed a bug in `StringParameter` when the JSON value contained double quotes. These double quotes were not encoded properly, causing structural problems in the rendered request.
-- Fixed a bug in `NarrowRandomParameterValueProvider` that caused the minimum value for integers to be used as maximum value.
+### v25.12
+- Included DeepREST Python implementation in the source code.
+- New Dockerfiles available for RestTestGen and DeepREST, with build and runtime stages.
+- Reimplemented LLM parameter value provider to better handle the LLM dictionary and contact LLM at runtime.
+- DeepRestStrategy is now highly configurable and saves reports to file, including the HTML report, JSON reports, coverage reports, and saves REST-assured test cases.
+- Fixed a crash caused by the HTML report writer when an HTTP interaction did not get a response, e.g., because of a timeout.
+- Fixed a crash caused by the HTML report writer when executed in JAR.
+- Fixed an IllegalArgumentException caused by the random number generator with some particular version of Java.
 
 For the changelog of past versions, please see the [CHANGELOG.md](CHANGELOG.md) file.
 
@@ -108,19 +106,27 @@ apiUnderTest: vampi
 strategyClassName: MassAssignmentSecurityTestingStrategy
 ```
 
-### 3️⃣ Building and running RestTestGen
-You can build and run RestTestGen in three ways: either within a Docker container, on your machine with Gradle, or on your machine within the IntelliJ IDEA IDE. 
+### 3️⃣ Building and running RestTestGen/DeepREST
+You can build and run RestTestGen in three ways: either within a Docker container, on your machine with Gradle, or on your machine within the IntelliJ IDEA IDE.
 
-#### Docker
+We recommend to build and run DeepREST with Docker, which perfectly synconizes the Java and Python components.
+
+#### Docker (RestTestGen)
 Requirements: Docker. For further information, see the [REQUIREMENTS.md](REQUIREMENTS.md) file.
 
 To build and run RestTestGen with Docker, follow these steps:
 1. Build the image with: `docker build -t rtg .`
-2. Run the container from the image with: `docker run --rm -v ./:/app --network host rtg`
+2. Run the container from the image with: `docker run --rm --network host -v ./apis/:/app/apis/ -v ./rtg-config.yml:/app/rtg-config.yml rtg`
 
-> If Docker raises an error about the relative path `./`, please replace the relative path with an absolute path to the RestTestGen's source code, for example `docker run --rm -v /my/absolute/path/to/resttestgen:/app --network host rtg`.
 
 > The Docker container will only include Java 11 and Gradle 8.14, without Python. If your authentication or reset scripts rely on Python, we recommend running RestTestGen directly on your machine using Gradle. However, in upcoming versions of RestTestGen, we aim to provide a more comprehensive container that includes additional dependencies, such as Python, to better support authentication and reset scripts.
+
+#### Docker (DeepREST)
+Requirements: Docker. For further information, see the [REQUIREMENTS.md](REQUIREMENTS.md) file.
+
+To build and run DeepREST with Docker, follow these steps:
+1. Build the image with: `docker build -f DeepREST.dockerfile -t deeprest .`
+2. Run the container from the image with: `docker run --rm --network host -v ./apis/:/app/apis/ -v ./rtg-config.yml:/app/rtg-config.yml deeprest`
 
 #### Gradle
 Requirements: Java 11. For further information, see the [REQUIREMENTS.md](REQUIREMENTS.md) file.

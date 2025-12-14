@@ -11,6 +11,7 @@ import io.resttestgen.core.helper.CoverageCollection;
 import io.resttestgen.core.openapi.Operation;
 import io.resttestgen.core.testing.TestInteraction;
 import io.resttestgen.core.testing.TestSequence;
+import io.resttestgen.core.testing.TestStatus;
 import io.resttestgen.core.testing.coverage.Coverage;
 import io.resttestgen.core.testing.coverage.CoverageManager;
 import io.resttestgen.implementation.coveragemetric.*;
@@ -18,15 +19,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Generates HTML reports with test sequence data and coverage information.
@@ -36,8 +36,8 @@ public class HtmlReportWriter {
     private static final Logger logger = LogManager.getLogger(HtmlReportWriter.class);
 
     // Path constants for templates and resources
-    private static final String REPORT_RESOURCES_TEMPLATE_FOLDER = "src/main/resources/report-resources/";
-    private static final String COVERAGE_REPORT_TEMPLATE = "report-template.html";
+    private static final String REPORT_RESOURCES_TEMPLATE_FOLDER = "report-resources/";
+    private static final String REPORT_TEMPLATE = "report-template.html";
     private static final String REPORT_OUTPUT_FILENAME = "report.html";
     private static final String CSS_SUBFOLDER = "css/";
     private static final String JS_SUBFOLDER = "js/";
@@ -76,51 +76,6 @@ public class HtmlReportWriter {
      */
     public int getGlobalIncrementalId() {
         return this.globalIncrementalId++;
-    }
-
-    /**
-     * Copy a file or directory to the output location.
-     *
-     * @param sourceTarget Source file or directory
-     * @param destTarget Destination file or directory
-     * @throws IOException If an I/O error occurs
-     * @throws IllegalArgumentException If any parameter is null
-     */
-    private void copyFileOrDir(File sourceTarget, File destTarget) throws IOException {
-        Objects.requireNonNull(sourceTarget, "Source target cannot be null");
-        Objects.requireNonNull(destTarget, "Destination target cannot be null");
-
-        if (!sourceTarget.exists()) {
-            throw new IOException("Source file or directory does not exist: " + sourceTarget.getPath());
-        }
-
-        if (!destTarget.exists()) {
-            if (!destTarget.mkdirs()) {
-                throw new IOException("Failed to create destination directory: " + destTarget.getPath());
-            }
-        }
-
-        String[] files = sourceTarget.list();
-        if (files == null) {
-            throw new IOException("Failed to list files in: " + sourceTarget.getPath());
-        }
-
-        for (String f : files) {
-            File source = new File(sourceTarget, f);
-            File dest = new File(destTarget, f);
-            if (source.isDirectory()) {
-                copyFileOrDir(source, dest);
-            } else {
-                try (InputStream in = new FileInputStream(source);
-                     OutputStream out = new FileOutputStream(dest)) {
-                    byte[] buf = new byte[4096]; // Larger buffer for efficiency
-                    int length;
-                    while ((length = in.read(buf)) > 0) {
-                        out.write(buf, 0, length);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -185,7 +140,7 @@ public class HtmlReportWriter {
         Files.createDirectories(jsConstantsOutputPath.getParent());
 
         // Read the template content
-        String jsContent = new String(Files.readAllBytes(Paths.get(REPORT_RESOURCES_TEMPLATE_FOLDER, JS_SUBFOLDER, JS_CONSTANTS_FILENAME)));
+        String jsContent = new String(Files.readAllBytes(Paths.get(getHtmlReportPathAsString(), JS_SUBFOLDER, JS_CONSTANTS_FILENAME)));
 
         // If jsConstantsOutputPath is null, we need to get the path
         if (jsConstantsOutputPath == null) {
@@ -216,30 +171,31 @@ public class HtmlReportWriter {
         // Create output directory if it doesn't exist
         Files.createDirectories(getOutputPath());
 
+
+
+
+
         // Copy HTML template as is (no modifications or replacements needed)
         // All dynamic data is injected into the JS constants file instead
-        Path htmlTemplatePath = getHTMLTemplateFile();
         Path htmlOutputPath = getHTMLOutputFile();
         Files.createDirectories(htmlOutputPath.getParent());
-        Files.copy(htmlTemplatePath, htmlOutputPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-
-        // Copy CSS resources
-        this.copyFileOrDir(
-                getCSSTemplateFolder().toFile(),
-                getCSSOutputFolder().toFile()
-        );
-
-        // Copy JS resources
-        this.copyFileOrDir(
-                getJSTemplateFolder().toFile(),
-                getJSOutputFolder().toFile()
-        );
-
-        // Copy images
-        this.copyFileOrDir(
-                getImgTemplateFolder().toFile(),
-                getImgOutputFolder().toFile()
-        );
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + REPORT_TEMPLATE, htmlOutputPath.toString());
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "main.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "main.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "base.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "base.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "components/header.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "components/header.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "components/list.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "components/list.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "components/parameter.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "components/parameter.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "components/popup.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "components/popup.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + CSS_SUBFOLDER + "components/toast.css", getHtmlReportPathAsString() + CSS_SUBFOLDER + "components/toast.css");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + IMG_SUBFOLDER + "rtg-logo-light.svg", getHtmlReportPathAsString() + IMG_SUBFOLDER + "rtg-logo-light.svg");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "constants.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "constants.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "dom-utils.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "dom-utils.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "list.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "list.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "list-manager.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "list-manager.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "main.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "main.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "parameter-utils.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "parameter-utils.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "popup.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "popup.js");
+        copyResourceFile(REPORT_RESOURCES_TEMPLATE_FOLDER + JS_SUBFOLDER + "postman-utils.js", getHtmlReportPathAsString() + JS_SUBFOLDER + "postman-utils.js");
 
         // Fill the JS constants file with basic information
         fillJSConstantsMetadata();
@@ -254,13 +210,8 @@ public class HtmlReportWriter {
         return Paths.get(configuration.getOutputPath(), configuration.getTestingSessionName());
     }
 
-    /**
-     * Gets the report resources template folder path.
-     *
-     * @return Path object for the template folder
-     */
-    private Path getReportResourcesTemplateFolder() {
-        return Paths.get(REPORT_RESOURCES_TEMPLATE_FOLDER);
+    private String getHtmlReportPathAsString() {
+        return getOutputPath().resolve("html-report/") + "/report-resources/";
     }
 
     /**
@@ -273,15 +224,6 @@ public class HtmlReportWriter {
     }
 
     /**
-     * Gets the HTML template file path.
-     *
-     * @return Path object for the HTML template
-     */
-    private Path getHTMLTemplateFile() {
-        return getReportResourcesTemplateFolder().resolve(COVERAGE_REPORT_TEMPLATE);
-    }
-
-    /**
      * Gets the HTML output file path.
      *
      * @return Path object for the HTML output file
@@ -290,32 +232,6 @@ public class HtmlReportWriter {
         return getOutputPath().resolve("html-report/" + REPORT_OUTPUT_FILENAME);
     }
 
-    /**
-     * Gets the CSS template folder path.
-     *
-     * @return Path object for the CSS template folder
-     */
-    private Path getCSSTemplateFolder() {
-        return getReportResourcesTemplateFolder().resolve(CSS_SUBFOLDER);
-    }
-
-    /**
-     * Gets the CSS output folder path.
-     *
-     * @return Path object for the CSS output folder
-     */
-    private Path getCSSOutputFolder() {
-        return getReportResourcesOutputFolder().resolve(CSS_SUBFOLDER);
-    }
-
-    /**
-     * Gets the JS template folder path.
-     *
-     * @return Path object for the JS template folder
-     */
-    private Path getJSTemplateFolder() {
-        return getReportResourcesTemplateFolder().resolve(JS_SUBFOLDER);
-    }
 
     /**
      * Gets the JS output folder path.
@@ -333,24 +249,6 @@ public class HtmlReportWriter {
      */
     private Path getJSConstantsOutputFile() {
         return getJSOutputFolder().resolve(JS_CONSTANTS_FILENAME);
-    }
-
-    /**
-     * Gets the img template folder path.
-     *
-     * @return Path object for the img template folder
-     */
-    private Path getImgTemplateFolder() {
-        return getReportResourcesTemplateFolder().resolve(IMG_SUBFOLDER);
-    }
-
-    /**
-     * Gets the img output folder path.
-     *
-     * @return Path object for the img output folder
-     */
-    private Path getImgOutputFolder() {
-        return getReportResourcesOutputFolder().resolve(IMG_SUBFOLDER);
     }
 
     /**
@@ -407,8 +305,11 @@ public class HtmlReportWriter {
 
         for (int i = 0; i < interactions.size(); i++) {
             TestInteraction interaction = interactions.get(i);
-            JsonObject data = createInteractionJsonData(testSequence, interaction, i);
-            contentBuilder.append(gson.toJson(data)).append(",\n");
+
+            if (interaction.getTestStatus() == TestStatus.EXECUTED) {
+                JsonObject data = createInteractionJsonData(testSequence, interaction, i);
+                contentBuilder.append(gson.toJson(data)).append(",\n");
+            }
         }
     }
 
@@ -460,7 +361,17 @@ public class HtmlReportWriter {
         // Request URL
         data.addProperty("requestURL", interaction.getRequestURL());
         data.addProperty("requestURLStripped", interaction.getRequestURL().replaceAll("^(https?://[^/]+)(/.*)?$", "$2"));
-        data.addProperty("requestURLReference", interaction.getReferenceOperation().getEndpoint());
+        try {
+            data.addProperty("requestURLReference", interaction.getReferenceOperation().getEndpoint());
+        } catch (NullPointerException e) {
+            // The reference url does not exist because of the applied mutation
+            try {
+                String pathAndQuery = new URI(interaction.getRequestURL()).getPath() +
+                        (new URI(interaction.getRequestURL()).getQuery() != null ? "?" + new URI(interaction.getRequestURL()).getQuery() : "");
+                data.addProperty("requestURLReference", pathAndQuery);
+            } catch (Exception ignored) {}
+            data.addProperty("testType", "-");
+        }
         data.addProperty("requestURLIsDocumented",
                 operation != null && coverageCollection.isPathDocumented(operation.getEndpoint()));
         data.addProperty("requestURLIsTested",
@@ -493,8 +404,10 @@ public class HtmlReportWriter {
         data.addProperty("responseBody", interaction.getResponseBody());
 
         // Request type (positive or negative test, i.e., valid or invalid input)
-        boolean negativeTest = interaction.getFuzzedOperation().getAllRequestParameters().stream().flatMap(p -> p.getTags().stream()).anyMatch(t -> t.equals("mutated"));
-        data.addProperty("testType", negativeTest ? "-" : "+");
+        if (!data.has("testType")) {
+            boolean negativeTest = interaction.getFuzzedOperation().getAllRequestParameters().stream().flatMap(p -> p.getTags().stream()).anyMatch(t -> t.equals("mutated"));
+            data.addProperty("testType", negativeTest ? "-" : "+");
+        }
     }
 
     /**
@@ -552,5 +465,19 @@ public class HtmlReportWriter {
 
         parameterData.add("parameterValue", valueData);
         return parameterData;
+    }
+
+    public static void copyResourceFile(String resourcePath, String targetPath) throws IOException {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader(); // Most reliable
+
+        try (InputStream is = cl.getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new IOException("Resource not found on classpath: " + resourcePath);
+            }
+
+            Path target = Paths.get(targetPath);
+            Files.createDirectories(target.getParent());
+            Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 }

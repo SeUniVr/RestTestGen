@@ -6,10 +6,7 @@ import io.resttestgen.core.datatype.HttpMethod;
 import io.resttestgen.core.datatype.HttpStatusCode;
 import io.resttestgen.core.helper.RequestManager;
 import io.resttestgen.core.testing.coverage.CoverageManager;
-import io.resttestgen.implementation.interactionprocessor.RequestDictionaryInteractionProcessor;
-import io.resttestgen.implementation.interactionprocessor.ResponseDictionaryInteractionProcessor;
-import io.resttestgen.implementation.interactionprocessor.GraphInteractionProcessor;
-import io.resttestgen.implementation.interactionprocessor.JsonParserInteractionProcessor;
+import io.resttestgen.implementation.interactionprocessor.*;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,12 +15,15 @@ import okio.Buffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -73,7 +73,11 @@ public class TestRunner {
 
             client1 = new OkHttpClient.Builder()
                     .hostnameVerifier((hostname, session) -> true)
-                    .sslSocketFactory(sslContext.getSocketFactory(), TRUST_ALL_CERTS).build();
+                    .sslSocketFactory(sslContext.getSocketFactory(), TRUST_ALL_CERTS)
+                    .connectTimeout(11, TimeUnit.SECONDS)
+                    .writeTimeout(11, TimeUnit.SECONDS)
+                    .readTimeout(11, TimeUnit.SECONDS)
+                    .build();
 
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             client1 = new OkHttpClient();
@@ -84,6 +88,7 @@ public class TestRunner {
         addInteractionProcessor(new RequestDictionaryInteractionProcessor());
         addInteractionProcessor(new ResponseDictionaryInteractionProcessor());
         addInteractionProcessor(new GraphInteractionProcessor());
+        addInteractionProcessor(new ExperienceUpdaterInteractionProcessor());
         addInvalidStatusCode(new HttpStatusCode(429));
     }
 

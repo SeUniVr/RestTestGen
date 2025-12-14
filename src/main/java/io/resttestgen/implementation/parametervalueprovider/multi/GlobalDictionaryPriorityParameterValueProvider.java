@@ -46,9 +46,9 @@ public class GlobalDictionaryPriorityParameterValueProvider extends ParameterVal
         }
 
         // If no other value is available, randomly generate it
-        ParameterValueProvider randomProvider = Environment.getInstance().getRandom().nextBoolean() ?
-                ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM) :
-                ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.NARROW_RANDOM);
+        ParameterValueProvider randomProvider = Environment.getInstance().getRandom().nextInt(10) < 7 ?
+                ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.NARROW_RANDOM) :
+                ParameterValueProviderCachedFactory.getParameterValueProvider(ParameterValueProviderType.RANDOM);
         randomProvider.setStrict(this.strict);
         return randomProvider.provideValueFor(leafParameter);
     }

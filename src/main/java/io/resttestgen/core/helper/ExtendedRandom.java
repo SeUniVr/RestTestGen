@@ -465,7 +465,8 @@ public class ExtendedRandom extends Random {
         return null;
     }
 
-    public Float nextFloat(Float min, Float max) {
+    // Has this name to avoid collisions
+    public Float nextFloa(Float min, Float max) {
         min = min != null ? min : -Float.MAX_VALUE;
         max = max != null ? max : Float.MAX_VALUE;
         if (min <= max) {

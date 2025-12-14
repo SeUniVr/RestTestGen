@@ -19,10 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -65,11 +62,13 @@ public class OperationDependencyGraph {
     }
 
     public void setOperationAsTested(Operation operation) {
-        getNodeFromOperation(operation).setAsTested();
+        Optional<OperationNode> operationNode = getNodeFromOperation(operation);
+        operationNode.ifPresent(OperationNode::setAsTested);
     }
 
     public void increaseOperationTestingAttempts(Operation operation) {
-        getNodeFromOperation(operation).increaseTestingAttempts();
+        Optional<OperationNode> operationNode = getNodeFromOperation(operation);
+        operationNode.ifPresent(OperationNode::increaseTestingAttempts);
     }
 
 
@@ -111,7 +110,7 @@ public class OperationDependencyGraph {
                                     edge.setAsSatisfied();
                                 }*/
 
-                                graph.addEdge(getNodeFromOperation(targetOperation), getNodeFromOperation(sourceOperation), edge);
+                                graph.addEdge(getNodeFromOperation(targetOperation).get(), getNodeFromOperation(sourceOperation).get(), edge);
                                 commonParametersNames.add(outputParameter.getNormalizedName());
                             }
                         }
@@ -128,10 +127,10 @@ public class OperationDependencyGraph {
      * @param operation the reference operation
      * @return the node in the graph containing the reference operation
      */
-    private OperationNode getNodeFromOperation(Operation operation) {
+    private Optional<OperationNode> getNodeFromOperation(Operation operation) {
         return graph.vertexSet().stream().filter(operationNode ->
                 (operationNode.getOperation().getMethod() == operation.getMethod() &&
-                        operationNode.getOperation().getEndpoint().equals(operation.getEndpoint()))).findFirst().get();
+                        operationNode.getOperation().getEndpoint().equals(operation.getEndpoint()))).findFirst();
     }
 
     /**

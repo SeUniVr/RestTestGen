@@ -15,8 +15,8 @@ public class NarrowRandomParameterValueProvider extends ParameterValueProvider {
 
     private static final ExtendedRandom random = Environment.getInstance().getRandom();
 
-    private static final double NUMBER_LOWER_BOUND = 0.0;
-    private static final double NUMBER_UPPER_BOUND = 120.0;
+    private static final double NUMBER_LOWER_BOUND = -10.0;
+    private static final double NUMBER_UPPER_BOUND = 150.0;
 
     @Override
     public Pair<ParameterValueProvider, Object> provideValueFor(LeafParameter leafParameter) {

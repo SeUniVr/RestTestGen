@@ -18,7 +18,14 @@ public class MissingRequiredParameterMutator extends ParameterMutator {
      */
     @Override
     public boolean isParameterMutable(Parameter parameter) {
-        return parameter.isRequired();
+        if (!parameter.isRequired()) {
+            return false;
+        }
+
+        if (parameter instanceof LeafParameter && ((LeafParameter) parameter).getConcreteValue() == null) {
+            return false;
+        }
+        return true;
     }
 
     /**
